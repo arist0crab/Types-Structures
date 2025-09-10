@@ -1,8 +1,32 @@
-#include "defines.h"
 #include "input.h"
-#include "color.h"
 
+void input_lfloat(lfloat_t *lfnum, size_t max_lfloat_len, exit_status *status);
 void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status);
+
+
+/**
+ * @brief Функция одновременного ввода двух чисел.
+ * 
+ * Функция позволяет ввести два 'больших' числа, записав каждое в указанную
+ * структуру. При возникновении каких-либо ошибок соответствующий глобальный 
+ * аргумент status будет изменен.
+ * 
+ * @param *first_lfnum Указатель на первую структуру, в которую записываются данные
+ * @param *second_lfnum Указатель на вторую структуру, в которую записываются данные
+ * @param *status Указатель на статус выполнения программы
+*/
+void input_two_lfloats(lfloat_t *first_lfnum, lfloat_t *second_lfnum, exit_status *status)
+{
+    input_lfloat(first_lfnum, FIRST_MANTISS_LENGTH, status);
+    if (*status == SUCCESS_CODE)
+    {
+        print_parsed_number(first_lfnum);
+        input_lfloat(second_lfnum, SECOND_MANTISS_LENGTH, status);
+        if (*status == SUCCESS_CODE)
+            print_parsed_number(second_lfnum);
+    }
+}
+
 
 /**
  * @brief Информация
@@ -21,6 +45,7 @@ void print_instructions(void)
     printf("5. Согласно условию длина 1-ого множителя до 35-ти значащих цифр, 2-ого - до 40, длина результата - до 40. Величина порядка 5 цифр.\n");
     printf("\n");
 }
+
 
 /**
  * @brief Ввод числа
@@ -51,6 +76,17 @@ void input_lfloat(lfloat_t *lfnum, size_t max_lfloat_len, exit_status *status)
 
     lffloat_string_parse(lfnum, input_buffer, status);
 }
+
+/**
+ * @brief Функция для парсинга числа из строки.
+ * 
+ * Парсит строку и вносит полученные из нее данные в указанную структуру.
+ * Если при парсинге возникнут ошибки, будет изменен status (статус выполнения программы).
+ * 
+ * @param *lfnum Указатель на структуру, в которую будут внесены данные
+ * @param *string Строка, которую необходимо распарсить
+ * @param *status Глобальный статус выполнения программы
+*/
 
 
 void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status)
