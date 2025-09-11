@@ -19,3 +19,6 @@ void print_parsed_number(lfloat_t *lfloat_number)
     printf("--> mantiss_sign: %d\n", lfloat_number->mant_sign);
     printf("--> order: %d\n\n", lfloat_number->order);
 }
+
+
+// TODO: add errors output
