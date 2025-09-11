@@ -34,7 +34,7 @@ void lfloat_multiply(lfloat_t *first_lfloat, lfloat_t *second_lfloat, lfloat_t *
         }
     }
     
-    // Нахождение реального размера результата
+    // Фактическое количество значащих цифр в результате умножения 
     size_t result_size = 0;
     for (size_t i = ARR_SIZE; i > 0; i--)
         if (arr[i - 1] != 0) 

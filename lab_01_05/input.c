@@ -87,8 +87,6 @@ void input_lfloat(lfloat_t *lfnum, size_t max_lfloat_len, exit_status *status)
  * @param *string Строка, которую необходимо распарсить
  * @param *status Глобальный статус выполнения программы
 */
-
-
 void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status)
 {
     const char *ptr = string; // Указатель для движения по строке
@@ -162,7 +160,9 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status)
         int order_value = 0;
         int order_digits_count = 0;
 
-        if (*ptr == 'E')
+        if (*ptr != 'E')
+            lfnum->order = digits_before_point - lead_zrs_after_point;
+        else
         {
             while (*(++ptr) == ' ');
 
