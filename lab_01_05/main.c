@@ -15,7 +15,7 @@ int main(void)
     print_instructions();
     input_two_lfloats(&first_num, &second_num, &status);
     lfloat_multiply(&first_num, &second_num, &result_num, &status);
-    print_parsed_number(&result_num);
+    print_result(&result_num, &status);
 
     return status;
 }
