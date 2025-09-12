@@ -1,6 +1,17 @@
 #include "process.h"
 
-// Функция для сдвига элементов массива влево
+/**
+ * @brief Сдвигает элементы массива влево на указанное количество позиций
+ * 
+ * Функция перемещает элементы массива влево, заполняя освободившуюся 
+ * правую часть нулями. Эквивалентно удалению первых `shift` элементов
+ * и сдвигу оставшихся в начало массива
+ * 
+ * @param[in,out] arr Указатель на массив для сдвига
+ * @param[in] size Размер массива
+ * @param[in] shift Количество позиций для сдвига влево
+ * 
+ */
 static void shift_array_left(int *arr, size_t size, size_t shift)
 {
     if (shift != 0)
@@ -12,6 +23,19 @@ static void shift_array_left(int *arr, size_t size, size_t shift)
     }
 }
 
+/**
+* @brief Умножает два длинных вещественных числа
+* 
+* Функция выполняет умножение двух чисел в формате lfloat_t, обрабатывает
+* мантиссы и порядки, выполняет нормализацию результата и округление
+* при превышении максимальной длины мантиссы
+* 
+* @param[in] first_lfloat Указатель на первый множитель
+* @param[in] second_lfloat Указатель на второй множитель  
+* @param[out] result_lfloat Указатель на результат умножения
+* @param[out] status Статус выполнения операции
+* 
+*/
 void lfloat_multiply(lfloat_t *first_lfloat, lfloat_t *second_lfloat, lfloat_t *result_lfloat, exit_status *status)
 {
     int arr[ARR_SIZE] = {0};  // Массив для хранения промежуточных результатов умножения
@@ -70,9 +94,11 @@ void lfloat_multiply(lfloat_t *first_lfloat, lfloat_t *second_lfloat, lfloat_t *
         result_size -= diff_size;
     }
 
+    // Записываем результат в структуру
     result_lfloat->mant_size = result_size;
     result_lfloat->mant_sign = (first_lfloat->mant_sign == second_lfloat->mant_sign) ? 1 : 0;
 
+    // Определяем порядок результата основываясь на длине мантисс
     if (first_lfloat->mant_size == 0 || second_lfloat->mant_size == 0)
         result_lfloat->order = 0;
     else

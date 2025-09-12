@@ -11,9 +11,9 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status);
  * структуру. При возникновении каких-либо ошибок соответствующий глобальный 
  * аргумент status будет изменен.
  * 
- * @param *first_lfnum Указатель на первую структуру, в которую записываются данные
- * @param *second_lfnum Указатель на вторую структуру, в которую записываются данные
- * @param *status Указатель на статус выполнения программы
+ * @param[in] first_lfnum Указатель на первую структуру, в которую записываются данные
+ * @param[in] second_lfnum Указатель на вторую структуру, в которую записываются данные
+ * @param[out] status Указатель на статус выполнения программы
 */
 void input_two_lfloats(lfloat_t *first_lfnum, lfloat_t *second_lfnum, exit_status *status)
 {
@@ -53,9 +53,9 @@ void print_instructions(void)
  * Функция для ввода числа в необходимом формате из командной строки и ее парсинга, т.е.
  * записи в структуру lfnum. 
  * 
- * @param *lfnum Указатель на структуру, в которую записываются данные
- * @param max_lfloat_len Максимальная кол-во значащих цифр в вводимом числе
- * @param *status Указатель на статус выполнения программы
+ * @param[out] lfnum Указатель на структуру, в которую записываются данные
+ * @param[in] max_lfloat_len Максимальная кол-во значащих цифр в вводимом числе
+ * @param[out] status Указатель на статус выполнения программы
 */
 
 void input_lfloat(lfloat_t *lfnum, size_t max_lfloat_len, exit_status *status)
@@ -83,9 +83,9 @@ void input_lfloat(lfloat_t *lfnum, size_t max_lfloat_len, exit_status *status)
  * Парсит строку и вносит полученные из нее данные в указанную структуру.
  * Если при парсинге возникнут ошибки, будет изменен status (статус выполнения программы).
  * 
- * @param *lfnum Указатель на структуру, в которую будут внесены данные
- * @param *string Строка, которую необходимо распарсить
- * @param *status Глобальный статус выполнения программы
+ * @param[out] lfnum Указатель на структуру, в которую будут внесены данные
+ * @param[in] string Строка, которую необходимо распарсить
+ * @param[out] status Глобальный статус выполнения программы
 */
 void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status)
 {
@@ -161,7 +161,10 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status)
         int order_digits_count = 0;
 
         if (*ptr != 'E')
-            lfnum->order = digits_before_point - lead_zrs_after_point;
+            if (mantissa_length > 0)
+                lfnum->order = digits_before_point - lead_zrs_after_point;
+            else 
+                lfnum->order = digits_before_point - lead_zrs_after_point - 1;
         else
         {
             while (*(++ptr) == ' ');
