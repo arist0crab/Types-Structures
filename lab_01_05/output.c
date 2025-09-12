@@ -47,7 +47,7 @@ void print_normalized_lfloat(const lfloat_t *num)
     for (int i = num->mant_size - 1; i >= 0; i--)
         printf("%d", num->mantiss[i]);
 
-    printf(" Е %s%d%s\n\n", (num->order >= 0) ? "+" : "-", num->order, RESET);
+    printf(" Е %s%d%s\n\n", (num->order >= 0) ? "+" : "", num->order, RESET);
 }
 
 /**
@@ -59,7 +59,7 @@ void print_normalized_lfloat(const lfloat_t *num)
 */
 void print_parsed_number(lfloat_t *lfloat_number)
 {
-    printf("====== PARSE RESULT ======\n");
+    printf("====== PARSED RESULT ======\n");
     printf("--> reversed_mantiss: ");
     for (int i = 0; i < lfloat_number->mant_size; i++)
         printf("%d ", lfloat_number->mantiss[i]);

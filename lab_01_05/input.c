@@ -105,12 +105,17 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status)
         lfnum->mant_sign = false;
     }
 
-    while (*ptr == '0' || *ptr == '.')
+    while ((*ptr == '0' || *ptr == '.') && *status == SUCCESS_CODE)
     {
         if (*ptr == '0')
             (point_encountered) ? lead_zrs_after_point++ : lead_zrs_before_point++;
         else 
-            point_encountered = true;
+        {
+            if (!point_encountered)
+                point_encountered = true;
+            else 
+                *status = INVALID_CHARACTER;
+        }
 
         ptr++;         
     }       
@@ -148,7 +153,8 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status)
         int write_index = mantissa_length - 1; // Записываем с конца массива
         point_encountered = 0; // Сбрасываем для второго прохода
 
-        for (const char *curr = mantissa_start; curr <= mantissa_end; curr++) {
+        for (const char *curr = mantissa_start; curr <= mantissa_end; curr++) 
+        {
             if (*curr == '.')
                 point_encountered = 1;
             else 
@@ -161,10 +167,17 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status)
         int order_digits_count = 0;
 
         if (*ptr != 'E')
+        {
             if (mantissa_length > 0)
-                lfnum->order = digits_before_point - lead_zrs_after_point;
-            else 
-                lfnum->order = digits_before_point - lead_zrs_after_point - 1;
+            {
+                if (digits_before_point > 0)
+                    lfnum->order = digits_before_point;
+                else
+                    lfnum->order = -lead_zrs_after_point - mantissa_length;
+            }
+            else
+                lfnum->order = 0;
+        }
         else
         {
             while (*(++ptr) == ' ');
