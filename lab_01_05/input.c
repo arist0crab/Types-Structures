@@ -208,12 +208,12 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status)
             else if (order_digits_count > MAX_ORDER_LENGTH)
                 *status = ERR_ORDER_SIZE;  // Если порядок больше дозволенного
             
-            if (*status == SUCCESS_CODE && !order_sign)
-                order_value = -order_value;  // Если знак порядка отрицательный, меняем значение  
-                
             // NOTE === ВЫЧИСЛЕНИЕ ИТОГОВОГО ПОРЯДКА ===
             if (*status == SUCCESS_CODE)
-                lfnum->order = order_value + digits_before_point + lead_zrs_before_point - lead_zrs_after_point;
+            {
+                order_value = (order_sign) ? order_value : -order_value;  // Если знак порядка отрицательный, меняем значение 
+                lfnum->order = (digits_before_point) ? digits_before_point + order_value : order_value - lead_zrs_after_point - mantissa_length;
+            }
         }
     }
 }
