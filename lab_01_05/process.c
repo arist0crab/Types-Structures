@@ -102,7 +102,7 @@ void lfloat_multiply(lfloat_t *first_lfloat, lfloat_t *second_lfloat, lfloat_t *
     if (first_lfloat->mant_size == 0 || second_lfloat->mant_size == 0)
         result_lfloat->order = 0;
     else
-        result_lfloat->order += second_lfloat->order + first_lfloat->order + order_add;
+        result_lfloat->order = second_lfloat->order + first_lfloat->order + order_add;
 
     if (result_lfloat->order > MAX_ORDER_VAL || result_lfloat->order < MIN_ORDER_VAL)
         *status = WRONG_ORDER_VALUE;

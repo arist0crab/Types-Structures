@@ -1,7 +1,7 @@
 #include "input.h"
 
 void input_lfloat(lfloat_t *lfnum, size_t max_lfloat_len, exit_status *status);
-void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status);
+void lffloat_string_parse(lfloat_t *lfnum, char *string, size_t max_lfloat_len, exit_status *status);
 
 
 /**
@@ -62,7 +62,8 @@ void input_lfloat(lfloat_t *lfnum, size_t max_lfloat_len, exit_status *status)
 {
     char input_buffer[MAX_BUFFER_LENGTH];
 
-    printf("%sВвод: ", BLUE);
+    printf("%s     |----.----|----.----|----.----|----.----|----.----|\n", BLUE);
+    printf("Ввод: ");
     fgets(input_buffer, MAX_BUFFER_LENGTH, stdin);
     printf("%s\n", RESET);
 
@@ -71,10 +72,7 @@ void input_lfloat(lfloat_t *lfnum, size_t max_lfloat_len, exit_status *status)
     if (cur_len && input_buffer[cur_len - 1] == '\n')
         input_buffer[--cur_len] = '\0';
 
-    if (!cur_len || cur_len > max_lfloat_len)
-        *status = INCORRECT_NUM_LENGTH;
-
-    lffloat_string_parse(lfnum, input_buffer, status);
+    lffloat_string_parse(lfnum, input_buffer, max_lfloat_len, status);
 }
 
 /**
@@ -85,9 +83,10 @@ void input_lfloat(lfloat_t *lfnum, size_t max_lfloat_len, exit_status *status)
  * 
  * @param[out] lfnum Указатель на структуру, в которую будут внесены данные
  * @param[in] string Строка, которую необходимо распарсить
+ * @param[in] max_lfloat_len Максимальная длина мантиссы
  * @param[out] status Глобальный статус выполнения программы
 */
-void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status)
+void lffloat_string_parse(lfloat_t *lfnum, char *string, size_t max_lfloat_len, exit_status *status)
 {
     const char *ptr = string; // Указатель для движения по строке
     bool order_sign = true;  // Знаки: true -> '+', false -> '-'
@@ -144,7 +143,7 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status)
     }
 
     // NOTE === ПРОВЕРКА ОГРАНИЧЕНИЙ РАЗМЕРА МАНТИССЫ ===
-    if (*status == SUCCESS_CODE && mantissa_length > MAX_MANTISS_LENGTH)
+    if (*status == SUCCESS_CODE && (size_t)mantissa_length > max_lfloat_len)
         *status = ERR_MANTISS_SIZE;
     
     // NOTE === ЗАПОЛЕНИЕ МАССИВА МАНТИССЫ ===
@@ -203,16 +202,26 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, exit_status *status)
                 ptr++;
             }
 
-            if (order_digits_count == 0 && ptr == order_start)
-                *status = NO_NUM_AFTER_E;  // Если после 'E' нет цифр
-            else if (order_digits_count > MAX_ORDER_LENGTH)
-                *status = ERR_ORDER_SIZE;  // Если порядок больше дозволенного
+            if (*ptr != '\0')  // Проверяем что ввод завершился именно концом строки, а не INVALID_CHARACTER
+                *status = INVALID_CHARACTER;
+            
+            if (*status == SUCCESS_CODE)
+            {
+                if (order_digits_count == 0 && ptr == order_start)
+                    *status = NO_NUM_AFTER_E;  // Если после 'E' нет цифр
+                else if (order_digits_count > MAX_ORDER_LENGTH)
+                    *status = ERR_ORDER_SIZE;  // Если порядок больше дозволенного
+            }
+
+            if (order_value > MAX_ORDER_VAL)
+                *status = WRONG_ORDER_VALUE;
             
             // NOTE === ВЫЧИСЛЕНИЕ ИТОГОВОГО ПОРЯДКА ===
             if (*status == SUCCESS_CODE)
             {
                 order_value = (order_sign) ? order_value : -order_value;  // Если знак порядка отрицательный, меняем значение 
                 lfnum->order = (digits_before_point) ? digits_before_point + order_value : order_value - lead_zrs_after_point - mantissa_length;
+                lfnum->order++;
             }
         }
     }
