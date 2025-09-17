@@ -46,7 +46,7 @@ void print_normalized_lfloat(const lfloat_t *num)
 
     for (int i = num->mant_size - 1; i >= 0; i--)
         printf("%d", num->mantiss[i]);
-
+    
     printf("Е%s%d%s\n\n", (num->order >= 0) ? "+" : "", num->order, RESET);
 }
 

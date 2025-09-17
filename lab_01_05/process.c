@@ -67,10 +67,6 @@ void lfloat_multiply(lfloat_t *first_lfloat, lfloat_t *second_lfloat, lfloat_t *
             break;
         }
 
-    /* Корректировка порядка. Учитывает фактический размер результата умножения мантисс
-    При умножении выравниваем "десятичную точку" результата, корректируя порядок */
-    int order_add = result_size - first_lfloat->mant_size - second_lfloat->mant_size;
-
     if (result_size > MAX_MANTISS_LENGTH)
     {
         size_t diff_size = result_size - MAX_MANTISS_LENGTH;
@@ -102,7 +98,10 @@ void lfloat_multiply(lfloat_t *first_lfloat, lfloat_t *second_lfloat, lfloat_t *
     if (first_lfloat->mant_size == 0 || second_lfloat->mant_size == 0)
         result_lfloat->order = 0;
     else
-        result_lfloat->order = second_lfloat->order + first_lfloat->order + order_add;
+    {
+        int order_correction = result_size - first_lfloat->mant_size - second_lfloat->mant_size;
+        result_lfloat->order = first_lfloat->order + second_lfloat->order + order_correction;
+    }
 
     if (result_lfloat->order > MAX_ORDER_VAL || result_lfloat->order < MIN_ORDER_VAL)
         *status = WRONG_ORDER_VALUE;

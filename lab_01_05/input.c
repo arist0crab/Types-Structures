@@ -62,7 +62,7 @@ void input_lfloat(lfloat_t *lfnum, size_t max_lfloat_len, exit_status *status)
 {
     char input_buffer[MAX_BUFFER_LENGTH];
 
-    printf("%s     |----.----|----.----|----.----|----.----|----.----|\n", BLUE);
+    printf("%s      +0----.----1----.----2----.----3----.----4----.----5\n", BLUE);
     printf("Ввод: ");
     fgets(input_buffer, MAX_BUFFER_LENGTH, stdin);
     printf("%s\n", RESET);
@@ -172,7 +172,7 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, size_t max_lfloat_len, 
                 if (digits_before_point > 0)
                     lfnum->order = digits_before_point;
                 else
-                    lfnum->order = -lead_zrs_after_point - mantissa_length;
+                    lfnum->order = -lead_zrs_after_point; 
             }
             else
                 lfnum->order = 0;
@@ -221,7 +221,6 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, size_t max_lfloat_len, 
             {
                 order_value = (order_sign) ? order_value : -order_value;  // Если знак порядка отрицательный, меняем значение 
                 lfnum->order = (digits_before_point) ? digits_before_point + order_value : order_value - lead_zrs_after_point - mantissa_length;
-                lfnum->order++;
             }
         }
     }
