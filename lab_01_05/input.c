@@ -222,6 +222,6 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, size_t max_lfloat_len, 
                 order_value = (order_sign) ? order_value : -order_value;  // Если знак порядка отрицательный, меняем значение 
                 lfnum->order = (digits_before_point) ? digits_before_point + order_value : order_value - lead_zrs_after_point - mantissa_length;
             }
-        }
+        }    
     }
 }
