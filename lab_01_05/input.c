@@ -95,6 +95,9 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, size_t max_lfloat_len, 
     int lead_zrs_after_point = 0;  // Нули после точки
     bool point_encountered = false;  // Флаг встречи точки
 
+    while (*ptr == ' ')
+        ptr++;
+
     // NOTE === ОБРАБОТКА ЗНАКА МАНТИССЫ И ВЕДУЩИХ НУЛЕЙ ===
     if (*ptr == '+')
         ptr++;
