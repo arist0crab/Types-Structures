@@ -17,6 +17,7 @@ typedef struct
 {
     int mantiss[MAX_MANTISS_LENGTH];
     int mant_size;
+    int raw_order;
     int order;
     bool mant_sign;
 } lfloat_t;

@@ -165,22 +165,21 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, size_t max_lfloat_len, 
         lfnum->mant_size = mantissa_length;
 
         // NOTE === ОБРАБОТКА ПОРЯДКА ====
-        int order_value = 0;
+        int raw_order_value = 0;
         int order_digits_count = 0;
 
-        if (*ptr != 'E')
+
+        if (mantissa_length > 0)
         {
-            if (mantissa_length > 0)
-            {
-                if (digits_before_point > 0)
-                    lfnum->order = digits_before_point;
-                else
-                    lfnum->order = -lead_zrs_after_point; 
-            }
+            if (digits_before_point > 0)
+                lfnum->order = digits_before_point;
             else
-                lfnum->order = 0;
+                lfnum->order = -lead_zrs_after_point; 
         }
         else
+            lfnum->order = 0;
+
+        if (*ptr == 'E')
         {
             while (*(++ptr) == ' ');
 
@@ -200,7 +199,7 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, size_t max_lfloat_len, 
             const char *order_start = ptr;
             while (*ptr >= '0' && *ptr <= '9')
             {
-                order_value = order_value * 10 + (*ptr - '0');
+                raw_order_value = raw_order_value * 10 + (*ptr - '0');
                 order_digits_count++;
                 ptr++;
             }
@@ -216,15 +215,12 @@ void lffloat_string_parse(lfloat_t *lfnum, char *string, size_t max_lfloat_len, 
                     *status = ERR_ORDER_SIZE;  // Если порядок больше дозволенного
             }
 
-            if (order_value > MAX_ORDER_VAL)
+            if (raw_order_value > MAX_ORDER_VAL)
                 *status = WRONG_ORDER_VALUE;
             
             // NOTE === ВЫЧИСЛЕНИЕ ИТОГОВОГО ПОРЯДКА ===
             if (*status == SUCCESS_CODE)
-            {
-                order_value = (order_sign) ? order_value : -order_value;  // Если знак порядка отрицательный, меняем значение 
-                lfnum->order = (digits_before_point) ? digits_before_point + order_value : order_value - lead_zrs_after_point - mantissa_length;
-            }
+                lfnum->raw_order = (order_sign) ? raw_order_value : -raw_order_value;  // Если знак порядка отрицательный, меняем значение 
         }    
     }
 }

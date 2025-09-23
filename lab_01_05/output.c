@@ -66,5 +66,6 @@ void print_parsed_number(lfloat_t *lfloat_number)
     printf("\n");
     printf("--> mantiss_size: %d\n", lfloat_number->mant_size);
     printf("--> mantiss_sign: %d\n", lfloat_number->mant_sign);
+    printf("--> raw_order: %d\n", lfloat_number->raw_order);
     printf("--> order: %d\n\n", lfloat_number->order);
 }
