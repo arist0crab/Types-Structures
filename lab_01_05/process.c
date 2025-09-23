@@ -102,9 +102,6 @@ void lfloat_multiply(lfloat_t *first_lfloat, lfloat_t *second_lfloat, lfloat_t *
         int order_correction = result_size - first_lfloat->mant_size - second_lfloat->mant_size;
         result_lfloat->order = first_lfloat->order + second_lfloat->order + order_correction;
         result_lfloat->order += first_lfloat->raw_order + second_lfloat->raw_order;
-        printf("order correction: %d\n", order_correction);
-        printf("result_size %ld\n", result_size);
-        printf("raw orders sum %d\n", first_lfloat->raw_order + second_lfloat->raw_order);
     }
 
     if (result_lfloat->order > MAX_ORDER_VAL || result_lfloat->order < MIN_ORDER_VAL)
