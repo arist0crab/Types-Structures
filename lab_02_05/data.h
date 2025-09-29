@@ -3,6 +3,30 @@
 
 #define MAX_STR_LEN 128
 
+typedef enum { PIECE, MUSICAL } play_type_t;
+typedef enum { BALLET, OPERA, MUSICAL_SHOW } musical_genre_t;
+typedef enum { DRAMA, COMEDY, FAIRY_TALE } piece_genre_t;
+typedef enum { AGE_3PLUS, AGE_10PLUS, AGE_16PLUS } age_rating_t;
+
+typedef enum 
+{
+    EXIT_THE_PROGRAM,
+    READ_FILE,
+    PRINT_DATA,
+    PRINT_KEY_TABLE,
+    ADD_THEATER_PLAY,
+    DELETE_THEATER_PLAY,
+    PRICE_QUICK_SORT,
+    PRICE_SLOW_SORT,
+    KEY_TABLE_QUICK_SORT,
+    KEY_TABLE_SLOW_SORT,
+    PRINT_DATA_KEY_TABLE,
+    PRINT_EFFICIENCY_TABLE,
+    PRINT_BALETS,
+
+    CHOICES_QUANTITY
+} choice_t;
+
 typedef struct
 {
     char theater_name[MAX_STR_LEN];
@@ -26,35 +50,7 @@ typedef struct
             int duration;
         } musical_info;
         
-    };
-    
+    } play_data;
 } theater_play_t;
-
-typedef enum 
-{
-    PIECE,
-    MUSICAL
-} play_type_t;
-
-typedef enum 
-{
-    BALLET,
-    OPERA,
-    MUSICAL_SHOW
-} musical_genre_t;
-
-typedef enum 
-{
-    DRAMA, 
-    COMEDY,
-    FAIRY_TALE
-} piece_genre_t;
-
-typedef enum
-{
-    AGE_3PLUS,
-    AGE_10PLUS,
-    AGE_16PLUS
-} age_rating_t;
 
 #endif
