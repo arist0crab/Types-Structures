@@ -6,9 +6,8 @@
 #include "print_instructions.h"
 #include <stdbool.h>
 
-#define MAX_PLAYS_QUANTITY 1000
-
 static theater_play_t *theater_plays_arr = NULL;
+static size_t theater_plays_q = 0;
 
 int main(void)
 {
@@ -26,7 +25,7 @@ int main(void)
         exit_code = print_menu();
         exit_code = input_choice(&current_choice);
         if (exit_code == SUCCCESS_CODE)
-            process_choice(current_choice, &program_running);
+            exit_code = process_choice(current_choice, &program_running, theater_plays_arr, &theater_plays_q);
     }
 
     // освобождаем выделенную память
