@@ -13,10 +13,17 @@ status_t print_theater_plays_table(theater_play_t *theater_plays_arr, size_t the
     status_t rc = SUCCCESS_CODE;
     theater_play_t *current_theater_play;
 
-    if (theater_plays_arr == NULL || (int)theater_plays_q <= 0)
+    if (theater_plays_arr == NULL || (int)theater_plays_q < 0)
         rc = ARR_PROCESSING_ERROR;
 
-    if (rc == SUCCCESS_CODE)
+    if (rc == SUCCCESS_CODE && theater_plays_q == 0)
+    {
+        printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
+        printf("|                                          М А С С И В   П У С Т   П Р О С Т И Т Е   :(((                                                  |\n");
+        printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
+    }
+
+    if (rc == SUCCCESS_CODE && theater_plays_q > 0)
     {
         printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
         printf("|  N  |     Театр     |   Спектакль   |    Цена    |  Цена (max)  |  Тип  |  Жанр  |  Возраст  |  Время (мин)  |  Композитор  |   Страна   |\n");

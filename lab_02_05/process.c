@@ -41,6 +41,7 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
         break;
 
     case PRINT_DATA:
+        rc = print_theater_plays_table(theater_plays_arr, *theater_plays_q);
         break;
     
     case PRINT_KEY_TABLE:
