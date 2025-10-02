@@ -101,7 +101,7 @@ status_t read_file(theater_play_t *theater_plays_arr, size_t *theater_plays_q)
 
     if (rc == SUCCCESS_CODE)
     {
-        printf("%sВведите имя файла (предполагаемой базы данных): %s", BLUE, RESET);
+        printf("%sВведите имя файла: %s", BLUE, RESET);
         if (scanf("%s", filename) != 1)
             rc = INVALID_INPUT;
     }
