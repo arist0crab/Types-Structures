@@ -5,6 +5,7 @@ char *get_general_genre(theater_play_t *cur_play);
 char *get_sring_piece_genre(piece_genre_t piece_genre);
 char *get_sring_musical_genre(musical_genre_t musical_genre);
 char *get_age_rating_string(theater_play_t *cur_play);
+char *get_string_duration(int duration);
 
 
 status_t print_theater_plays_table(theater_play_t *theater_plays_arr, size_t theater_plays_q)
@@ -18,12 +19,12 @@ status_t print_theater_plays_table(theater_play_t *theater_plays_arr, size_t the
     if (rc == SUCCCESS_CODE)
     {
         printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
-        printf("|  N  |   Театр   |  Спектакль  |    Цена    |  Цена (max)  |  Тип  |  Жанр  |  Возраст  |  Время (мин)  |  Композитор  |  Страна  |  Вид  |\n");
+        printf("|  N  |     Театр     |   Спектакль   |    Цена    |  Цена (max)  |  Тип  |  Жанр  |  Возраст  |  Время (мин)  |  Композитор  |   Страна   |\n");
         printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
         for (size_t i = 0; i < theater_plays_q; i++)
         {
             current_theater_play = &theater_plays_arr[i];
-            printf("| %-3ld | %-9s | %-11s | %-10.2lf | %-12.2lf | %-5s | %-6s | %-9s | %-13d | %-12s | %-8s | %-5s |\n",
+            printf("| %-3ld | %-13s | %-13s | %-10.2lf | %-12.2lf | %-5s | %-6s | %-9s | %-13s | %-12s | %-10s |\n",
             i + 1,
             current_theater_play->theater_name,
             current_theater_play->play_name,
@@ -32,27 +33,16 @@ status_t print_theater_plays_table(theater_play_t *theater_plays_arr, size_t the
             get_string_play_type(current_theater_play->play_type),
             get_general_genre(current_theater_play),
             get_age_rating_string(current_theater_play),
-            (current_theater_play->play_type == PIECE) ? 0 : current_theater_play->play_data.musical_info.duration,
+            (current_theater_play->play_type == MUSICAL) ? get_string_duration(current_theater_play->play_data.musical_info.duration) : "",
             (current_theater_play->play_type == MUSICAL) ? current_theater_play->play_data.musical_info.composer : "",
-            (current_theater_play->play_type == MUSICAL) ? current_theater_play->play_data.musical_info.country : "",
-            (current_theater_play->play_type == MUSICAL) ? get_sring_musical_genre(current_theater_play->play_data.musical_info.musical_genre) : ""
+            (current_theater_play->play_type == MUSICAL) ? current_theater_play->play_data.musical_info.country : ""
             );
             printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
+
         }
     }
 
     return rc;
-}
-
-
-char *get_string_play_type(play_type_t play_type)
-{
-    switch (play_type)
-    {
-        case PIECE: return "PIECE";
-        case MUSICAL: return "MUSIC";
-        default: return "ERROR";
-    }
 }
 
 char *get_general_genre(theater_play_t *cur_play)
@@ -87,32 +77,31 @@ char *get_sring_musical_genre(musical_genre_t musical_genre)
     }
 }
 
+char *get_string_duration(int duration)
+{
+    static char duration_string[MAX_STR_LEN];
+    sprintf(duration_string, "%d min.", duration);
+    return duration_string;
+}
+
+char *get_string_play_type(play_type_t play_type)
+{
+    switch (play_type)
+    {
+        case PIECE: return "PIECE";
+        case MUSICAL: return "MUSIC";
+        default: return "ERROR";
+    }
+}
 
 char *get_age_rating_string(theater_play_t *cur_play)
 {
-    age_rating_t cur_age_rating;
-
-    switch (cur_play->play_type)
+    switch (cur_play->age_rating)
     {
-        case PIECE:
-            cur_age_rating = cur_play->play_data.piece_info.age_rating;
-            break;
-
-        case MUSICAL:
-            cur_age_rating = cur_play->play_data.musical_info.age_rating;
-            break;
-        
-        default:
-            cur_age_rating = -1;
-            break;
-    }
-
-    switch (cur_age_rating)
-    {
+        case AGE_RATING_NONE: return "";
         case AGE_3PLUS: return "3+";
         case AGE_10PLUS: return "10+";
         case AGE_16PLUS: return "16+";
         default: return "ERROR";
     }
-
 }

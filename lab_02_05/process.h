@@ -5,6 +5,8 @@
 #include "status.h"
 #include "color.h"
 #include "output.h"
+#include "read_file.h"
+#include "print_instructions.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

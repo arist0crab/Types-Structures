@@ -5,5 +5,6 @@
 #include <stdio.h>
 
 status_t print_menu(void);
+status_t print_read_file_comments(void);
 
 #endif

@@ -1,4 +1,4 @@
-theater1 playname1 120 300 PIECE DRAMA 3
+theater1 playname1 120 300 PIECE DRAMA
 theater2 playname2 1200 33300 MUSICAL composer2 country2 MUSICAL_SHOW 10 112
 theater3 playname3 133 3000 PIECE FAIRY_TALE 3
 theater4 playname4 1 30 MUSICAL composer4 country4 MUSICAL_SHOW 16 1132
