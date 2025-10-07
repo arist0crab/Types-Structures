@@ -6,5 +6,6 @@
 #include <stdio.h>
 
 status_t print_theater_plays_table(theater_play_t *theater_plays_arr, size_t theater_plays_q);
+status_t print_keys_table(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t theater_plays_q);
 
 #endif

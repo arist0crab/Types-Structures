@@ -8,7 +8,7 @@ status_t read_musical_data(FILE *filestream, theater_play_t *current_play);
 status_t get_age_rating_from_num(int age_num, age_rating_t *age_rating);
 
 
-status_t read_file(theater_play_t *theater_plays_arr, size_t *theater_plays_q)
+status_t read_file(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q)
 {
     status_t rc = SUCCCESS_CODE;
     FILE *filestream = NULL;
@@ -44,7 +44,10 @@ status_t read_file(theater_play_t *theater_plays_arr, size_t *theater_plays_q)
     if (filestream)
         fclose(filestream);
 
-    // TODO: инициализировать массив ключей
+    // инициализируем таблицу ключей
+    if (rc == SUCCCESS_CODE)
+        for (size_t i = 0; i < *theater_plays_q; i++)
+            theater_plays_keys[i] = i;
 
     return rc;  
 }

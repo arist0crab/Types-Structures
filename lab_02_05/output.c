@@ -52,6 +52,35 @@ status_t print_theater_plays_table(theater_play_t *theater_plays_arr, size_t the
     return rc;
 }
 
+status_t print_keys_table(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t theater_plays_q)
+{
+    size_t theater_index;
+
+    if (theater_plays_keys == NULL || (int)theater_plays_q < 0)
+        return ARR_PROCESSING_ERROR;
+
+    if (theater_plays_q <= 0)
+    {
+        printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
+        printf("|                                          М А С С И В   П У С Т   П Р О С Т И Т Е   :(((                                                  |\n");
+        printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
+    }
+    else 
+    {
+        printf("+-------------------------+\n");
+        printf("|  Номер  |  Цена билета  |\n");
+        printf("+-------------------------+\n");
+        for (size_t i = 0; i < theater_plays_q; i++)
+        {
+            theater_index = theater_plays_keys[i];
+            printf("| %-7ld | %-13.2lf |\n", theater_index + 1, theater_plays_arr[theater_index].ticket_price);
+            printf("+-------------------------+\n");
+        }
+    }
+
+    return SUCCCESS_CODE;
+}
+
 char *get_general_genre(theater_play_t *cur_play)
 {
     switch (cur_play->play_type)

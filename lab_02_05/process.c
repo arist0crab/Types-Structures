@@ -21,7 +21,7 @@ status_t allocate_memory(void **elems_arr, size_t elems_quantity, size_t elem_si
     return rc;
 }
 
-status_t process_choice(choice_t choice, bool *program_running, theater_play_t *theater_plays_arr, size_t *theater_plays_q)
+status_t process_choice(choice_t choice, bool *program_running, theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q)
 {
     status_t rc = SUCCCESS_CODE;
     
@@ -35,7 +35,7 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
         print_read_file_comments();
         rc = clean_arr(theater_plays_arr, theater_plays_q);
         if (rc == SUCCCESS_CODE)
-            rc = read_file(theater_plays_arr, theater_plays_q);
+            rc = read_file(theater_plays_arr, theater_plays_keys, theater_plays_q);
         if (rc == SUCCCESS_CODE)
             rc = print_theater_plays_table(theater_plays_arr, *theater_plays_q);
         break;
@@ -45,6 +45,7 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
         break;
     
     case PRINT_KEY_TABLE:
+        rc = print_keys_table(theater_plays_arr, theater_plays_keys, *theater_plays_q);
         break;
 
     case ADD_THEATER_PLAY:

@@ -7,6 +7,7 @@
 #include <stdbool.h>
 
 static theater_play_t *theater_plays_arr = NULL;
+static int *theater_plays_keys = NULL;
 static size_t theater_plays_q = 0;
 
 int main(void)
@@ -16,6 +17,8 @@ int main(void)
     choice_t current_choice;
 
     exit_code = allocate_memory((void **)&theater_plays_arr, MAX_PLAYS_QUANTITY, sizeof(theater_play_t));
+    if (exit_code == SUCCCESS_CODE)
+        exit_code = allocate_memory((void **)&theater_plays_keys, MAX_PLAYS_QUANTITY, sizeof(int));
 
     if (exit_code == SUCCCESS_CODE)
         program_running = true;    
@@ -25,7 +28,7 @@ int main(void)
         exit_code = print_menu();
         exit_code = input_choice(&current_choice);
         if (exit_code == SUCCCESS_CODE)
-            process_choice(current_choice, &program_running, theater_plays_arr, &theater_plays_q);
+            process_choice(current_choice, &program_running, theater_plays_arr, theater_plays_keys, &theater_plays_q);
     }
 
     // освобождаем выделенную память
