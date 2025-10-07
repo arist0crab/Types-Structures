@@ -6,8 +6,6 @@ status_t input_string_to_delete(char *target_string);
 status_t shift_array_with_delete_one_string_elem(theater_play_t *theater_plays_arr, size_t *theater_plays_q, size_t *current_pos, char *string_to_delete, char *source_string_to_compare);
 status_t shift_array_with_delete_one_integer_elem(theater_play_t *theater_plays_arr, size_t *theater_plays_q, size_t *current_pos, int int_to_delete, int source_int_to_delete);
 status_t delete_play(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q);
-status_t delete_key_by_index(int *theater_plays_keys, size_t *theater_plays_q, int index);
-
 
 status_t allocate_memory(void **elems_arr, size_t elems_quantity, size_t elem_size)
 {
@@ -63,9 +61,11 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
         break;
 
     case PRICE_QUICK_SORT:
+        rc = quick_sort_by_ticket_price(theater_plays_arr, 0, *theater_plays_q - 1);
         break;
 
     case PRICE_SLOW_SORT:
+        rc = slow_sort_by_ticket_price(theater_plays_arr, theater_plays_q);
         break;
 
     case KEY_TABLE_QUICK_SORT:

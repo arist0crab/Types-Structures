@@ -13,7 +13,8 @@ typedef enum
     FILE_READ_ERROR,
     ARR_PROCESSING_ERROR,
     RECORDS_ARR_OVERFLOWED,
-    INVALID_DELETE
+    INVALID_DELETE,
+    INVALID_SORT
 } status_t;
 
 #endif
