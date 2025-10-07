@@ -69,9 +69,11 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
         break;
 
     case KEY_TABLE_QUICK_SORT:
+        rc = quick_sort_by_keys(theater_plays_arr, theater_plays_keys, 0, *theater_plays_q - 1);
         break;
 
     case KEY_TABLE_SLOW_SORT:
+        rc = slow_sort_by_keys(theater_plays_arr, theater_plays_keys, theater_plays_q);
         break;
 
     case PRINT_DATA_KEY_TABLE:
