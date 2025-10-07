@@ -41,3 +41,13 @@ status_t print_read_file_comments(void)
 
     return SUCCCESS_CODE;
 }
+
+// TODO: напечатать инструкции
+// status_t print_add_play_comments(void)
+// {
+//     printf("====================  ДОБАВЛЕНИЕ ЗАПИСИ  =====================\n");
+//     printf("");
+//     printf("");
+//     printf("");
+//     printf("");
+// }

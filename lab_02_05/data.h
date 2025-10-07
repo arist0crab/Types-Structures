@@ -7,7 +7,7 @@
 typedef enum { PIECE, MUSICAL } play_type_t;
 typedef enum { BALLET, OPERA, MUSICAL_SHOW } musical_genre_t;
 typedef enum { DRAMA, COMEDY, FAIRY_TALE } piece_genre_t;
-typedef enum { AGE_RATING_NONE, AGE_3PLUS, AGE_10PLUS, AGE_16PLUS } age_rating_t;
+typedef enum { AGE_3PLUS, AGE_10PLUS, AGE_16PLUS, AGE_RATING_NONE } age_rating_t;
 
 typedef enum 
 {

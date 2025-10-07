@@ -67,14 +67,14 @@ status_t print_keys_table(theater_play_t *theater_plays_arr, int *theater_plays_
     }
     else 
     {
-        printf("+-------------------------+\n");
-        printf("|  Номер  |  Цена билета  |\n");
-        printf("+-------------------------+\n");
+        printf("+----------------------+\n");
+        printf("|  id  |  Цена билета  |\n");
+        printf("+----------------------+\n");
         for (size_t i = 0; i < theater_plays_q; i++)
         {
             theater_index = theater_plays_keys[i];
-            printf("| %-7ld | %-13.2lf |\n", theater_index + 1, theater_plays_arr[theater_index].ticket_price);
-            printf("+-------------------------+\n");
+            printf("| %-4ld | %-13.2lf |\n", theater_index + 1, theater_plays_arr[theater_index].ticket_price);
+            printf("+----------------------+\n");
         }
     }
 
