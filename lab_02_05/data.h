@@ -3,6 +3,7 @@
 
 #define MAX_STR_LEN 128
 #define MAX_PLAYS_QUANTITY 1000
+#define EPS 1e-10
 
 typedef enum { PIECE, MUSICAL } play_type_t;
 typedef enum { BALLET, OPERA, MUSICAL_SHOW } musical_genre_t;

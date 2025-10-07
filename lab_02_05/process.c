@@ -2,6 +2,12 @@
 
 status_t clean_arr(theater_play_t *theater_plays_arr, size_t *theater_plays_q);
 status_t add_play(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q);
+status_t input_string_to_delete(char *target_string);
+status_t shift_array_with_delete_one_string_elem(theater_play_t *theater_plays_arr, size_t *theater_plays_q, size_t *current_pos, char *string_to_delete, char *source_string_to_compare);
+status_t shift_array_with_delete_one_integer_elem(theater_play_t *theater_plays_arr, size_t *theater_plays_q, size_t *current_pos, int int_to_delete, int source_int_to_delete);
+status_t delete_play(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q);
+status_t delete_key_by_index(int *theater_plays_keys, size_t *theater_plays_q, int index);
+
 
 status_t allocate_memory(void **elems_arr, size_t elems_quantity, size_t elem_size)
 {
@@ -53,6 +59,7 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
         break;
 
     case DELETE_THEATER_PLAY:
+        rc = delete_play(theater_plays_arr, theater_plays_keys, theater_plays_q);
         break;
 
     case PRICE_QUICK_SORT:
@@ -100,7 +107,7 @@ status_t add_play(theater_play_t *theater_plays_arr, int *theater_plays_keys, si
     if (*theater_plays_q >= MAX_PLAYS_QUANTITY)
         return RECORDS_ARR_OVERFLOWED;
 
-    printf("%sВведите название театра: %s", BLUE, RESET);  // TODO добавить в инструкции что это будет обрезаться как мне будет угодно
+    printf("%sВведите название театра: %s", BLUE, RESET);
     scanf("%s", new_play.theater_name);
     printf("%sВведите название спектакля: %s", BLUE, RESET);
     scanf("%s", new_play.play_name);
@@ -184,7 +191,199 @@ status_t add_play(theater_play_t *theater_plays_arr, int *theater_plays_keys, si
     theater_plays_keys[*theater_plays_q] = *theater_plays_q;
     (*theater_plays_q)++; 
 
+    return rc;
+}
+
+status_t delete_play(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q)
+{
+    status_t rc = SUCCCESS_CODE;
+    char string_to_delete[MAX_STR_LEN];
+    int field_to_delete, field_in_field_to_delete;
+    int duration_to_delete;
+    double price_to_delete;
+
+    if (*theater_plays_q <= 0 || theater_plays_arr == NULL || theater_plays_keys == NULL)
+        return INVALID_DELETE;
+
+    print_delete_instructions();
+
+    if (scanf("%d", &field_to_delete) != 1 || field_to_delete < 1 || field_to_delete > 9)
+        rc = INVALID_INPUT;
+
+    if (rc == SUCCCESS_CODE)
+    {
+        switch (field_to_delete)
+        {
+            case 1: // название театра
+                rc = input_string_to_delete(string_to_delete);
+                if (rc == SUCCCESS_CODE)
+                    for (size_t i = 0; i < *theater_plays_q; i++)
+                        shift_array_with_delete_one_string_elem(theater_plays_arr, theater_plays_q, &i, string_to_delete, theater_plays_arr[i].theater_name);
+                break;
+
+            case 2:  // название спектакля
+                rc = input_string_to_delete(string_to_delete);
+                if (rc == SUCCCESS_CODE)
+                    for (size_t i = 0; i < *theater_plays_q; i++)
+                        shift_array_with_delete_one_string_elem(theater_plays_arr, theater_plays_q, &i, string_to_delete, theater_plays_arr[i].play_name);
+                break;
+
+            case 3:  // цена билета
+                printf("%sВведите цену, записи с которой будут удалены: %s", BLUE, RESET);
+
+                if (scanf("%lf", &price_to_delete) != 1 || price_to_delete < 0)
+                    rc = INVALID_DELETE;
+
+                if (rc == SUCCCESS_CODE)
+                {
+                    for (size_t i = 0; i < *theater_plays_q; i++)
+                        if (fabs(price_to_delete - theater_plays_arr[i].ticket_price) < EPS)
+                        {
+                            for (size_t j = i; j < *theater_plays_q - 1; j++)
+                                theater_plays_arr[j] = theater_plays_arr[j + 1];
+                            (*theater_plays_q)--;
+                            i--;
+                        }
+                }
+                // TODO: ключи подвинуть
+                break;
+
+            case 4:  // тип спектакля
+                printf("%s", BLUE);
+                printf("Выберите значение для удаления:\n");
+                printf("0 - пьесы\n");
+                printf("1 - мюзиклы\n");
+                printf("%s", RESET);
+
+                if (scanf("%d", &field_in_field_to_delete) != 1 || field_in_field_to_delete < 0 || field_in_field_to_delete > 1)
+                    rc = INVALID_DELETE;
+
+                if (rc == SUCCCESS_CODE)
+                    for (size_t i = 0; i < *theater_plays_q; i++)
+                        shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_q, &i, field_in_field_to_delete, theater_plays_arr[i].play_type);
+                break;
+
+            case 5:  // возраст
+                printf("%s", BLUE);
+                printf("Выберите значение для удаления:\n");
+                printf("0 - 3+\n");
+                printf("1 - 10+\n");
+                printf("2 - 16+\n");
+                printf("%s", RESET);
+
+                if (scanf("%d", &field_in_field_to_delete) != 1 || field_in_field_to_delete < 0 || field_in_field_to_delete > 2)
+                    rc = INVALID_DELETE;
+
+                if (rc == SUCCCESS_CODE)
+                    for (size_t i = 0; i < *theater_plays_q; i++)
+                        shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_q, &i, field_in_field_to_delete, theater_plays_arr[i].age_rating);
+
+                break;
+
+            case 6:  // композитор
+                rc = input_string_to_delete(string_to_delete);
+                if (rc == SUCCCESS_CODE)
+                    for (size_t i = 0; i < *theater_plays_q; i++)
+                        shift_array_with_delete_one_string_elem(theater_plays_arr, theater_plays_q, &i, string_to_delete, theater_plays_arr[i].play_data.musical_info.composer);
+                break;
+
+            case 7:  // страна
+                rc = input_string_to_delete(string_to_delete);
+                if (rc == SUCCCESS_CODE)
+                    for (size_t i = 0; i < *theater_plays_q; i++)
+                        shift_array_with_delete_one_string_elem(theater_plays_arr, theater_plays_q, &i, string_to_delete, theater_plays_arr[i].play_data.musical_info.country);
+                break;
+
+            case 8:  // тип выступления
+                printf("%s", BLUE);
+                printf("Выберите значение для удаления:\n");
+                printf("0 - балет\n");
+                printf("1 - опера\n");
+                printf("2 - музыкальное шоу\n");
+                printf("3 - драма\n");
+                printf("4 - комедия\n");
+                printf("5 - сказка\n");
+                printf("%s", RESET);
+
+                if (scanf("%d", &field_in_field_to_delete) != 1 || field_in_field_to_delete < 0 || field_in_field_to_delete > 5)
+                    rc = INVALID_DELETE;
+
+                if (rc == SUCCCESS_CODE)
+                {
+                    if (field_in_field_to_delete < 3)  // для мюзиклов
+                        for (size_t i = 0; i < *theater_plays_q; i++)
+                            shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_q, &i, field_in_field_to_delete, theater_plays_arr[i].play_data.musical_info.musical_genre);
+                    else  // для пьес
+                    {
+                        field_in_field_to_delete -= 3;
+                        for (size_t i = 0; i < *theater_plays_q; i++)
+                            shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_q, &i, field_in_field_to_delete, theater_plays_arr[i].play_data.piece_info.piece_genre);
+                    }
+                }
+                break;
+
+            case 9:  // продолжительность
+                printf("%sВведите длительность, записи с которой будут удалены: %s", BLUE, RESET);
+                
+                if (scanf("%d", &duration_to_delete) != 1 || duration_to_delete <= 0)
+                    rc = INVALID_DELETE;
+
+                if (rc == SUCCCESS_CODE)
+                    for (size_t i = 0; i < *theater_plays_q; i++)
+                        shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_q, &i, duration_to_delete, theater_plays_arr[i].play_data.musical_info.duration);
+                break;
+            
+            default:
+                rc = INVALID_DELETE;
+                break;
+        }
+    }
+
+    return rc;        
+}
+
+status_t input_string_to_delete(char *target_string)
+{
+    printf("%sВведите строку, по которой будет будет очищено поле: %s", BLUE, RESET);
+    if (scanf("%s", target_string) != 1)
+        return INVALID_DELETE;
+
+    size_t target_string_len = strlen(target_string);
+    if (target_string[target_string_len - 1] == '\n')
+        target_string[target_string_len - 1] = '\0';
+
+    return SUCCCESS_CODE;
+}
+
+status_t shift_array_with_delete_one_string_elem(theater_play_t *theater_plays_arr, size_t *theater_plays_q, size_t *current_pos, char *string_to_delete, char *source_string_to_compare)
+{
+    status_t rc = SUCCCESS_CODE;
     
+    if (strcmp(string_to_delete, source_string_to_compare) == 0)
+    {
+        for (size_t j = *current_pos; j < *theater_plays_q - 1; j++)
+            theater_plays_arr[j] = theater_plays_arr[j + 1];
+        (*theater_plays_q)--;
+        (*current_pos)--;
+    }
+
+    // TODO че с ключами
+    return rc;
+}
+
+status_t shift_array_with_delete_one_integer_elem(theater_play_t *theater_plays_arr, size_t *theater_plays_q, size_t *current_pos, int int_to_delete, int source_int_to_delete)
+{
+    status_t rc = SUCCCESS_CODE;
+    
+    if (int_to_delete == source_int_to_delete)
+    {
+        for (size_t j = *current_pos; j < *theater_plays_q - 1; j++)
+            theater_plays_arr[j] = theater_plays_arr[j + 1];
+        (*theater_plays_q)--;
+        (*current_pos)--;
+    }
+
+    // TODO: удалить из списка ключей
 
     return rc;
 }
