@@ -4,6 +4,7 @@
 #include "data.h"
 #include "status.h"
 #include "color.h"
+#include "input.h"
 #include "output.h"
 #include "read_file.h"
 #include "print_instructions.h"

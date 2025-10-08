@@ -28,6 +28,8 @@ status_t allocate_memory(void **elems_arr, size_t elems_quantity, size_t elem_si
 status_t process_choice(choice_t choice, bool *program_running, theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q)
 {
     status_t rc = SUCCCESS_CODE;
+    age_rating_t target_age_rating;
+    int target_duration;
     
     switch (choice)
     {
@@ -84,6 +86,10 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
         break;
 
     case PRINT_BALETS:
+        rc = input_age_rating_and_duration(&target_age_rating, &target_duration);
+        if (rc == SUCCCESS_CODE)
+            rc = print_balets_by_conditions(theater_plays_arr, *theater_plays_q, target_age_rating, target_duration);
+
         break;
 
     case CHOICES_QUANTITY:

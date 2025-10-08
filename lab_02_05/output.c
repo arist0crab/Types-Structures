@@ -83,6 +83,57 @@ status_t print_keys_table(theater_play_t *theater_plays_arr, int *theater_plays_
     return SUCCCESS_CODE;
 }
 
+status_t print_balets_by_conditions(theater_play_t *theater_plays_arr, size_t theater_plays_q, age_rating_t target_age_rating, int target_duration)
+{
+    theater_play_t *current_theater_play;
+    bool suitable_was_found = false;
+    
+    if (theater_plays_arr == NULL || target_duration < 0 || target_age_rating < 0 || target_age_rating > 2)
+        return INVALID_INPUT;
+
+    if (theater_plays_q <= 0)
+    {
+        printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
+        printf("|                                          М А С С И В   П У С Т   П Р О С Т И Т Е   :(((                                                  |\n");
+        printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
+    }
+    else 
+    {
+        printf("+-------------------------------------------------------------------------------------------------------------------------------------------+\n");
+        printf("|  id  |     Театр     |   Спектакль   |    Цена    |  Цена (max)  |  Тип  |  Жанр  |  Возраст  |  Время (мин)  |  Композитор  |   Страна   |\n");
+        printf("+-------------------------------------------------------------------------------------------------------------------------------------------+\n");
+        for (size_t i = 0; i < theater_plays_q; i++)
+        {
+            current_theater_play = &theater_plays_arr[i];
+            if (current_theater_play->play_type == MUSICAL && current_theater_play->play_data.musical_info.musical_genre == BALLET && current_theater_play->play_data.musical_info.duration < target_duration && current_theater_play->age_rating == target_age_rating)
+            {
+                suitable_was_found = true;
+                printf("| %-4ld | %-13s | %-13s | %-10.2lf | %-12.2lf | %-5s | %-6s | %-9s | %-13s | %-12s | %-10s |\n",
+                i,
+                current_theater_play->theater_name,
+                current_theater_play->play_name,
+                current_theater_play->ticket_price,
+                current_theater_play->max_ticket_price,
+                get_string_play_type(current_theater_play->play_type),
+                get_general_genre(current_theater_play),
+                get_age_rating_string(current_theater_play),
+                (current_theater_play->play_type == MUSICAL) ? get_string_duration(current_theater_play->play_data.musical_info.duration) : "",
+                (current_theater_play->play_type == MUSICAL) ? current_theater_play->play_data.musical_info.composer : "",
+                (current_theater_play->play_type == MUSICAL) ? current_theater_play->play_data.musical_info.country : ""
+                );
+                printf("+-------------------------------------------------------------------------------------------------------------------------------------------+\n");
+            }
+        }
+        if (!suitable_was_found)
+        {
+            printf("|                               П О  В А Ш Е М У  З А П Р О С У  Н И Ч Е Г О  Н Е  Н А Й Д Е Н О  :((((((((((((((((                         |\n");
+            printf("+-------------------------------------------------------------------------------------------------------------------------------------------+\n");
+        }
+    }
+
+    return SUCCCESS_CODE;
+}
+
 char *get_general_genre(theater_play_t *cur_play)
 {
     switch (cur_play->play_type)
