@@ -6,9 +6,10 @@
 status_t clean_arr(theater_play_t *theater_plays_arr, size_t *theater_plays_q);
 status_t add_play(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q);
 status_t input_string_to_delete(char *target_string);
-status_t shift_array_with_delete_one_string_elem(theater_play_t *theater_plays_arr, size_t *theater_plays_q, size_t *current_pos, char *string_to_delete, char *source_string_to_compare);
-status_t shift_array_with_delete_one_integer_elem(theater_play_t *theater_plays_arr, size_t *theater_plays_q, size_t *current_pos, int int_to_delete, int source_int_to_delete);
+status_t shift_array_with_delete_one_string_elem(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q, size_t *current_pos, char *string_to_delete, char *source_string_to_compare);
+status_t shift_array_with_delete_one_integer_elem(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q, size_t *current_pos, int int_to_delete, int source_int_to_delete);
 status_t delete_play(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q);
+status_t rebuild_keys_table(int *theater_plays_keys, size_t *theater_plays_q);
 
 status_t allocate_memory(void **elems_arr, size_t elems_quantity, size_t elem_size)
 {
@@ -47,6 +48,9 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
             rc = read_file(theater_plays_arr, theater_plays_keys, theater_plays_q);
         if (rc == SUCCCESS_CODE)
             rc = print_theater_plays_table(theater_plays_arr, theater_plays_keys, *theater_plays_q, false);
+
+        if (rc != SUCCCESS_CODE)
+            clean_arr(theater_plays_arr, theater_plays_q);
         break;
 
     case PRINT_DATA:
@@ -190,7 +194,7 @@ status_t add_play(theater_play_t *theater_plays_arr, int *theater_plays_keys, si
 
     if (rc == SUCCCESS_CODE)
     {
-        printf("%sВведите тип спектакля (целое число):\n0 - пьеса\n1- мюзикл\n%s", BLUE, RESET);
+        printf("%sВведите тип спектакля (целое число):\n0 - пьеса\n1 - мюзикл\n%s", BLUE, RESET);
         if (scanf("%d", &temp_int) != 1 || temp_int < 0 || temp_int > 1)
             rc = INVALID_INPUT;
         else 
@@ -248,9 +252,12 @@ status_t add_play(theater_play_t *theater_plays_arr, int *theater_plays_keys, si
     if (rc != SUCCCESS_CODE)
         while (getchar() != '\n');
 
-    theater_plays_arr[*theater_plays_q] = new_play;
-    theater_plays_keys[*theater_plays_q] = *theater_plays_q;
-    (*theater_plays_q)++; 
+    if (rc == SUCCCESS_CODE)
+    {
+        theater_plays_arr[*theater_plays_q] = new_play;
+        theater_plays_keys[*theater_plays_q] = *theater_plays_q;
+        (*theater_plays_q)++; 
+    }
 
     return rc;
 }
@@ -279,14 +286,14 @@ status_t delete_play(theater_play_t *theater_plays_arr, int *theater_plays_keys,
                 rc = input_string_to_delete(string_to_delete);
                 if (rc == SUCCCESS_CODE)
                     for (size_t i = 0; i < *theater_plays_q; i++)
-                        shift_array_with_delete_one_string_elem(theater_plays_arr, theater_plays_q, &i, string_to_delete, theater_plays_arr[i].theater_name);
+                        shift_array_with_delete_one_string_elem(theater_plays_arr, theater_plays_keys, theater_plays_q, &i, string_to_delete, theater_plays_arr[i].theater_name);
                 break;
 
             case 2:  // название спектакля
                 rc = input_string_to_delete(string_to_delete);
                 if (rc == SUCCCESS_CODE)
                     for (size_t i = 0; i < *theater_plays_q; i++)
-                        shift_array_with_delete_one_string_elem(theater_plays_arr, theater_plays_q, &i, string_to_delete, theater_plays_arr[i].play_name);
+                        shift_array_with_delete_one_string_elem(theater_plays_arr, theater_plays_keys, theater_plays_q, &i, string_to_delete, theater_plays_arr[i].play_name);
                 break;
 
             case 3:  // цена билета
@@ -306,7 +313,8 @@ status_t delete_play(theater_play_t *theater_plays_arr, int *theater_plays_keys,
                             i--;
                         }
                 }
-                // TODO: ключи подвинуть
+                rebuild_keys_table(theater_plays_keys, theater_plays_q);
+
                 break;
 
             case 4:  // тип спектакля
@@ -321,7 +329,7 @@ status_t delete_play(theater_play_t *theater_plays_arr, int *theater_plays_keys,
 
                 if (rc == SUCCCESS_CODE)
                     for (size_t i = 0; i < *theater_plays_q; i++)
-                        shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_q, &i, field_in_field_to_delete, theater_plays_arr[i].play_type);
+                        shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_keys, theater_plays_q, &i, field_in_field_to_delete, theater_plays_arr[i].play_type);
                 break;
 
             case 5:  // возраст
@@ -337,7 +345,7 @@ status_t delete_play(theater_play_t *theater_plays_arr, int *theater_plays_keys,
 
                 if (rc == SUCCCESS_CODE)
                     for (size_t i = 0; i < *theater_plays_q; i++)
-                        shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_q, &i, field_in_field_to_delete, theater_plays_arr[i].age_rating);
+                        shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_keys, theater_plays_q, &i, field_in_field_to_delete, theater_plays_arr[i].age_rating);
 
                 break;
 
@@ -345,14 +353,14 @@ status_t delete_play(theater_play_t *theater_plays_arr, int *theater_plays_keys,
                 rc = input_string_to_delete(string_to_delete);
                 if (rc == SUCCCESS_CODE)
                     for (size_t i = 0; i < *theater_plays_q; i++)
-                        shift_array_with_delete_one_string_elem(theater_plays_arr, theater_plays_q, &i, string_to_delete, theater_plays_arr[i].play_data.musical_info.composer);
+                        shift_array_with_delete_one_string_elem(theater_plays_arr, theater_plays_keys, theater_plays_q, &i, string_to_delete, theater_plays_arr[i].play_data.musical_info.composer);
                 break;
 
             case 7:  // страна
                 rc = input_string_to_delete(string_to_delete);
                 if (rc == SUCCCESS_CODE)
                     for (size_t i = 0; i < *theater_plays_q; i++)
-                        shift_array_with_delete_one_string_elem(theater_plays_arr, theater_plays_q, &i, string_to_delete, theater_plays_arr[i].play_data.musical_info.country);
+                        shift_array_with_delete_one_string_elem(theater_plays_arr, theater_plays_keys, theater_plays_q, &i, string_to_delete, theater_plays_arr[i].play_data.musical_info.country);
                 break;
 
             case 8:  // тип выступления
@@ -373,12 +381,12 @@ status_t delete_play(theater_play_t *theater_plays_arr, int *theater_plays_keys,
                 {
                     if (field_in_field_to_delete < 3)  // для мюзиклов
                         for (size_t i = 0; i < *theater_plays_q; i++)
-                            shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_q, &i, field_in_field_to_delete, theater_plays_arr[i].play_data.musical_info.musical_genre);
+                            shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_keys, theater_plays_q, &i, field_in_field_to_delete, theater_plays_arr[i].play_data.musical_info.musical_genre);
                     else  // для пьес
                     {
                         field_in_field_to_delete -= 3;
                         for (size_t i = 0; i < *theater_plays_q; i++)
-                            shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_q, &i, field_in_field_to_delete, theater_plays_arr[i].play_data.piece_info.piece_genre);
+                            shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_keys, theater_plays_q, &i, field_in_field_to_delete, theater_plays_arr[i].play_data.piece_info.piece_genre);
                     }
                 }
                 break;
@@ -391,7 +399,7 @@ status_t delete_play(theater_play_t *theater_plays_arr, int *theater_plays_keys,
 
                 if (rc == SUCCCESS_CODE)
                     for (size_t i = 0; i < *theater_plays_q; i++)
-                        shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_q, &i, duration_to_delete, theater_plays_arr[i].play_data.musical_info.duration);
+                        shift_array_with_delete_one_integer_elem(theater_plays_arr, theater_plays_keys, theater_plays_q, &i, duration_to_delete, theater_plays_arr[i].play_data.musical_info.duration);
                 break;
             
             default:
@@ -416,7 +424,7 @@ status_t input_string_to_delete(char *target_string)
     return SUCCCESS_CODE;
 }
 
-status_t shift_array_with_delete_one_string_elem(theater_play_t *theater_plays_arr, size_t *theater_plays_q, size_t *current_pos, char *string_to_delete, char *source_string_to_compare)
+status_t shift_array_with_delete_one_string_elem(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q, size_t *current_pos, char *string_to_delete, char *source_string_to_compare)
 {
     status_t rc = SUCCCESS_CODE;
     
@@ -427,12 +435,12 @@ status_t shift_array_with_delete_one_string_elem(theater_play_t *theater_plays_a
         (*theater_plays_q)--;
         (*current_pos)--;
     }
+    rebuild_keys_table(theater_plays_keys, theater_plays_q);
 
-    // TODO че с ключами
     return rc;
 }
 
-status_t shift_array_with_delete_one_integer_elem(theater_play_t *theater_plays_arr, size_t *theater_plays_q, size_t *current_pos, int int_to_delete, int source_int_to_delete)
+status_t shift_array_with_delete_one_integer_elem(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q, size_t *current_pos, int int_to_delete, int source_int_to_delete)
 {
     status_t rc = SUCCCESS_CODE;
     
@@ -444,9 +452,20 @@ status_t shift_array_with_delete_one_integer_elem(theater_play_t *theater_plays_
         (*current_pos)--;
     }
 
-    // TODO: удалить из списка ключей
+    rebuild_keys_table(theater_plays_keys, theater_plays_q);
 
     return rc;
+}
+
+status_t rebuild_keys_table(int *theater_plays_keys, size_t *theater_plays_q)
+{
+    if (theater_plays_keys == NULL)
+        return ARR_PROCESSING_ERROR;
+
+    for (size_t i = 0; i < *theater_plays_q; i++)
+        theater_plays_keys[i] = i;
+
+    return SUCCCESS_CODE;
 }
 
 status_t clean_arr(theater_play_t *theater_plays_arr, size_t *theater_plays_q)
