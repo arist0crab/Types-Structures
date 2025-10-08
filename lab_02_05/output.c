@@ -20,7 +20,7 @@ status_t print_theater_plays_table(theater_play_t *theater_plays_arr, int *theat
     if (rc == SUCCCESS_CODE && theater_plays_q == 0)
     {
         printf("+-------------------------------------------------------------------------------------------------------------------------------------------+\n");
-        printf("|                                          М А С С И В   П У С Т   П Р О С Т И Т Е   :(((                                                  |\n");
+        printf("|                                          М А С С И В   П У С Т   П Р О С Т И Т Е   :(((                                                   |\n");
         printf("+-------------------------------------------------------------------------------------------------------------------------------------------+\n");
     }
 
@@ -157,6 +157,63 @@ status_t print_memory_data(size_t memory_used, size_t memory_used_keys)
     printf("Размер данных: %zu байт\n", memory_used);
     printf("Размер таблицы ключей: %zu байт\n", memory_used_keys);
     printf("Общий объем используемой памяти: %zu байт\n", memory_used + memory_used_keys);
+
+    return SUCCCESS_CODE;
+}
+
+status_t print_status_message(status_t rc)
+{
+    switch (rc)
+    {
+        case SUCCCESS_CODE:
+            printf("%s=============================================================== S U C C E S S ===============================================================%s", GREEN_BOLD, RESET);
+            break;
+
+        case INVALID_QUANTITY:
+            printf("%s! ! ! Неправильно введенное кол-во, повторите попытку%s", RED_BOLD, RESET);
+            break;
+
+        case INVALID_POINTER:
+            printf("%s! ! ! Ошибка при работе с указателями, простите(%s", RED_BOLD, RESET);
+            break;
+
+        case INVALID_INPUT:
+            printf("%s! ! ! Ошибка ввода, повторите попытку%s", RED_BOLD, RESET);
+            break;
+
+        case MEM_ALLOCATE_ERROR:
+            printf("%s! ! ! Ошибка выделения памяти%s", RED_BOLD, RESET);
+            break;
+
+        case INVALID_CHOICE:
+            printf("%s! ! ! Неверная опция выбора, проверьте поле ввода, повторите попытку%s", RED_BOLD, RESET);
+            break;
+
+        case FILE_OPEN_ERROR:
+            printf("%s! ! ! Невозможно открыть файл, проверьте имя файла%s", RED_BOLD, RESET);
+            break;
+
+        case FILE_READ_ERROR:
+            printf("%s! ! ! Ошибка чтения файла, проверьте содержимое файла%s", RED_BOLD, RESET);
+            break;
+
+        case ARR_PROCESSING_ERROR:
+            printf("%s! ! ! Ошибка обработка массива%s", RED_BOLD, RESET);
+            break;
+
+        case RECORDS_ARR_OVERFLOWED:
+            printf("%s! ! ! Преувеличено количество записей в таблице%s", RED_BOLD, RESET);
+            break;
+
+        case INVALID_DELETE:
+            printf("%s! ! ! Ошибка в процессе удаления записи%s", RED_BOLD, RESET);
+            break;
+
+        case INVALID_SORT:
+            printf("%s! ! ! Ошибка в процессе сортировки%s", RED_BOLD, RESET);
+            break;
+    }
+    printf("\n\n");
 
     return SUCCCESS_CODE;
 }

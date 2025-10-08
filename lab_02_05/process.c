@@ -157,8 +157,7 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
         break;
     }
 
-    if (rc == SUCCCESS_CODE)
-        printf("%sSUCCESS%s\n\n", GREEN_BOLD, RESET);
+    print_status_message(rc);
 
     return rc;
 }
