@@ -8,31 +8,33 @@ char *get_age_rating_string(theater_play_t *cur_play);
 char *get_string_duration(int duration);
 
 
-status_t print_theater_plays_table(theater_play_t *theater_plays_arr, size_t theater_plays_q)
+status_t print_theater_plays_table(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t theater_plays_q, bool print_by_keys)
 {
     status_t rc = SUCCCESS_CODE;
     theater_play_t *current_theater_play;
+    size_t index;
 
     if (theater_plays_arr == NULL || (int)theater_plays_q < 0)
         rc = ARR_PROCESSING_ERROR;
 
     if (rc == SUCCCESS_CODE && theater_plays_q == 0)
     {
-        printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
+        printf("+-------------------------------------------------------------------------------------------------------------------------------------------+\n");
         printf("|                                          М А С С И В   П У С Т   П Р О С Т И Т Е   :(((                                                  |\n");
-        printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
+        printf("+-------------------------------------------------------------------------------------------------------------------------------------------+\n");
     }
 
     if (rc == SUCCCESS_CODE && theater_plays_q > 0)
     {
-        printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
-        printf("|  N  |     Театр     |   Спектакль   |    Цена    |  Цена (max)  |  Тип  |  Жанр  |  Возраст  |  Время (мин)  |  Композитор  |   Страна   |\n");
-        printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
+        printf("+-------------------------------------------------------------------------------------------------------------------------------------------+\n");
+        printf("|  id  |     Театр     |   Спектакль   |    Цена    |  Цена (max)  |  Тип  |  Жанр  |  Возраст  |  Время (мин)  |  Композитор  |   Страна   |\n");
+        printf("+-------------------------------------------------------------------------------------------------------------------------------------------+\n");
         for (size_t i = 0; i < theater_plays_q; i++)
         {
-            current_theater_play = &theater_plays_arr[i];
-            printf("| %-3ld | %-13s | %-13s | %-10.2lf | %-12.2lf | %-5s | %-6s | %-9s | %-13s | %-12s | %-10s |\n",
-            i + 1,
+            index = (print_by_keys) ? (size_t)theater_plays_keys[i] : i;
+            current_theater_play = &theater_plays_arr[index];
+            printf("| %-4ld | %-13s | %-13s | %-10.2lf | %-12.2lf | %-5s | %-6s | %-9s | %-13s | %-12s | %-10s |\n",
+            index,
             current_theater_play->theater_name,
             current_theater_play->play_name,
             current_theater_play->ticket_price,
@@ -44,7 +46,7 @@ status_t print_theater_plays_table(theater_play_t *theater_plays_arr, size_t the
             (current_theater_play->play_type == MUSICAL) ? current_theater_play->play_data.musical_info.composer : "",
             (current_theater_play->play_type == MUSICAL) ? current_theater_play->play_data.musical_info.country : ""
             );
-            printf("+------------------------------------------------------------------------------------------------------------------------------------------+\n");
+            printf("+-------------------------------------------------------------------------------------------------------------------------------------------+\n");
 
         }
     }
