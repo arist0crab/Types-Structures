@@ -1,4 +1,7 @@
+#define _POSIX_C_SOURCE 199309L
 #include "process.h"
+#include <stdio.h>
+#include <time.h>
 
 status_t clean_arr(theater_play_t *theater_plays_arr, size_t *theater_plays_q);
 status_t add_play(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q);
@@ -83,6 +86,55 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
         break;
 
     case PRINT_EFFICIENCY_TABLE:
+        printf("%sИзмерение времени выполнения сортировок для данных и таблицы ключей...\n%s", BLUE, RESET);
+        struct timespec quick_sort_data_start, quick_sort_data_end;
+        struct timespec slow_sort_data_start, slow_sort_data_end;
+        struct timespec quick_sort_key_start, quick_sort_key_end;
+        struct timespec slow_sort_key_start, slow_sort_key_end;
+        long long quick_sort_data_time_sum = 0;
+        long long slow_sort_data_time_sum = 0;
+        long long quick_sort_key_time_sum = 0;
+        long long slow_sort_key_time_sum = 0;
+
+        for (size_t i = 0; i < 500; i++)
+        {
+            // измерение времени выполнения быстрой сортировки данных
+            clock_gettime(CLOCK_MONOTONIC, &quick_sort_data_start);
+            quick_sort_by_ticket_price(theater_plays_arr, 0, *theater_plays_q - 1);
+            clock_gettime(CLOCK_MONOTONIC, &quick_sort_data_end);
+            quick_sort_data_time_sum += (quick_sort_data_end.tv_sec - quick_sort_data_start.tv_sec) * 1000000000LL + (quick_sort_data_end.tv_nsec - quick_sort_data_start.tv_nsec);
+
+            // измерение времени выполнения медленной сортировки данных
+            clock_gettime(CLOCK_MONOTONIC, &slow_sort_data_start);
+            slow_sort_by_ticket_price(theater_plays_arr, theater_plays_q);
+            clock_gettime(CLOCK_MONOTONIC, &slow_sort_data_end);
+            slow_sort_data_time_sum += (slow_sort_data_end.tv_sec - slow_sort_data_start.tv_sec) * 1000000000LL + (slow_sort_data_end.tv_nsec - slow_sort_data_start.tv_nsec);
+
+            // измерение времени выполнения быстрой сортировки ключей
+            clock_gettime(CLOCK_MONOTONIC, &quick_sort_key_start);
+            quick_sort_by_keys(theater_plays_arr, theater_plays_keys, 0, *theater_plays_q - 1);
+            clock_gettime(CLOCK_MONOTONIC, &quick_sort_key_end);
+            quick_sort_key_time_sum += (quick_sort_key_end.tv_sec - quick_sort_key_start.tv_sec) * 1000000000LL + (quick_sort_key_end.tv_nsec - quick_sort_key_start.tv_nsec);
+
+            // измерение времени выполнения быстрой сортировки ключей
+            clock_gettime(CLOCK_MONOTONIC, &slow_sort_key_start);
+            slow_sort_by_keys(theater_plays_arr, theater_plays_keys, theater_plays_q);
+            clock_gettime(CLOCK_MONOTONIC, &slow_sort_key_end);
+            slow_sort_key_time_sum += (slow_sort_key_end.tv_sec - slow_sort_key_start.tv_sec) * 1000000000LL + (slow_sort_key_end.tv_nsec - slow_sort_key_start.tv_nsec);
+        }
+
+        // рассчитываем среднее время выполнения
+        long long average_quick_sort_data_time = quick_sort_data_time_sum / 500;
+        long long average_slow_sort_data_time = slow_sort_data_time_sum / 500;
+        long long average_quick_sort_key_time = quick_sort_key_time_sum / 500;
+        long long average_slow_sort_key_time = slow_sort_key_time_sum / 500;
+
+        print_efficiency_table(average_quick_sort_data_time, average_slow_sort_data_time, average_quick_sort_key_time, average_slow_sort_key_time);
+
+        size_t memory_used = *theater_plays_q * sizeof(theater_play_t);
+        size_t memory_used_keys = *theater_plays_q * sizeof(int);
+        print_memory_data(memory_used, memory_used_keys);
+
         break;
 
     case PRINT_BALETS:

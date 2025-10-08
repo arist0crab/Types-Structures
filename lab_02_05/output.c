@@ -134,6 +134,33 @@ status_t print_balets_by_conditions(theater_play_t *theater_plays_arr, size_t th
     return SUCCCESS_CODE;
 }
 
+status_t print_efficiency_table(long long average_quick_sort_data_time, long long average_slow_sort_data_time, long long average_quick_sort_key_time, long long average_slow_sort_key_time)
+{
+    printf("+--------------------------------------------------+\n");
+    printf("|           Сортировка           |   Наносекунды   |\n");
+    printf("+--------------------------------------------------+\n");
+    printf("| Быстрая сортировка             | %-14lld |\n", average_quick_sort_data_time);
+    printf("+--------------------------------------------------+\n");
+    printf("| Медленная сортировка           | %-14lld |\n", average_slow_sort_data_time);
+    printf("+--------------------------------------------------+\n");
+    printf("| Быстрая сортировка по ключу    | %-14lld |\n", average_quick_sort_key_time);
+    printf("+--------------------------------------------------+\n");
+    printf("| Медленная сортировка по ключу  | %-14lld |\n", average_slow_sort_key_time);
+    printf("+--------------------------------------------------+\n");
+
+    return SUCCCESS_CODE;
+}
+
+status_t print_memory_data(size_t memory_used, size_t memory_used_keys)
+{
+    printf("Использование оперативной памяти:\n");
+    printf("Размер данных: %zu байт\n", memory_used);
+    printf("Размер таблицы ключей: %zu байт\n", memory_used_keys);
+    printf("Общий объем используемой памяти: %zu байт\n", memory_used + memory_used_keys);
+
+    return SUCCCESS_CODE;
+}
+
 char *get_general_genre(theater_play_t *cur_play)
 {
     switch (cur_play->play_type)
