@@ -1,0 +1,12 @@
+#ifndef __PRINT_INSTRUCTIONS__
+#define __PRINT_INSTRUCTIONS__
+
+#include "status.h"
+#include "color.h"
+#include <stdio.h>
+
+status_t print_menu(void);
+status_t print_read_file_comments(void);
+status_t print_delete_instructions(void);
+
+#endif
