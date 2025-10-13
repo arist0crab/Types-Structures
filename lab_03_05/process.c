@@ -1,0 +1,28 @@
+#include "process.h"
+
+
+status_t proccess_menu_option(menu_option_t menu_option)
+{
+    status_t ec = SUCCESS_CODE;
+
+    switch (menu_option)
+    {
+        case EXIT_PROGRAM:
+            break;
+
+        case PRINT_MATR:
+
+            break;
+
+        case CSR_CSC_MATR_MULT:
+            break;
+
+        case COMMON_MATR_MULT:
+            break;
+
+        case COMPARE_ALGORITHMS:
+            break;
+    }
+
+    return ec;
+}

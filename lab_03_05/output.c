@@ -7,11 +7,21 @@ status_t print_menu(void)
     printf("|                            Меню                  |\n");
     printf("+--------------------------------------------------+\n");
     printf("| 0  - Выйти из программы                          |\n");
-    printf("| 1  - Умножить разреженную матрицу на вектор      |\n");
-    printf("| 2  - Умножить полную матрицу на вектор           |\n");
-    printf("| 3  - Вывести матрицу                             |\n");
-    printf("| 4  - Сравнить алгоритмы матриц                   |\n");
+    printf("| 1  - Вывести матрицы                             |\n");
+    printf("| 2  - Перемножить матрицы форматов CSR и CSC      |\n");
+    printf("| 2  - Перемножить матрицы в обычной форме         |\n");
+    printf("| 4  - Сравнить алогритмы перемножения             |\n");
     printf("+--------------------------------------------------+\n");
+
+    return SUCCESS_CODE;
+}
+
+status_t print_final_common_result(status_t exit_code)
+{
+    if (exit_code == SUCCESS_CODE)
+        printf("%sПрограмма завершилась успешно!%s\n", GREEN_BOLD, RESET);
+    else 
+        printf("%sПрограмма завершилась с ошибкой: %d%s\n", RED_BOLD, exit_code, RESET);
 
     return SUCCESS_CODE;
 }

@@ -7,5 +7,6 @@
 
 status_t print_menu(void);
 status_t print_result(status_t exit_code);
+status_t print_final_common_result(status_t exit_code);
 
 #endif

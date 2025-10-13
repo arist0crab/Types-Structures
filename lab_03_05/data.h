@@ -14,9 +14,9 @@ typedef enum
 typedef enum 
 {
     EXIT_PROGRAM,
-    MULT_SPARSE_MATR_BY_VECTOR,
-    MULT_FULL_MATR_BY_VECTOR,
     PRINT_MATR,
+    CSR_CSC_MATR_MULT,
+    COMMON_MATR_MULT,
     COMPARE_ALGORITHMS
 } menu_option_t;
 
