@@ -4,6 +4,7 @@
 #include "data.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
     int *A;
@@ -30,6 +31,7 @@ typedef struct {
 } dense_matrix_t;
 
 extern dense_matrix_t dense_matr_1, dense_matr_2;
+extern CSR_matrix_t result_CSR_matr;
 extern CSR_matrix_t CSR_matr;
 extern CSC_matrix_t CSC_matr;
 extern int matrices_initialized_quantity;
@@ -41,5 +43,6 @@ status_t free_csc_matr(void);
 status_t allocate_dense_matrix(dense_matrix_t *dense_matr, size_t n, size_t m);
 status_t allocate_csr_matrix(size_t non_zero_quantity, size_t rows_quantity);
 status_t allocate_csc_matrix(size_t non_zero_quantity, size_t cols_quantity);
+status_t multiply_csr_and_csc(void);
 
 #endif

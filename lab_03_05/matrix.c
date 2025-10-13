@@ -8,6 +8,7 @@ status_t allocate_dense_matrix(dense_matrix_t *dense_matr, size_t n, size_t m);
 
 // инициализируем глобальные структуры
 dense_matrix_t dense_matr_1 = {0}, dense_matr_2 = {0};
+CSR_matrix_t result_CSR_matr = {0};
 CSR_matrix_t CSR_matr = {0};
 CSC_matrix_t CSC_matr = {0};
 int matrices_initialized_quantity = 0;
@@ -162,6 +163,20 @@ status_t free_csr_matr(void)
     return SUCCESS_CODE;
 }
 
+status_t free_result_csr_matr(void)
+{
+    if (result_CSR_matr.A) free(result_CSR_matr.A);
+    if (result_CSR_matr.JA) free(result_CSR_matr.JA);
+    if (result_CSR_matr.IA) free(result_CSR_matr.IA);
+    result_CSR_matr.A = NULL, result_CSR_matr.JA = NULL, result_CSR_matr.IA = NULL;
+    result_CSR_matr.rows = 0, result_CSR_matr.cols = 0, result_CSR_matr.non_zero = 0;
+
+    // "сбросили" матрицу - подкрутили счетчик
+    matrices_initialized_quantity -= (matrices_initialized_quantity > 0);
+
+    return SUCCESS_CODE;
+}
+
 status_t free_csc_matr(void)
 {
     if (CSC_matr.B) free(CSC_matr.B);
@@ -180,10 +195,218 @@ status_t free_all_matr(void)
 {
     free_dense_matrix(&dense_matr_1);
     free_dense_matrix(&dense_matr_2);
+    free_result_csr_matr();
     free_csr_matr();
     free_csc_matr();
 
     matrices_initialized_quantity = 0;
 
     return SUCCESS_CODE;
+}
+
+
+// FIXME не всегда правильно работает, например для слуая:
+/*
+   CSR                CSC
+[0, 0, 5]          
+[0, 0, 0]          [0, 0, 8]
+[7, 0, 0]    *     [0, 0, 0]
+[0, 0, 0]          [0, 9, 0]
+*/
+status_t multiply_csr_and_csc(void)
+{
+    status_t ec = SUCCESS_CODE;
+
+    // Все указатели и переменные в начале
+    size_t n_rows_A = 0, n_cols_B = 0, n_common = 0;
+    size_t max_non_zero_quantity = 0, result_ind = 0;
+
+    size_t *B_row_count = NULL;
+    size_t *B_row_ptr = NULL;
+    int *B_rows_cols = NULL;
+    int *B_rows_vals = NULL;
+    size_t *pos = NULL;
+    int *row_result = NULL;
+
+    // Проверка входных данных
+    if (!CSR_matr.A || !CSR_matr.IA || !CSR_matr.JA ||
+        !CSC_matr.B || !CSC_matr.IB || !CSC_matr.JB ||
+        CSR_matr.cols == 0 || CSR_matr.rows == 0 || CSR_matr.non_zero == 0 ||
+        CSC_matr.cols == 0 || CSC_matr.rows == 0 || CSC_matr.non_zero == 0)
+    {
+        return UNKNOWN_ERROR;
+    }
+
+    if (CSR_matr.cols != CSC_matr.rows)
+        return ERR_MULT;
+
+    n_rows_A = CSR_matr.rows;
+    n_cols_B = CSC_matr.cols;
+    n_common = CSR_matr.cols;
+
+    // Подсчёт количества элементов в строках B (на основе CSC)
+    B_row_count = (size_t*)calloc(n_common, sizeof(size_t));
+    if (B_row_count == NULL)
+    {
+        ec = ERR_MEM;
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        for (size_t col = 0; col < n_cols_B && ec == SUCCESS_CODE; ++col)
+        {
+            size_t start = CSC_matr.JB[col];
+            size_t end = CSC_matr.JB[col + 1];
+
+            for (size_t p = start; p < end; ++p)
+            {
+                size_t row = (size_t)CSC_matr.IB[p];
+                if (row >= n_common)
+                {
+                    ec = UNKNOWN_ERROR;
+                    break;
+                }
+                B_row_count[row]++;
+            }
+        }
+    }
+
+    // Индексные указатели строк B
+    if (ec == SUCCESS_CODE)
+    {
+        B_row_ptr = (size_t*)calloc(n_common + 1, sizeof(size_t));
+        if (B_row_ptr == NULL)
+            ec = ERR_MEM;
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        for (size_t i = 1; i <= n_common; ++i)
+            B_row_ptr[i] = B_row_ptr[i - 1] + B_row_count[i - 1];
+
+        B_rows_cols = (int*)calloc(CSC_matr.non_zero, sizeof(int));
+        B_rows_vals = (int*)calloc(CSC_matr.non_zero, sizeof(int));
+        pos = (size_t*)malloc(n_common * sizeof(size_t));
+
+        if (!B_rows_cols || !B_rows_vals || !pos)
+            ec = ERR_MEM;
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        for (size_t i = 0; i < n_common; ++i)
+            pos[i] = B_row_ptr[i];
+
+        for (size_t col = 0; col < n_cols_B; ++col)
+        {
+            size_t start = CSC_matr.JB[col];
+            size_t end = CSC_matr.JB[col + 1];
+            for (size_t p = start; p < end; ++p)
+            {
+                size_t row = (size_t)CSC_matr.IB[p];
+                size_t dst = pos[row]++;
+                B_rows_cols[dst] = (int)col;
+                B_rows_vals[dst] = CSC_matr.B[p];
+            }
+        }
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        max_non_zero_quantity = n_rows_A * n_cols_B;
+        free_result_csr_matr();
+
+        result_CSR_matr.A = (int *)calloc(max_non_zero_quantity, sizeof(int));
+        result_CSR_matr.JA = (int *)calloc(max_non_zero_quantity, sizeof(int));
+        result_CSR_matr.IA = (int *)calloc((n_rows_A + 1), sizeof(int));
+
+        if (!result_CSR_matr.A || !result_CSR_matr.JA || !result_CSR_matr.IA)
+            ec = ERR_MEM;
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        row_result = (int*)malloc(n_cols_B * sizeof(int));
+        if (!row_result)
+            ec = ERR_MEM;
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        result_ind = 0;
+        result_CSR_matr.IA[0] = 0;
+
+        for (size_t i = 0; i < n_rows_A; ++i)
+        {
+            memset(row_result, 0, n_cols_B * sizeof(int));
+
+            size_t row_start = CSR_matr.IA[i];
+            size_t row_end = CSR_matr.IA[i + 1];
+
+            for (size_t p = row_start; p < row_end; ++p)
+            {
+                size_t k = (size_t)CSR_matr.JA[p];
+                int val_a = CSR_matr.A[p];
+                size_t b_start = B_row_ptr[k];
+                size_t b_end = B_row_ptr[k + 1];
+                for (size_t q = b_start; q < b_end; ++q)
+                {
+                    int col_b = B_rows_cols[q];
+                    int val_b = B_rows_vals[q];
+                    row_result[col_b] += val_a * val_b;
+                }
+            }
+
+            for (size_t j = 0; j < n_cols_B; ++j)
+            {
+                if (row_result[j] != 0)
+                {
+                    if (result_ind >= max_non_zero_quantity)
+                    {
+                        size_t new_cap = max_non_zero_quantity * 2 + 16;
+                        int *newA = (int*)realloc(result_CSR_matr.A, new_cap * sizeof(int));
+                        int *newJA = (int*)realloc(result_CSR_matr.JA, new_cap * sizeof(int));
+                        if (!newA || !newJA)
+                        {
+                            ec = ERR_MEM;
+                            break;
+                        }
+                        result_CSR_matr.A = newA;
+                        result_CSR_matr.JA = newJA;
+                        max_non_zero_quantity = new_cap;
+                    }
+
+                    if (ec == SUCCESS_CODE)
+                    {
+                        result_CSR_matr.A[result_ind] = row_result[j];
+                        result_CSR_matr.JA[result_ind] = (int)j;
+                        result_ind++;
+                    }
+                }
+            }
+
+            result_CSR_matr.IA[i + 1] = result_ind;
+
+            if (ec != SUCCESS_CODE)
+                break;
+        }
+    }
+
+    // финализация
+    if (ec == SUCCESS_CODE)
+    {
+        result_CSR_matr.rows = n_rows_A;
+        result_CSR_matr.cols = n_cols_B;
+        result_CSR_matr.non_zero = result_ind;
+    }
+
+    // Централизованное освобождение
+    free(B_row_count);
+    free(B_row_ptr);
+    free(B_rows_cols);
+    free(B_rows_vals);
+    free(pos);
+    free(row_result);
+
+    return ec;
 }

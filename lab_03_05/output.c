@@ -70,6 +70,8 @@ status_t print_all_matrices(void)
         printf("У вас нет инициализированных матриц :(\n");
     else 
     {
+        printf("%sМатриц инициализировано: %d%s\n", BLUE, matrices_initialized_quantity, RESET);
+        
         if (dense_matr_1.data)
         {
             printf("%s=== Плотная матрица №1 ===%s\n", BLUE, RESET);
@@ -92,6 +94,12 @@ status_t print_all_matrices(void)
         {
             printf("%s====== CSC матрица ======%s\n", BLUE, RESET);
             print_csc_matrix(&CSC_matr);
+        }
+
+        if (result_CSR_matr.A)
+        {
+            printf("%s=== результирующая CSR матрица ===%s\n", BLUE, RESET);
+            print_csr_matrix(&result_CSR_matr);
         }
     }
 
@@ -138,12 +146,12 @@ status_t print_csc_matrix(const CSC_matrix_t *csc_matr)
         printf("%d ", csc_matr->B[i]);
     printf("\n");
 
-    printf("JB (строки): ");
+    printf("IB (строки): ");
     for (size_t i = 0; i < csc_matr->non_zero; i++)
         printf("%d ", csc_matr->IB[i]);
     printf("\n");
 
-    printf("IB (строки): ");
+    printf("JB (строки): ");
     for (size_t i = 0; i < csc_matr->cols + 1; i++)
         printf("%d ", csc_matr->JB[i]);
     printf("\n");

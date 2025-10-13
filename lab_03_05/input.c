@@ -41,13 +41,13 @@ status_t input_any_matrix(void)
         return ERR_IO;
 
     if (option == 0)
-        input_dense_matr(&dense_matr_1);
+        ec = input_dense_matr(&dense_matr_1);
     else if (option == 1)
-        input_dense_matr(&dense_matr_2);
+        ec = input_dense_matr(&dense_matr_2);
     else if (option == 2)
-        input_csr_matrix();
+        ec = input_csr_matrix();
     else if (option == 3)
-        input_csc_matrix();
+        ec = input_csc_matrix();
     else
         ec = UNKNOWN_ERROR;
 
@@ -87,9 +87,8 @@ status_t input_csr_matrix(void)
             if (CSR_matr.IA[i] < CSR_matr.IA[i - 1])
                 ec = ERR_IO; 
 
-    if (ec == SUCCESS_CODE)
-        matrices_initialized_quantity += 1;
-    else 
+    matrices_initialized_quantity += 1;
+    if (ec != SUCCESS_CODE) 
         free_csr_matr();
 
     return ec;
@@ -128,9 +127,8 @@ status_t input_csc_matrix(void)
             if (CSC_matr.JB[i] < CSC_matr.JB[i - 1])
                 ec = ERR_IO; 
 
-    if (ec == SUCCESS_CODE)
-        matrices_initialized_quantity += 1;
-    else 
+    matrices_initialized_quantity += 1;
+    if (ec != SUCCESS_CODE) 
         free_csc_matr();
 
     return ec;
@@ -224,11 +222,11 @@ status_t input_indexes_array(int *indexes_array, size_t non_zero_quantity, int m
 {
     status_t ec = SUCCESS_CODE;
 
-    printf("%sВведите индекс строки для каждого элемента:\n%s", BLUE, RESET);
+    printf("%sВведите индекс столбца/строки для каждого элемента:\n%s", BLUE, RESET);
     for (size_t i = 0; ec == SUCCESS_CODE && i < non_zero_quantity; i++)
     {
         printf("%sИндекс №%ld%s: ", BLUE, i + 1, RESET);
-        if (scanf("%d", &indexes_array[i]) != 1 || indexes_array[i] < 0 || indexes_array[i] >= max_possible_index)
+        if (scanf("%d", &indexes_array[i]) != 1 || indexes_array[i] < 0 || indexes_array[i] > max_possible_index)
             ec = ERR_IO;
     }
 
@@ -239,7 +237,7 @@ status_t input_max_non_zero_for_each_col_or_row(int *target_array, size_t range_
 {
     status_t ec = SUCCESS_CODE;
 
-    printf("%sВведите кол-во значимых элементов для каждого столбца:\n%s", BLUE, RESET);
+    printf("%sВведите кол-во значимых элементов для каждого столбца/строки:\n%s", BLUE, RESET);
     for (size_t i = 0; ec == SUCCESS_CODE && i < range_ind + 1; i++)
     {
         printf("%sЭлемент №%ld%s: ", BLUE, i + 1, RESET);

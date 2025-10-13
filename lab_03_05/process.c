@@ -19,6 +19,9 @@ status_t proccess_menu_option(menu_option_t menu_option)
             break;
 
         case CSR_CSC_MATR_MULT:
+            ec = multiply_csr_and_csc();
+            // TODO: проверить что result_CSR_matr существует
+            print_csr_matrix(&result_CSR_matr);
             break;
 
         case COMMON_MATR_MULT:
