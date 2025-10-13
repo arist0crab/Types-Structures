@@ -16,6 +16,7 @@ int main(void)
     {
         menu_opt_processing_status = proccess_menu_option(cur_menu_opt);
         print_result(menu_opt_processing_status);
+        print_menu();
         exit_code = input_cur_menu_opt(&cur_menu_opt);
     }
     

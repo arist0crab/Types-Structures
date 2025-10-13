@@ -1,6 +1,9 @@
 #ifndef __DATA_H__
 #define __DATA_H__
 
+#define MAX_STR_LEN 256
+#define MAX_MATRIX_SIZE 1000
+
 typedef enum
 {
     SUCCESS_CODE,

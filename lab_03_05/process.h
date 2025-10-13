@@ -2,6 +2,7 @@
 #define __PROCESS_H__
 
 #include "data.h"
+#include "output.h"
 
 status_t proccess_menu_option(menu_option_t menu_option);
 

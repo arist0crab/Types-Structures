@@ -1,5 +1,8 @@
 #include "output.h"
 
+status_t print_dense_matrix(const dense_matrix_t *dense_matr);
+status_t print_csr_matrix(const CSR_matrix_t *csr_matr);
+status_t print_csc_matrix(const CSC_matrix_t *csc_matr);
 
 status_t print_menu(void)
 {
@@ -7,7 +10,7 @@ status_t print_menu(void)
     printf("|                            Меню                  |\n");
     printf("+--------------------------------------------------+\n");
     printf("| 0  - Выйти из программы                          |\n");
-    printf("| 1  - Вывести матрицы                             |\n");
+    printf("| 1  - Вывести все существующие матрицы            |\n");
     printf("| 2  - Перемножить матрицы форматов CSR и CSC      |\n");
     printf("| 2  - Перемножить матрицы в обычной форме         |\n");
     printf("| 4  - Сравнить алогритмы перемножения             |\n");
@@ -54,6 +57,95 @@ status_t print_result(status_t exit_code)
             return UNKNOWN_ERROR;
             break;
     }
+
+    printf("\n");
+
+    return SUCCESS_CODE;
+}
+
+status_t print_all_matrices(void)
+{
+    if (matrices_initialized_quantity == 0)
+        printf("У вас нет инициализированных матриц :(\n");
+    else 
+    {
+        if (dense_matr_1.data)
+        {
+            printf("%s=== Плотная матрица №1 ===%s\n", BLUE, RESET);
+            print_dense_matrix(&dense_matr_1);
+        }
+
+        if (dense_matr_2.data)
+        {
+            printf("%s=== Плотная матрица №2 ===%s\n", BLUE, RESET);
+            print_dense_matrix(&dense_matr_2);
+        }
+
+        if (CSR_matr.A)
+        {
+            printf("%s====== CSR матрица ======%s\n", BLUE, RESET);
+            print_csr_matrix(&CSR_matr);
+        }
+
+        if (CSC_matr.B)
+        {
+            printf("%s====== CSC матрица ======%s\n", BLUE, RESET);
+            print_csc_matrix(&CSC_matr);
+        }
+    }
+
+    return SUCCESS_CODE;
+}
+
+status_t print_dense_matrix(const dense_matrix_t *dense_matr)
+{
+    for (size_t i = 0; i < dense_matr->rows; i++)
+    {
+        for (size_t j = 0; j < dense_matr->cols; j++)
+            printf("%d ", dense_matr->data[i][j]);
+        printf("\n");
+    }
+    printf("\n");
+
+    return SUCCESS_CODE;
+}
+
+status_t print_csr_matrix(const CSR_matrix_t *csr_matr)
+{
+    printf("A (значения): ");
+    for (size_t i = 0; i < csr_matr->non_zero; i++)
+        printf("%d ", csr_matr->A[i]);
+    printf("\n\n");
+
+    printf("JA (столбцы): ");
+    for (size_t i = 0; i < csr_matr->non_zero; i++)
+        printf("%d ", csr_matr->JA[i]);
+    printf("\n\n");
+
+    printf("IA (строки): ");
+    for (size_t i = 0; i < csr_matr->rows + 1; i++)
+        printf("%d ", csr_matr->IA[i]);
+    printf("\n\n");
+
+    return SUCCESS_CODE;
+}
+
+status_t print_csc_matrix(const CSC_matrix_t *csc_matr)
+{
+    printf("B (значения): ");
+    for (size_t i = 0; i < csc_matr->non_zero; i++)
+        printf("%d ", csc_matr->B[i]);
+    printf("\n\n");
+
+    printf("JB (строки): ");
+    for (size_t i = 0; i < csc_matr->non_zero; i++)
+        printf("%d ", csc_matr->IB[i]);
+    printf("\n\n");
+
+    printf("IB (строки): ");
+    for (size_t i = 0; i < csc_matr->cols + 1; i++)
+        printf("%d ", csc_matr->JB[i]);
+    printf("\n\n");
 
     return SUCCESS_CODE;
 }

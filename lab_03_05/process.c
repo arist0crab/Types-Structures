@@ -11,7 +11,7 @@ status_t proccess_menu_option(menu_option_t menu_option)
             break;
 
         case PRINT_MATR:
-
+            print_all_matrices();
             break;
 
         case CSR_CSC_MATR_MULT:
