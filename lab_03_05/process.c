@@ -14,6 +14,10 @@ status_t proccess_menu_option(menu_option_t menu_option)
             print_all_matrices();
             break;
 
+        case INPUT_MATR:
+            ec = input_any_matrix();
+            break;
+
         case CSR_CSC_MATR_MULT:
             break;
 

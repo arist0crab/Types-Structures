@@ -2,9 +2,9 @@
 
 status_t free_all_matr(void);
 status_t free_dense_matrix(dense_matrix_t *dense_matrix);
+status_t free_csr_matr(void);
+status_t free_csc_matr(void);
 status_t allocate_dense_matrix(dense_matrix_t *dense_matr, size_t n, size_t m);
-
-
 
 // инициализируем глобальные структуры
 dense_matrix_t dense_matr_1 = {0}, dense_matr_2 = {0};
@@ -19,7 +19,7 @@ status_t allocate_dense_matrix(dense_matrix_t *dense_matr, size_t n, size_t m)
 
     // освобождаем dense_matr, если он что-то содержит
     free_dense_matrix(dense_matr);
-    dense_matr = NULL;
+    dense_matr->data = NULL;
 
     if (n == 0 || m == 0 || n > MAX_MATRIX_SIZE || m > MAX_MATRIX_SIZE)
         ec = ERR_RANGE;
@@ -62,6 +62,62 @@ status_t allocate_dense_matrix(dense_matrix_t *dense_matr, size_t n, size_t m)
     return ec;
 }
 
+status_t allocate_csr_matrix(size_t non_zero_quantity, size_t rows_quantity)
+{
+    status_t ec = SUCCESS_CODE;
+
+    if (non_zero_quantity == 0)
+        ec = ERR_RANGE;
+
+    CSR_matr.A = NULL;
+    CSR_matr.JA = NULL;
+    CSR_matr.IA = NULL;
+
+    CSR_matr.A = calloc(non_zero_quantity, sizeof(int));
+    CSR_matr.JA = calloc(non_zero_quantity, sizeof(int));
+    CSR_matr.IA = calloc(rows_quantity + 1, sizeof(int));
+
+    if (CSR_matr.A == NULL || CSR_matr.JA == NULL || CSR_matr.IA == NULL)
+        ec = ERR_MEM;
+
+    if (ec != SUCCESS_CODE)
+    {
+        CSR_matr.A = NULL;
+        CSR_matr.JA = NULL;
+        CSR_matr.IA = NULL;
+    }
+
+    return ec;
+}
+
+status_t allocate_csc_matrix(size_t non_zero_quantity, size_t cols_quantity)
+{
+    status_t ec = SUCCESS_CODE;
+
+    if (non_zero_quantity == 0)
+        ec = ERR_RANGE;
+
+    CSC_matr.B = NULL;
+    CSC_matr.JB = NULL;
+    CSC_matr.IB = NULL;
+
+    CSC_matr.B = calloc(non_zero_quantity, sizeof(int));
+    CSC_matr.IB = calloc(non_zero_quantity, sizeof(int));
+    CSC_matr.JB = calloc(cols_quantity + 1, sizeof(int));
+
+    if (CSC_matr.B == NULL || CSC_matr.JB == NULL || CSC_matr.IB == NULL)
+        ec = ERR_MEM;
+
+    if (ec != SUCCESS_CODE)
+    {
+        CSC_matr.B = NULL;
+        CSC_matr.JB = NULL;
+        CSC_matr.IB = NULL;
+    }
+
+    return ec;
+}
+
 status_t free_dense_matrix(dense_matrix_t *dense_matrix)
 {
     status_t ec = SUCCESS_CODE;
@@ -85,28 +141,47 @@ status_t free_dense_matrix(dense_matrix_t *dense_matrix)
     dense_matrix->data = NULL;
     dense_matrix->rows = 0;
     dense_matrix->cols = 0;
+
+    // "сбросили" матрицу - подкрутили счетчик
+    matrices_initialized_quantity -= (matrices_initialized_quantity > 0);
     
     return ec;
 }
 
-status_t free_all_matr(void)
+status_t free_csr_matr(void)
 {
-    free_dense_matrix(&dense_matr_1);
-    free_dense_matrix(&dense_matr_2);
-
-    // освобождаем CSR
     if (CSR_matr.A) free(CSR_matr.A);
     if (CSR_matr.JA) free(CSR_matr.JA);
     if (CSR_matr.IA) free(CSR_matr.IA);
     CSR_matr.A = NULL, CSR_matr.JA = NULL, CSR_matr.IA = NULL;
     CSR_matr.rows = 0, CSR_matr.cols = 0, CSR_matr.non_zero = 0;
 
-    // освобождаем CSS
+    // "сбросили" матрицу - подкрутили счетчик
+    matrices_initialized_quantity -= (matrices_initialized_quantity > 0);
+
+    return SUCCESS_CODE;
+}
+
+status_t free_csc_matr(void)
+{
     if (CSC_matr.B) free(CSC_matr.B);
     if (CSC_matr.JB) free(CSC_matr.JB);
     if (CSC_matr.IB) free(CSC_matr.IB);
     CSC_matr.B = NULL, CSC_matr.JB = NULL, CSC_matr.IB = NULL;
     CSC_matr.rows = 0, CSC_matr.cols = 0, CSC_matr.non_zero = 0;
+
+    // "сбросили" матрицу - подкрутили счетчик
+    matrices_initialized_quantity -= (matrices_initialized_quantity > 0);
+
+    return SUCCESS_CODE;
+}
+
+status_t free_all_matr(void)
+{
+    free_dense_matrix(&dense_matr_1);
+    free_dense_matrix(&dense_matr_2);
+    free_csr_matr();
+    free_csc_matr();
 
     matrices_initialized_quantity = 0;
 

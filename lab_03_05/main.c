@@ -1,4 +1,5 @@
 #include "data.h"
+#include "matrix.h"
 #include "input.h"
 #include "output.h"
 #include "process.h"
@@ -9,6 +10,7 @@ int main(void)
     status_t exit_code = SUCCESS_CODE;  // основной код возврата из программы
     status_t menu_opt_processing_status = SUCCESS_CODE;  // код возврата для обработки ошибок внутри цикла
     menu_option_t cur_menu_opt;  // выбранная опция меню
+    char buf;
 
     print_menu();
     exit_code = input_cur_menu_opt(&cur_menu_opt);
@@ -17,10 +19,13 @@ int main(void)
         menu_opt_processing_status = proccess_menu_option(cur_menu_opt);
         print_result(menu_opt_processing_status);
         print_menu();
+        while ((buf = getchar()) != '\n' && buf != EOF);
         exit_code = input_cur_menu_opt(&cur_menu_opt);
     }
     
     print_final_common_result(exit_code);
+
+    free_all_matr();
 
     return exit_code;
 }

@@ -11,9 +11,10 @@ status_t print_menu(void)
     printf("+--------------------------------------------------+\n");
     printf("| 0  - Выйти из программы                          |\n");
     printf("| 1  - Вывести все существующие матрицы            |\n");
-    printf("| 2  - Перемножить матрицы форматов CSR и CSC      |\n");
-    printf("| 2  - Перемножить матрицы в обычной форме         |\n");
-    printf("| 4  - Сравнить алогритмы перемножения             |\n");
+    printf("| 2  - Ввести какую-либо матрицу                   |\n");
+    printf("| 3  - Перемножить матрицы форматов CSR и CSC      |\n");
+    printf("| 4  - Перемножить матрицы в обычной форме         |\n");
+    printf("| 5  - Сравнить алогритмы перемножения             |\n");
     printf("+--------------------------------------------------+\n");
 
     return SUCCESS_CODE;
@@ -115,17 +116,17 @@ status_t print_csr_matrix(const CSR_matrix_t *csr_matr)
     printf("A (значения): ");
     for (size_t i = 0; i < csr_matr->non_zero; i++)
         printf("%d ", csr_matr->A[i]);
-    printf("\n\n");
+    printf("\n");
 
     printf("JA (столбцы): ");
     for (size_t i = 0; i < csr_matr->non_zero; i++)
         printf("%d ", csr_matr->JA[i]);
-    printf("\n\n");
+    printf("\n");
 
     printf("IA (строки): ");
     for (size_t i = 0; i < csr_matr->rows + 1; i++)
         printf("%d ", csr_matr->IA[i]);
-    printf("\n\n");
+    printf("\n");
 
     return SUCCESS_CODE;
 }
@@ -135,17 +136,17 @@ status_t print_csc_matrix(const CSC_matrix_t *csc_matr)
     printf("B (значения): ");
     for (size_t i = 0; i < csc_matr->non_zero; i++)
         printf("%d ", csc_matr->B[i]);
-    printf("\n\n");
+    printf("\n");
 
     printf("JB (строки): ");
     for (size_t i = 0; i < csc_matr->non_zero; i++)
         printf("%d ", csc_matr->IB[i]);
-    printf("\n\n");
+    printf("\n");
 
     printf("IB (строки): ");
     for (size_t i = 0; i < csc_matr->cols + 1; i++)
         printf("%d ", csc_matr->JB[i]);
-    printf("\n\n");
+    printf("\n");
 
     return SUCCESS_CODE;
 }

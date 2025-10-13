@@ -34,4 +34,12 @@ extern CSR_matrix_t CSR_matr;
 extern CSC_matrix_t CSC_matr;
 extern int matrices_initialized_quantity;
 
+status_t free_all_matr(void);
+status_t free_dense_matrix(dense_matrix_t *dense_matrix);
+status_t free_csr_matr(void);
+status_t free_csc_matr(void);
+status_t allocate_dense_matrix(dense_matrix_t *dense_matr, size_t n, size_t m);
+status_t allocate_csr_matrix(size_t non_zero_quantity, size_t rows_quantity);
+status_t allocate_csc_matrix(size_t non_zero_quantity, size_t cols_quantity);
+
 #endif
