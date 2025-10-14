@@ -90,6 +90,12 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
         break;
 
     case PRINT_EFFICIENCY_TABLE:
+        if (theater_plays_arr == NULL || (int)*theater_plays_q <= 0)
+        {
+            rc = ARR_PROCESSING_ERROR;
+            break;
+        }
+
         printf("%sИзмерение времени выполнения сортировок для данных и таблицы ключей...\n%s", BLUE, RESET);
         struct timespec quick_sort_data_start, quick_sort_data_end;
         struct timespec slow_sort_data_start, slow_sort_data_end;
