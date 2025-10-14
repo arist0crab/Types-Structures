@@ -215,51 +215,56 @@ status_t multiply_csr_and_csc(void)
     size_t temp_size = 0;
     size_t nnz_count = 0;
 
-    if (!CSR_matr.A || !CSR_matr.JA || !CSR_matr.IA ||
-        !CSC_matr.B || !CSC_matr.IB || !CSC_matr.JB) {
+    if (!CSR_matr.A || !CSR_matr.JA || !CSR_matr.IA || CSR_matr.rows == 0 || CSR_matr.cols == 0 ||  CSR_matr.non_zero == 0)
         return ERR_MEM;
-    }
+    if (!CSC_matr.B || !CSC_matr.IB || !CSC_matr.JB || CSC_matr.rows == 0 || CSC_matr.cols == 0 || CSC_matr.non_zero == 0)
+        return ERR_MEM;
 
     rowsA = CSR_matr.rows;
     colsA = CSR_matr.cols;
     rowsB = CSC_matr.rows;
     colsB = CSC_matr.cols;
 
-    if (colsA != rowsB) {
+    if (colsA != rowsB)
         return ERR_RANGE;
-    }
 
-    // Временный массив для накопления значений строки
+    // временный массив для накопления значений строки
     temp_row = (int*)calloc(colsB, sizeof(int));
-    if (!temp_row) {
+    if (!temp_row)
         ec = ERR_MEM;
-    }
 
-    // Результирующая структура
-    if (ec == SUCCESS_CODE) {
+    // результирующая структура
+    if (ec == SUCCESS_CODE) 
+    {
         result_CSR_matr.rows = rowsA;
         result_CSR_matr.cols = colsB;
         result_CSR_matr.IA = (int*)calloc(rowsA + 1, sizeof(int));
         if (!result_CSR_matr.IA) ec = ERR_MEM;
     }
 
-    // Подсчёт количества ненулевых элементов и запись в IA
-    if (ec == SUCCESS_CODE) {
-        for (i = 0; i < rowsA; i++) {
+    // подсчёт количества ненулевых элементов и запись в IA
+    if (ec == SUCCESS_CODE) 
+    {
+        for (i = 0; i < rowsA; i++) 
+        {
             temp_size = 0;
-            for (j = 0; j < colsB; j++) {
+            for (j = 0; j < colsB; j++) 
+            {
                 int sum = 0;
-                for (k = CSR_matr.IA[i]; k < (size_t)CSR_matr.IA[i + 1]; k++) {
+                for (k = CSR_matr.IA[i]; k < (size_t)CSR_matr.IA[i + 1]; k++) 
+                {
                     int colA = CSR_matr.JA[k];
-                    // Найти colA в столбце j матрицы B
-                    for (size_t p = CSC_matr.JB[j]; p < (size_t)CSC_matr.JB[j + 1]; p++) {
-                        if (CSC_matr.IB[p] == colA) {
+                    for (size_t p = CSC_matr.JB[j]; p < (size_t)CSC_matr.JB[j + 1]; p++) 
+                    {
+                        if (CSC_matr.IB[p] == colA) 
+                        {
                             sum += CSR_matr.A[k] * CSC_matr.B[p];
                             break;
                         }
                     }
                 }
-                if (sum != 0) {
+                if (sum != 0) 
+                {
                     temp_row[temp_size++] = j; // сохраняем индекс столбца
                     nnz_count++;
                 }
@@ -268,29 +273,37 @@ status_t multiply_csr_and_csc(void)
         }
     }
 
-    // Выделение памяти под A и JA
-    if (ec == SUCCESS_CODE) {
+    // выделение памяти под A и JA
+    if (ec == SUCCESS_CODE) 
+    {
         result_CSR_matr.A = (int*)malloc(nnz_count * sizeof(int));
         result_CSR_matr.JA = (int*)malloc(nnz_count * sizeof(int));
         if (!result_CSR_matr.A || !result_CSR_matr.JA) ec = ERR_MEM;
     }
 
-    // Заполнение A и JA
-    if (ec == SUCCESS_CODE) {
+    // заполнение A и JA
+    if (ec == SUCCESS_CODE) 
+    {
         nnz_count = 0;
-        for (i = 0; i < rowsA; i++) {
-            for (j = 0; j < colsB; j++) {
+        for (i = 0; i < rowsA; i++) 
+        {
+            for (j = 0; j < colsB; j++) 
+            {
                 int sum = 0;
-                for (k = CSR_matr.IA[i]; k < (size_t)CSR_matr.IA[i + 1]; k++) {
+                for (k = CSR_matr.IA[i]; k < (size_t)CSR_matr.IA[i + 1]; k++) 
+                {
                     int colA = CSR_matr.JA[k];
-                    for (size_t p = CSC_matr.JB[j]; p < (size_t)CSC_matr.JB[j + 1]; p++) {
-                        if (CSC_matr.IB[p] == colA) {
+                    for (size_t p = CSC_matr.JB[j]; p < (size_t)CSC_matr.JB[j + 1]; p++) 
+                    {
+                        if (CSC_matr.IB[p] == colA) 
+                        {
                             sum += CSR_matr.A[k] * CSC_matr.B[p];
                             break;
                         }
                     }
                 }
-                if (sum != 0) {
+                if (sum != 0) 
+                {
                     result_CSR_matr.A[nnz_count] = sum;
                     result_CSR_matr.JA[nnz_count] = j;
                     nnz_count++;
@@ -300,21 +313,10 @@ status_t multiply_csr_and_csc(void)
         result_CSR_matr.non_zero = nnz_count;
     }
 
-    // Освобождение временной памяти
     free(temp_row);
 
-    // Если произошла ошибка — освободить выделенное под результат
-    if (ec != SUCCESS_CODE) {
-        free(result_CSR_matr.A);
-        free(result_CSR_matr.JA);
-        free(result_CSR_matr.IA);
-        result_CSR_matr.A = NULL;
-        result_CSR_matr.JA = NULL;
-        result_CSR_matr.IA = NULL;
-        result_CSR_matr.rows = 0;
-        result_CSR_matr.cols = 0;
-        result_CSR_matr.non_zero = 0;
-    }
+    if (ec != SUCCESS_CODE) 
+        free_result_csr_matr();
 
     return ec;
 }
