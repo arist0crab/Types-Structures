@@ -151,7 +151,7 @@ status_t print_csc_matrix(const CSC_matrix_t *csc_matr)
         printf("%d ", csc_matr->IB[i]);
     printf("\n");
 
-    printf("JB (строки): ");
+    printf("JB (столбцы): ");
     for (size_t i = 0; i < csc_matr->cols + 1; i++)
         printf("%d ", csc_matr->JB[i]);
     printf("\n");
