@@ -27,6 +27,7 @@ status_t compare_matrix_multiplication(void)
     for (size_t cur_fill_percent = 10; cur_fill_percent <= 100; cur_fill_percent += 10)
     {
         cur_non_zero_quantity = common_rows * common_cols / 100 * cur_fill_percent;
+        cur_non_zero_quantity = (!cur_non_zero_quantity) ? 1 : cur_non_zero_quantity;
 
         // выделяем память под CSR и CSC
         ec = allocate_csr_matrix(cur_non_zero_quantity, common_rows);
@@ -47,6 +48,9 @@ status_t compare_matrix_multiplication(void)
         print_csc_matrix(&CSC_matr);
         // TODO написать функцию заполнения dense матрицы
         // TODO организовать цикл для замеров времени и памяти
+
+        free_csr_matr();
+        free_csc_matr();
     }
 
     free_all_matr();
