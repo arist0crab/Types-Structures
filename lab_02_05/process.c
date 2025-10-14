@@ -11,6 +11,8 @@ status_t shift_array_with_delete_one_integer_elem(theater_play_t *theater_plays_
 status_t delete_play(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q);
 status_t rebuild_keys_table(int *theater_plays_keys, size_t *theater_plays_q);
 
+FILE *filestream = NULL;
+
 status_t allocate_memory(void **elems_arr, size_t elems_quantity, size_t elem_size)
 {
     status_t rc = SUCCCESS_CODE;
@@ -90,12 +92,12 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
         break;
 
     case PRINT_EFFICIENCY_TABLE:
-        if (theater_plays_arr == NULL || (int)*theater_plays_q <= 0)
+        rc = get_and_open_file(&filestream);
+        if (filestream == NULL)
         {
-            rc = ARR_PROCESSING_ERROR;
+            rc = FILE_READ_ERROR;
             break;
         }
-
         printf("%sИзмерение времени выполнения сортировок для данных и таблицы ключей...\n%s", BLUE, RESET);
         struct timespec quick_sort_data_start, quick_sort_data_end;
         struct timespec slow_sort_data_start, slow_sort_data_end;
@@ -106,44 +108,73 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
         long long quick_sort_key_time_sum = 0;
         long long slow_sort_key_time_sum = 0;
 
-        for (size_t i = 0; i < 500; i++)
+        for (size_t i = 0; i < 500 && rc == SUCCCESS_CODE; i++)
         {
-            // измерение времени выполнения быстрой сортировки данных
-            clock_gettime(CLOCK_MONOTONIC, &quick_sort_data_start);
-            quick_sort_by_ticket_price(theater_plays_arr, 0, *theater_plays_q - 1);
-            clock_gettime(CLOCK_MONOTONIC, &quick_sort_data_end);
-            quick_sort_data_time_sum += (quick_sort_data_end.tv_sec - quick_sort_data_start.tv_sec) * 1000000000LL + (quick_sort_data_end.tv_nsec - quick_sort_data_start.tv_nsec);
+            rc = main_read_file_cycle(filestream, theater_plays_arr, theater_plays_q);
+            if (rc == SUCCCESS_CODE)
+            {
+                // измерение времени выполнения быстрой сортировки данных
+                clock_gettime(CLOCK_MONOTONIC, &quick_sort_data_start);
+                quick_sort_by_ticket_price(theater_plays_arr, 0, *theater_plays_q - 1);
+                clock_gettime(CLOCK_MONOTONIC, &quick_sort_data_end);
+                quick_sort_data_time_sum += (quick_sort_data_end.tv_sec - quick_sort_data_start.tv_sec) * 1000000000LL + (quick_sort_data_end.tv_nsec - quick_sort_data_start.tv_nsec);
+            }
 
-            // измерение времени выполнения медленной сортировки данных
-            clock_gettime(CLOCK_MONOTONIC, &slow_sort_data_start);
-            slow_sort_by_ticket_price(theater_plays_arr, theater_plays_q);
-            clock_gettime(CLOCK_MONOTONIC, &slow_sort_data_end);
-            slow_sort_data_time_sum += (slow_sort_data_end.tv_sec - slow_sort_data_start.tv_sec) * 1000000000LL + (slow_sort_data_end.tv_nsec - slow_sort_data_start.tv_nsec);
+            rc = main_read_file_cycle(filestream, theater_plays_arr, theater_plays_q);
+            if (rc == SUCCCESS_CODE)
+            {
+                // измерение времени выполнения медленной сортировки данных
+                clock_gettime(CLOCK_MONOTONIC, &slow_sort_data_start);
+                slow_sort_by_ticket_price(theater_plays_arr, theater_plays_q);
+                clock_gettime(CLOCK_MONOTONIC, &slow_sort_data_end);
+                slow_sort_data_time_sum += (slow_sort_data_end.tv_sec - slow_sort_data_start.tv_sec) * 1000000000LL + (slow_sort_data_end.tv_nsec - slow_sort_data_start.tv_nsec);
+            }
 
-            // измерение времени выполнения быстрой сортировки ключей
-            clock_gettime(CLOCK_MONOTONIC, &quick_sort_key_start);
-            quick_sort_by_keys(theater_plays_arr, theater_plays_keys, 0, *theater_plays_q - 1);
-            clock_gettime(CLOCK_MONOTONIC, &quick_sort_key_end);
-            quick_sort_key_time_sum += (quick_sort_key_end.tv_sec - quick_sort_key_start.tv_sec) * 1000000000LL + (quick_sort_key_end.tv_nsec - quick_sort_key_start.tv_nsec);
+            rc = main_read_file_cycle(filestream, theater_plays_arr, theater_plays_q);
+            // инициализируем таблицу ключей
+            if (rc == SUCCCESS_CODE)
+                for (size_t i = 0; i < *theater_plays_q; i++)
+                    theater_plays_keys[i] = i;
+            if (rc == SUCCCESS_CODE)
+            {
+                // измерение времени выполнения быстрой сортировки ключей
+                clock_gettime(CLOCK_MONOTONIC, &quick_sort_key_start);
+                quick_sort_by_keys(theater_plays_arr, theater_plays_keys, 0, *theater_plays_q - 1);
+                clock_gettime(CLOCK_MONOTONIC, &quick_sort_key_end);
+                quick_sort_key_time_sum += (quick_sort_key_end.tv_sec - quick_sort_key_start.tv_sec) * 1000000000LL + (quick_sort_key_end.tv_nsec - quick_sort_key_start.tv_nsec);
+            }
 
-            // измерение времени выполнения быстрой сортировки ключей
-            clock_gettime(CLOCK_MONOTONIC, &slow_sort_key_start);
-            slow_sort_by_keys(theater_plays_arr, theater_plays_keys, theater_plays_q);
-            clock_gettime(CLOCK_MONOTONIC, &slow_sort_key_end);
-            slow_sort_key_time_sum += (slow_sort_key_end.tv_sec - slow_sort_key_start.tv_sec) * 1000000000LL + (slow_sort_key_end.tv_nsec - slow_sort_key_start.tv_nsec);
+            rc = main_read_file_cycle(filestream, theater_plays_arr, theater_plays_q);
+            // инициализируем таблицу ключей
+            if (rc == SUCCCESS_CODE)
+                for (size_t i = 0; i < *theater_plays_q; i++)
+                    theater_plays_keys[i] = i;
+            if (rc == SUCCCESS_CODE)
+            {
+                // измерение времени выполнения медленной сортировки ключей
+                clock_gettime(CLOCK_MONOTONIC, &slow_sort_key_start);
+                slow_sort_by_keys(theater_plays_arr, theater_plays_keys, theater_plays_q);
+                clock_gettime(CLOCK_MONOTONIC, &slow_sort_key_end);
+                slow_sort_key_time_sum += (slow_sort_key_end.tv_sec - slow_sort_key_start.tv_sec) * 1000000000LL + (slow_sort_key_end.tv_nsec - slow_sort_key_start.tv_nsec);
+            }
         }
 
-        // рассчитываем среднее время выполнения
-        long long average_quick_sort_data_time = quick_sort_data_time_sum / 500;
-        long long average_slow_sort_data_time = slow_sort_data_time_sum / 500;
-        long long average_quick_sort_key_time = quick_sort_key_time_sum / 500;
-        long long average_slow_sort_key_time = slow_sort_key_time_sum / 500;
+        if (rc == SUCCCESS_CODE)
+        {
+            // рассчитываем среднее время выполнения
+            long long average_quick_sort_data_time = quick_sort_data_time_sum / 500;
+            long long average_slow_sort_data_time = slow_sort_data_time_sum / 500;
+            long long average_quick_sort_key_time = quick_sort_key_time_sum / 500;
+            long long average_slow_sort_key_time = slow_sort_key_time_sum / 500;
 
-        print_efficiency_table(average_quick_sort_data_time, average_slow_sort_data_time, average_quick_sort_key_time, average_slow_sort_key_time);
+            print_efficiency_table(average_quick_sort_data_time, average_slow_sort_data_time, average_quick_sort_key_time, average_slow_sort_key_time);
 
-        size_t memory_used = *theater_plays_q * sizeof(theater_play_t);
-        size_t memory_used_keys = *theater_plays_q * sizeof(int);
-        print_memory_data(memory_used, memory_used_keys);
+            size_t memory_used = *theater_plays_q * sizeof(theater_play_t);
+            size_t memory_used_keys = *theater_plays_q * sizeof(int);
+            print_memory_data(memory_used, memory_used_keys);
+        }
+
+        fclose(filestream);
 
         break;
 
@@ -151,7 +182,6 @@ status_t process_choice(choice_t choice, bool *program_running, theater_play_t *
         rc = input_age_rating_and_duration(&target_age_rating, &target_duration);
         if (rc == SUCCCESS_CODE)
             rc = print_balets_by_conditions(theater_plays_arr, *theater_plays_q, target_age_rating, target_duration);
-
         break;
 
     case CHOICES_QUANTITY:

@@ -25,21 +25,7 @@ status_t read_file(theater_play_t *theater_plays_arr, int *theater_plays_keys, s
     }
 
     if (rc == SUCCCESS_CODE)
-    {
-        do
-        {
-            if (*theater_plays_q >= MAX_PLAYS_QUANTITY)
-                rc = RECORDS_ARR_OVERFLOWED;
-            
-            if (rc == SUCCCESS_CODE)
-                rc = read_base_fields(filestream, &theater_plays_arr[*theater_plays_q]);
-
-            if (rc == SUCCCESS_CODE)
-                rc = read_selectable_fields(filestream, &theater_plays_arr[*theater_plays_q]);
-
-            *theater_plays_q += (rc == SUCCCESS_CODE);
-        } while (!feof(filestream) && rc == SUCCCESS_CODE);
-    }
+        rc = main_read_file_cycle(filestream, theater_plays_arr, theater_plays_q);
     
     if (filestream)
         fclose(filestream);
@@ -50,6 +36,35 @@ status_t read_file(theater_play_t *theater_plays_arr, int *theater_plays_keys, s
             theater_plays_keys[i] = i;
 
     return rc;  
+}
+
+status_t main_read_file_cycle(FILE *filestream, theater_play_t *theater_plays_arr, size_t *theater_plays_q)
+{
+    status_t rc = SUCCCESS_CODE;
+
+    if (!filestream)
+        return FILE_READ_ERROR;
+
+    rewind(filestream);
+    *theater_plays_q = 0;
+    memset(theater_plays_arr, 0, sizeof(theater_play_t));
+
+    do
+    {
+        if (*theater_plays_q >= MAX_PLAYS_QUANTITY)
+            rc = RECORDS_ARR_OVERFLOWED;
+        
+        if (rc == SUCCCESS_CODE)
+            rc = read_base_fields(filestream, &theater_plays_arr[*theater_plays_q]);
+
+        if (rc == SUCCCESS_CODE)
+            rc = read_selectable_fields(filestream, &theater_plays_arr[*theater_plays_q]);
+
+        *theater_plays_q += (rc == SUCCCESS_CODE);
+    } 
+    while (!feof(filestream) && rc == SUCCCESS_CODE);
+
+    return rc;
 }
 
 
