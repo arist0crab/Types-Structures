@@ -1,8 +1,5 @@
 #include "output.h"
 
-status_t print_csr_matrix(const CSR_matrix_t *csr_matr);
-status_t print_csc_matrix(const CSC_matrix_t *csc_matr);
-
 status_t print_menu(void)
 {
     printf("+--------------------------------------------------+\n");
@@ -120,6 +117,9 @@ status_t print_dense_matrix(const dense_matrix_t *dense_matr)
 
 status_t print_csr_matrix(const CSR_matrix_t *csr_matr)
 {
+    printf("Количество значимых элементов: %ld\n", csr_matr->non_zero);
+    printf("Количество строк: %ld\n", csr_matr->rows);
+    printf("Количество столбцов: %ld\n", csr_matr->cols);
     printf("A (значения): ");
     for (size_t i = 0; i < csr_matr->non_zero; i++)
         printf("%d ", csr_matr->A[i]);
@@ -140,6 +140,9 @@ status_t print_csr_matrix(const CSR_matrix_t *csr_matr)
 
 status_t print_csc_matrix(const CSC_matrix_t *csc_matr)
 {
+    printf("Количество значимых элементов: %ld\n", csc_matr->non_zero);
+    printf("Количество строк: %ld\n", csc_matr->cols);
+    printf("Количество столбцов: %ld\n", csc_matr->rows);
     printf("B (значения): ");
     for (size_t i = 0; i < csc_matr->non_zero; i++)
         printf("%d ", csc_matr->B[i]);

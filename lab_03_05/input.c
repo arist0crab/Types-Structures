@@ -6,7 +6,6 @@ status_t input_csr_matrix(void);
 status_t input_csc_matrix(void);
 
 // вспомогательные функции для ввода матриц
-status_t input_matrix_dimensions(size_t *rows, size_t *cols);
 status_t input_non_zero_quantity(size_t *non_zero_quantity, size_t max_non_zero_quantity);
 status_t input_non_zero_elements(int *non_zero_arr, size_t non_zero_quantity);
 status_t input_indexes_array(int *indexes_array, size_t non_zero_quantity, int max_possible_index);

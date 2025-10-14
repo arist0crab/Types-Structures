@@ -31,6 +31,8 @@ status_t proccess_menu_option(menu_option_t menu_option)
             break;
 
         case COMPARE_ALGORITHMS:
+            // TODO вывести предупреждение что все матрицы бцдцт сброшены
+            ec = compare_matrix_multiplication();
             break;
     }
 
