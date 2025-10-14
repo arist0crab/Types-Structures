@@ -20,11 +20,14 @@ status_t proccess_menu_option(menu_option_t menu_option)
 
         case CSR_CSC_MATR_MULT:
             ec = multiply_csr_and_csc();
-            // TODO: проверить что result_CSR_matr существует
-            print_csr_matrix(&result_CSR_matr);
+            if (result_CSR_matr.A && result_CSR_matr.IA && result_CSR_matr.JA)
+                print_csr_matrix(&result_CSR_matr);
             break;
 
         case COMMON_MATR_MULT:
+            ec = multiply_dense_matrices();
+            if (dense_matr_result.data && dense_matr_result.rows > 0 && dense_matr_result.cols > 0)
+                print_dense_matrix(&dense_matr_result);
             break;
 
         case COMPARE_ALGORITHMS:

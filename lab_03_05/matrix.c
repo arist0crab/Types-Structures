@@ -8,6 +8,7 @@ status_t allocate_dense_matrix(dense_matrix_t *dense_matr, size_t n, size_t m);
 
 // инициализируем глобальные структуры
 dense_matrix_t dense_matr_1 = {0}, dense_matr_2 = {0};
+dense_matrix_t dense_matr_result = {0};
 CSR_matrix_t result_CSR_matr = {0};
 CSR_matrix_t CSR_matr = {0};
 CSC_matrix_t CSC_matr = {0};
@@ -195,6 +196,7 @@ status_t free_all_matr(void)
 {
     free_dense_matrix(&dense_matr_1);
     free_dense_matrix(&dense_matr_2);
+    free_dense_matrix(&dense_matr_result);
     free_result_csr_matr();
     free_csr_matr();
     free_csc_matr();
@@ -317,6 +319,38 @@ status_t multiply_csr_and_csc(void)
 
     if (ec != SUCCESS_CODE) 
         free_result_csr_matr();
+
+    return ec;
+}
+
+status_t multiply_dense_matrices(void)
+{
+    status_t ec = SUCCESS_CODE;
+
+    if (dense_matr_1.cols != dense_matr_2.rows)
+        return ERR_MULT;
+
+    // если матрица существует освобождаем ее, чтобы перезаписать
+    if (dense_matr_result.data)
+        ec = free_dense_matrix(&dense_matr_result);
+
+    if (ec == SUCCESS_CODE)
+        ec = allocate_dense_matrix(&dense_matr_result, dense_matr_1.rows, dense_matr_2.cols);
+
+    if (ec == SUCCESS_CODE)
+        for (size_t i = 0; i < dense_matr_result.rows; i++)
+        {
+            for (size_t j = 0; j < dense_matr_result.cols; j++)
+            {
+                int sum = 0;
+                for (size_t k = 0; k < dense_matr_1.cols; k++)
+                    sum += dense_matr_1.data[i][k] * dense_matr_2.data[k][j];
+                dense_matr_result.data[i][j] = sum;
+            }
+        }
+
+    if (ec != SUCCESS_CODE && dense_matr_result.data)
+        free_dense_matrix(&dense_matr_result);
 
     return ec;
 }

@@ -1,9 +1,12 @@
 #include "input.h"
 
+// ввод матриц
 status_t input_dense_matr(dense_matrix_t *dense_matr);
-status_t input_matrix_dimensions(size_t *rows, size_t *cols);
 status_t input_csr_matrix(void);
 status_t input_csc_matrix(void);
+
+// вспомогательные функции для ввода матриц
+status_t input_matrix_dimensions(size_t *rows, size_t *cols);
 status_t input_non_zero_quantity(size_t *non_zero_quantity, size_t max_non_zero_quantity);
 status_t input_non_zero_elements(int *non_zero_arr, size_t non_zero_quantity);
 status_t input_indexes_array(int *indexes_array, size_t non_zero_quantity, int max_possible_index);
@@ -15,10 +18,7 @@ status_t input_cur_menu_opt(menu_option_t *cur_menu_opt)
     printf("%sВыберите пункт меню: %s", BLUE, RESET);
 
     if (scanf("%d", &temp) != 1 || temp < 0 || temp > 5)
-    {
-        
         return ERR_IO;
-    }
     
     *cur_menu_opt = (menu_option_t)temp;
     return SUCCESS_CODE;
@@ -154,9 +154,8 @@ status_t input_dense_matr(dense_matrix_t *dense_matr)
                 ec = ERR_IO;
         }   
 
-    if (ec == SUCCESS_CODE)
-        matrices_initialized_quantity += 1;
-    else 
+    matrices_initialized_quantity += 1;
+    if (ec != SUCCESS_CODE) 
         free_dense_matrix(dense_matr);
 
     return ec;

@@ -1,6 +1,5 @@
 #include "output.h"
 
-status_t print_dense_matrix(const dense_matrix_t *dense_matr);
 status_t print_csr_matrix(const CSR_matrix_t *csr_matr);
 status_t print_csc_matrix(const CSC_matrix_t *csc_matr);
 
