@@ -69,7 +69,7 @@ status_t allocate_csr_matrix(size_t non_zero_quantity, size_t rows_quantity)
     status_t ec = SUCCESS_CODE;
 
     if (non_zero_quantity == 0)
-        ec = ERR_RANGE;
+        return ERR_RANGE;
 
     CSR_matr.A = NULL;
     CSR_matr.JA = NULL;
@@ -97,7 +97,7 @@ status_t allocate_csc_matrix(size_t non_zero_quantity, size_t cols_quantity)
     status_t ec = SUCCESS_CODE;
 
     if (non_zero_quantity == 0)
-        ec = ERR_RANGE;
+        return ERR_RANGE;
 
     CSC_matr.B = NULL;
     CSC_matr.JB = NULL;
