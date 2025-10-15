@@ -152,8 +152,8 @@ status_t print_csr_matrix(const CSR_matrix_t *csr_matr)
 status_t print_csc_matrix(const CSC_matrix_t *csc_matr)
 {
     printf("Количество значимых элементов: %ld\n", csc_matr->non_zero);
-    printf("Количество строк: %ld\n", csc_matr->cols);
-    printf("Количество столбцов: %ld\n", csc_matr->rows);
+    printf("Количество строк: %ld\n", csc_matr->rows);
+    printf("Количество столбцов: %ld\n", csc_matr->cols);
     printf("B (значения): ");
     for (size_t i = 0; i < csc_matr->non_zero; i++)
         printf("%d ", csc_matr->B[i]);
