@@ -18,8 +18,8 @@ status_t compare_matrix_multiplication(void)
     size_t dense_1_memory, dense_2_memory;
     size_t csr_memory, csc_memory;
     struct timespec start_mesuare, end_measure;
-    long long global_dense_matr_time = 0, global_sparse_matr_time = 0;
-    long long global_dense_memory = 0, global_sparse_memory = 0;
+    long long global_dense_matr_time, global_sparse_matr_time;
+    long long global_dense_memory, global_sparse_memory;
 
     ec = input_matrix_dimensions(&common_rows, &common_cols);
     if (ec != SUCCESS_CODE)
@@ -58,32 +58,45 @@ status_t compare_matrix_multiplication(void)
             CSR_matr.cols = common_cols, CSC_matr.cols = common_cols;
         }
 
-        // заполняем матрицы
-        fill_random_csr(&CSR_matr, cur_non_zero_quantity);
-        fill_random_csc(&CSC_matr, cur_non_zero_quantity);
-        fill_random_dense(&dense_matr_1, cur_non_zero_quantity);
-        fill_random_dense(&dense_matr_2, cur_non_zero_quantity);
+        global_dense_matr_time = 0;
+        global_sparse_matr_time = 0;
+        global_dense_memory = 0;
+        global_sparse_memory = 0;
 
-        // перемножаем и замеряем время для плотных матриц
-        clock_gettime(CLOCK_MONOTONIC, &start_mesuare);
-        multiply_dense_matrices();
-        clock_gettime(CLOCK_MONOTONIC, &end_measure);
-        global_dense_matr_time = (end_measure.tv_sec - start_mesuare.tv_sec) * 1000000000LL + (end_measure.tv_nsec - start_mesuare.tv_nsec);
+        // для каждого значения процента делаем замеры по 100 раз
+        for (size_t i = 0; ec == SUCCESS_CODE && i < COMPARE_ITERATIONS_QUANITY; i++)
+        {
+            // заполняем матрицы
+            fill_random_csr(&CSR_matr, cur_non_zero_quantity);
+            fill_random_csc(&CSC_matr, cur_non_zero_quantity);
+            fill_random_dense(&dense_matr_1, cur_non_zero_quantity);
+            fill_random_dense(&dense_matr_2, cur_non_zero_quantity);
 
-        // перемножаем и замеряем время для плотных матриц
-        clock_gettime(CLOCK_MONOTONIC, &start_mesuare);
-        multiply_csr_and_csc();
-        clock_gettime(CLOCK_MONOTONIC, &end_measure);
-        global_sparse_matr_time = (end_measure.tv_sec - start_mesuare.tv_sec) * 1000000000LL + (end_measure.tv_nsec - start_mesuare.tv_nsec);
+            // перемножаем и замеряем время для плотных матриц
+            clock_gettime(CLOCK_MONOTONIC, &start_mesuare);
+            multiply_dense_matrices();
+            clock_gettime(CLOCK_MONOTONIC, &end_measure);
+            global_dense_matr_time += (end_measure.tv_sec - start_mesuare.tv_sec) * 1000000000LL + (end_measure.tv_nsec - start_mesuare.tv_nsec);
+
+            // перемножаем и замеряем время для плотных матриц
+            clock_gettime(CLOCK_MONOTONIC, &start_mesuare);
+            multiply_csr_and_csc();
+            clock_gettime(CLOCK_MONOTONIC, &end_measure);
+            global_sparse_matr_time += (end_measure.tv_sec - start_mesuare.tv_sec) * 1000000000LL + (end_measure.tv_nsec - start_mesuare.tv_nsec);           
+        }
+
+        global_dense_matr_time /= COMPARE_ITERATIONS_QUANITY;
+        global_sparse_matr_time /= COMPARE_ITERATIONS_QUANITY;
+
+        // считаем занимаемую память для разреженных матриц
+        calc_csr_matr_memory(&CSR_matr, &csr_memory);
+        calc_csc_matr_memory(&CSC_matr, &csc_memory);
+        global_sparse_memory = csr_memory + csc_memory;
 
         // считаем занимаемую память для плотных матриц
         calc_dense_matr_memory(&dense_matr_1, &dense_1_memory);
         calc_dense_matr_memory(&dense_matr_2, &dense_2_memory);
         global_dense_memory = dense_1_memory + dense_2_memory;
-
-        calc_csr_matr_memory(&CSR_matr, &csr_memory);
-        calc_csc_matr_memory(&CSC_matr, &csc_memory);
-        global_sparse_memory = csr_memory + csc_memory;
 
         printf("| %9ld | %10lld | %11lld | %12lld | %13lld |\n", cur_fill_percent, global_dense_matr_time, global_sparse_matr_time, global_dense_memory, global_sparse_memory);
         printf("+---------------------------------------------------------------------+\n");

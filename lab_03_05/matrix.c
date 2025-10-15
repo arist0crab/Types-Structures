@@ -230,6 +230,9 @@ status_t multiply_csr_and_csc(void)
     if (colsA != rowsB)
         return ERR_RANGE;
 
+    // освобождаем предыдущий результат
+    free_result_csr_matr();
+
     // временный массив для накопления значений строки
     temp_row = (int*)calloc(colsB, sizeof(int));
     if (!temp_row)
@@ -315,7 +318,7 @@ status_t multiply_csr_and_csc(void)
         result_CSR_matr.non_zero = nnz_count;
     }
 
-    free(temp_row);
+    if (temp_row) free(temp_row);
 
     if (ec != SUCCESS_CODE) 
         free_result_csr_matr();
