@@ -26,7 +26,7 @@ status_t proccess_menu_option(menu_option_t menu_option)
 
         case COMMON_MATR_MULT:
             ec = multiply_dense_matrices();
-            if (dense_matr_result.data && dense_matr_result.rows > 0 && dense_matr_result.cols > 0)
+            if (ec == SUCCESS_CODE)
                 print_dense_matrix(&dense_matr_result);
             break;
 

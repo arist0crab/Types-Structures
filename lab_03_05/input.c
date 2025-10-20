@@ -26,7 +26,7 @@ status_t input_cur_menu_opt(menu_option_t *cur_menu_opt)
 status_t input_any_matrix(void)
 {
     status_t ec = SUCCESS_CODE;
-    int option;
+    int matrix_type_option, input_type_option;
 
     printf("%s", BLUE);
     printf("Какую матрицу вы хотите ввести?\n");
@@ -36,18 +36,47 @@ status_t input_any_matrix(void)
     printf("3 - CSC-матрицу\n");
     printf("%s", RESET);
 
-    if (scanf("%d", &option) != 1 || option < 0 || option > 3)
+    if (scanf("%d", &matrix_type_option) != 1 || matrix_type_option < 0 || matrix_type_option > 3)
         return ERR_IO;
 
-    if (option == 0)
-        ec = input_dense_matr(&dense_matr_1);
-    else if (option == 1)
-        ec = input_dense_matr(&dense_matr_2);
-    else if (option == 2)
-        ec = input_csr_matrix();
-    else if (option == 3)
-        ec = input_csc_matrix();
-    else
+    printf("%s", BLUE);
+    printf("Каким способом вы хотите ввести матрицу?\n");
+    printf("0 - ввести с клавиатуры\n");
+    printf("1 - считать с файла\n");
+    printf("%s", RESET);
+
+    if (scanf("%d", &input_type_option) != 1 || input_type_option < 0 || input_type_option > 1)
+        return ERR_IO;
+
+    if (input_type_option == 0)
+    {
+        // ввод с клавиатуры
+        if (matrix_type_option == 0)
+            ec = input_dense_matr(&dense_matr_1);
+        else if (matrix_type_option == 1)
+            ec = input_dense_matr(&dense_matr_2);
+        else if (matrix_type_option == 2)
+            ec = input_csr_matrix();
+        else if (matrix_type_option == 3)
+            ec = input_csc_matrix();
+        else
+            ec = UNKNOWN_ERROR;
+    }
+    else if (input_type_option == 1)
+    {
+        // чтение из файла
+        if (matrix_type_option == 0)
+            ec = read_dense_from_file(&dense_matr_1);
+        else if (matrix_type_option == 1)
+            ec = read_dense_from_file(&dense_matr_2);
+        else if (matrix_type_option == 2)
+            ec = read_csr_from_file(&CSR_matr);
+        else if (matrix_type_option == 3)
+            ec = read_csc_from_file(&CSC_matr);
+        else
+            ec = UNKNOWN_ERROR;
+    }
+    else 
         ec = UNKNOWN_ERROR;
 
     return ec;

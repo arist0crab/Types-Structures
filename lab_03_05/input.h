@@ -4,6 +4,7 @@
 #include "data.h"
 #include "matrix.h"
 #include "color.h"
+#include "file_read.h"
 #include <stdio.h>
 
 status_t input_cur_menu_opt(menu_option_t *cur_menu_opt);
