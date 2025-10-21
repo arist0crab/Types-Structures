@@ -56,8 +56,10 @@ status_t input_any_matrix(void)
         else if (matrix_type_option == 1)
             ec = input_dense_matr(&dense_matr_2);
         else if (matrix_type_option == 2)
+            // TODO для CSR сделать пункт "заполнить рандомно"
             ec = input_csr_matrix();
         else if (matrix_type_option == 3)
+            // TODO для CSC сделать пункт "заполнить рандомно"
             ec = input_csc_matrix();
         else
             ec = UNKNOWN_ERROR;
@@ -85,6 +87,8 @@ status_t input_any_matrix(void)
 status_t input_csr_matrix(void)
 {
     status_t ec = SUCCESS_CODE;
+
+    // TODO поменять систему ввода: строка/столбец -> элемент
 
     if (CSR_matr.A)
         free_csr_matr();
@@ -125,6 +129,8 @@ status_t input_csr_matrix(void)
 status_t input_csc_matrix(void)
 {
     status_t ec = SUCCESS_CODE;
+
+    // TODO поменять систему ввода: строка/столбец -> элемент
 
     if (CSC_matr.B)
         free_csc_matr();
