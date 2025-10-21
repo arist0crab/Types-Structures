@@ -10,6 +10,9 @@ status_t input_non_zero_quantity(size_t *non_zero_quantity, size_t max_non_zero_
 status_t input_non_zero_elements(int *non_zero_arr, size_t non_zero_quantity);
 status_t input_indexes_array(int *indexes_array, size_t non_zero_quantity, int max_possible_index);
 status_t input_max_non_zero_for_each_col_or_row(int *target_array, size_t range_ind, int non_zero_quantity);
+status_t random_input_dense_matrix(dense_matrix_t *dense_matrix);
+status_t random_input_csr_matrix(CSR_matrix_t *csr_matrix);
+status_t random_input_csc_matrix(CSC_matrix_t *csc_matrix);
 
 status_t input_cur_menu_opt(menu_option_t *cur_menu_opt)
 {
@@ -43,9 +46,10 @@ status_t input_any_matrix(void)
     printf("Каким способом вы хотите ввести матрицу?\n");
     printf("0 - ввести с клавиатуры\n");
     printf("1 - считать с файла\n");
+    printf("2 - заполнить случайно\n");
     printf("%s", RESET);
 
-    if (scanf("%d", &input_type_option) != 1 || input_type_option < 0 || input_type_option > 1)
+    if (scanf("%d", &input_type_option) != 1 || input_type_option < 0 || input_type_option > 2)
         return ERR_IO;
 
     if (input_type_option == 0)
@@ -56,10 +60,8 @@ status_t input_any_matrix(void)
         else if (matrix_type_option == 1)
             ec = input_dense_matr(&dense_matr_2);
         else if (matrix_type_option == 2)
-            // TODO для CSR сделать пункт "заполнить рандомно"
             ec = input_csr_matrix();
         else if (matrix_type_option == 3)
-            // TODO для CSC сделать пункт "заполнить рандомно"
             ec = input_csc_matrix();
         else
             ec = UNKNOWN_ERROR;
@@ -75,6 +77,20 @@ status_t input_any_matrix(void)
             ec = read_csr_from_file(&CSR_matr);
         else if (matrix_type_option == 3)
             ec = read_csc_from_file(&CSC_matr);
+        else
+            ec = UNKNOWN_ERROR;
+    }
+    else if (input_type_option == 2)
+    {
+        // случайное заполнение
+        if (matrix_type_option == 0)
+            ec = random_input_dense_matrix(&dense_matr_1);
+        else if (matrix_type_option == 1)
+            ec = random_input_dense_matrix(&dense_matr_2);
+        else if (matrix_type_option == 2)
+            ec = random_input_csr_matrix(&CSR_matr);
+        else if (matrix_type_option == 3)
+            ec = random_input_csc_matrix(&CSC_matr);
         else
             ec = UNKNOWN_ERROR;
     }
@@ -191,6 +207,108 @@ status_t input_dense_matr(dense_matrix_t *dense_matr)
     matrices_initialized_quantity += 1;
     if (ec != SUCCESS_CODE) 
         free_dense_matrix(dense_matr);
+
+    return ec;
+}
+
+
+status_t random_input_dense_matrix(dense_matrix_t *dense_matrix)
+{
+    status_t ec = SUCCESS_CODE;
+    size_t random_fill_percent = 0, random_non_zero_q = 0;
+
+    if (dense_matrix == NULL)   
+        return ERR_MEM;
+
+    free_dense_matrix(dense_matrix);
+
+    ec = input_matrix_dimensions(&dense_matrix->rows, &dense_matrix->cols);
+    if (ec == SUCCESS_CODE)
+    {
+        printf("%sВведите процент заполнения матрицы (1%%-100%%): %s", BLUE, RESET);
+        if (scanf("%lu", &random_fill_percent) != 1 || random_fill_percent == 0 || random_fill_percent > 100)
+            ec = ERR_IO;
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        random_non_zero_q = (size_t)(dense_matrix->rows * dense_matrix->cols / 100.00 * random_fill_percent);
+        random_non_zero_q = (!random_non_zero_q) ? 1 : random_non_zero_q;
+        ec = allocate_dense_matrix(dense_matrix, dense_matrix->rows, dense_matrix->cols);
+    }
+
+    if (ec == SUCCESS_CODE)
+        ec = fill_random_dense(dense_matrix, random_non_zero_q);
+
+    matrices_initialized_quantity += (ec == SUCCESS_CODE);
+
+    return ec;
+}
+
+status_t random_input_csr_matrix(CSR_matrix_t *csr_matrix)
+{
+    status_t ec = SUCCESS_CODE;
+    size_t random_fill_percent = 0, random_non_zero_q = 0;
+
+    if (csr_matrix == NULL)
+        return ERR_MEM;
+
+    free_csr_matr();
+
+    ec = input_matrix_dimensions(&csr_matrix->rows, &csr_matrix->cols);
+    if (ec == SUCCESS_CODE)
+    {
+        printf("%sВведите процент заполнения матрицы (1%%-100%%): %s", BLUE, RESET);
+        if (scanf("%lu", &random_fill_percent) != 1 || random_fill_percent == 0 || random_fill_percent > 100)
+            ec = ERR_IO;
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        random_non_zero_q = (size_t)(csr_matrix->rows * csr_matrix->cols / 100.00 * random_fill_percent);
+        random_non_zero_q = (!random_non_zero_q) ? 1 : random_non_zero_q;
+        csr_matrix->non_zero = random_non_zero_q;
+        ec = allocate_csr_matrix(random_non_zero_q, csr_matrix->rows);
+    }
+
+    if (ec == SUCCESS_CODE)
+        ec = fill_random_csr(csr_matrix, random_non_zero_q);
+
+    matrices_initialized_quantity += (ec == SUCCESS_CODE);
+
+    return ec;
+}
+
+status_t random_input_csc_matrix(CSC_matrix_t *csc_matrix)
+{
+    status_t ec = SUCCESS_CODE;
+    size_t random_fill_percent = 0, random_non_zero_q = 0;
+
+    if (csc_matrix == NULL)
+        return ERR_MEM;
+
+    free_csc_matr();
+
+    ec = input_matrix_dimensions(&csc_matrix->rows, &csc_matrix->cols);
+    if (ec == SUCCESS_CODE)
+    {
+        printf("%sВведите процент заполнения матрицы (1%%-100%%): %s", BLUE, RESET);
+        if (scanf("%lu", &random_fill_percent) != 1 || random_fill_percent == 0 || random_fill_percent > 100)
+            ec = ERR_IO;
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        random_non_zero_q = (size_t)(csc_matrix->rows * csc_matrix->cols / 100.00 * random_fill_percent);
+        random_non_zero_q = (!random_non_zero_q) ? 1 : random_non_zero_q;
+        csc_matrix->non_zero = random_non_zero_q;
+        ec = allocate_csc_matrix(random_non_zero_q, csc_matrix->cols);
+    }
+
+    if (ec == SUCCESS_CODE)
+        ec = fill_random_csc(csc_matrix, random_non_zero_q);
+
+    matrices_initialized_quantity += (ec == SUCCESS_CODE);
 
     return ec;
 }

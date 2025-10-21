@@ -2,9 +2,6 @@
 #include "compare_algorithms.h"
 #include <time.h>
 
-status_t fill_random_csr(CSR_matrix_t *mat, size_t num_random);
-status_t fill_random_csc(CSC_matrix_t *mat, size_t num_random);
-status_t fill_random_dense(dense_matrix_t *mat, size_t num_random);
 status_t calc_csr_matr_memory(CSR_matrix_t *csr_matr, size_t *memory_result);
 status_t calc_csc_matr_memory(CSC_matrix_t *csc_matr, size_t *memory_result);
 status_t calc_dense_matr_memory(dense_matrix_t *dense_matr, size_t *memory_result);
@@ -22,6 +19,9 @@ status_t compare_matrix_multiplication(void)
     long long global_dense_memory, global_sparse_memory;
 
     ec = input_matrix_dimensions(&common_rows, &common_cols);
+    if (ec == SUCCESS_CODE && common_rows != common_cols)
+        ec = ERR_MULT;
+
     if (ec != SUCCESS_CODE)
         return ec;
 
@@ -162,7 +162,7 @@ status_t fill_random_csr(CSR_matrix_t *mat, size_t num_random)
     // префиксная сумма IA
     for (size_t i = 1; i <= mat->rows; i++)
         mat->IA[i] += mat->IA[i - 1];
-
+        
     free(positions);
 
     return SUCCESS_CODE;
