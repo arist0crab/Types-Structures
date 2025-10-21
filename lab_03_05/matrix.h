@@ -30,6 +30,12 @@ typedef struct {
     size_t cols;
 } dense_matrix_t;
 
+typedef struct {
+    int value;
+    size_t row;
+    size_t col;
+} matrix_element_t;
+
 extern dense_matrix_t dense_matr_1, dense_matr_2;
 extern dense_matrix_t dense_matr_result;
 extern CSR_matrix_t result_CSR_matr;

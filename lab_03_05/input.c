@@ -13,6 +13,8 @@ status_t input_max_non_zero_for_each_col_or_row(int *target_array, size_t range_
 status_t random_input_dense_matrix(dense_matrix_t *dense_matrix);
 status_t random_input_csr_matrix(CSR_matrix_t *csr_matrix);
 status_t random_input_csc_matrix(CSC_matrix_t *csc_matrix);
+int compare_csr(const void *a, const void *b) ;
+int compare_csc(const void *a, const void *b) ;
 
 status_t input_cur_menu_opt(menu_option_t *cur_menu_opt)
 {
@@ -103,8 +105,8 @@ status_t input_any_matrix(void)
 status_t input_csr_matrix(void)
 {
     status_t ec = SUCCESS_CODE;
-
-    // TODO поменять систему ввода: строка/столбец -> элемент
+    matrix_element_t *elems = NULL;
+    size_t current_row = 0;
 
     if (CSR_matr.A)
         free_csr_matr();
@@ -117,27 +119,54 @@ status_t input_csr_matrix(void)
         ec = allocate_csr_matrix(CSR_matr.non_zero, CSR_matr.rows);
 
     if (ec == SUCCESS_CODE)
-        ec = input_non_zero_elements(CSR_matr.A, CSR_matr.non_zero);
+    {
+        elems = calloc(CSR_matr.non_zero, sizeof(matrix_element_t));
+        if (elems == NULL)
+            ec = ERR_MEM;
+    }
 
     if (ec == SUCCESS_CODE)
-        ec = input_indexes_array(CSR_matr.JA, CSR_matr.non_zero, CSR_matr.rows);
+    {
+        printf("%sВведите N ненулевых элементов (значение, индекс строки, индекс столбца):%s\n", BLUE, RESET);
+        for (size_t n = 0; ec == SUCCESS_CODE && n < CSR_matr.non_zero; n++)
+        {
+            if (scanf("%d %lu %lu", &elems[n].value, &elems[n].row, &elems[n].col) != 3)
+                ec = ERR_IO;
+            else if (elems[n].row >= CSR_matr.rows || elems[n].col >= CSR_matr.cols)
+                ec = ERR_RANGE;
+        }
+    }
+
+    for (size_t i = 0; ec == SUCCESS_CODE && i < CSR_matr.non_zero - 1; i++)
+        for (size_t j = i + 1; ec == SUCCESS_CODE && j < CSR_matr.non_zero; j++)
+            if (elems[i].row == elems[j].row && elems[i].col == elems[j].col)
+                ec = ERR_RANGE;
 
     if (ec == SUCCESS_CODE)
-        ec = input_max_non_zero_for_each_col_or_row(CSR_matr.IA, CSR_matr.rows, CSR_matr.non_zero);
+        qsort(elems, CSR_matr.non_zero, sizeof(matrix_element_t), compare_csr);
 
-    if (ec == SUCCESS_CODE)
-        if (CSR_matr.IA[0] != 0 || CSR_matr.IA[CSR_matr.rows] != (int)CSR_matr.non_zero)
-            ec = ERR_IO;
+    for (size_t i = 0; ec == SUCCESS_CODE && i < CSR_matr.non_zero; i++) 
+    {
+        CSR_matr.A[i] = elems[i].value;
+        CSR_matr.JA[i] = elems[i].col;
+    }
 
-    // проверка монотонности IA
-    if (ec == SUCCESS_CODE)
-        for (size_t i = 1; i <= CSR_matr.rows && ec == SUCCESS_CODE; i++)
-            if (CSR_matr.IA[i] < CSR_matr.IA[i - 1])
-                ec = ERR_IO; 
+    for (size_t i = 0; ec == SUCCESS_CODE && i < CSR_matr.non_zero; ) 
+    {
+        CSR_matr.IA[current_row++] = i;
+        while (i < CSR_matr.non_zero) i++;
+    }
 
-    matrices_initialized_quantity += 1;
+    while (current_row <= CSR_matr.rows && ec == SUCCESS_CODE)
+        CSR_matr.IA[current_row++] = CSR_matr.non_zero;
+
+    matrices_initialized_quantity += (ec == SUCCESS_CODE);
+
     if (ec != SUCCESS_CODE) 
         free_csr_matr();
+
+    if (elems)
+        free(elems);
 
     return ec;
 }
@@ -397,4 +426,20 @@ status_t input_max_non_zero_for_each_col_or_row(int *target_array, size_t range_
     }
 
     return ec;
+}
+
+int compare_csr(const void *a, const void *b) 
+{
+    const matrix_element_t *ea = (const matrix_element_t *)a;
+    const matrix_element_t *eb = (const matrix_element_t *)b;
+    if (ea->row != eb->row) return ea->row - eb->row;
+    return ea->col - eb->col;
+}
+
+int compare_csc(const void *a, const void *b) 
+{
+    const matrix_element_t *ea = (const matrix_element_t *)a;
+    const matrix_element_t *eb = (const matrix_element_t *)b;
+    if (ea->col != eb->col) return ea->col - eb->col;
+    return ea->row - eb->row;
 }
