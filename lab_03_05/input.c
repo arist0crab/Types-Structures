@@ -71,6 +71,7 @@ status_t input_any_matrix(void)
     else if (input_type_option == 1)
     {
         // чтение из файла
+        print_file_input_warning();
         if (matrix_type_option == 0)
             ec = read_dense_from_file(&dense_matr_1);
         else if (matrix_type_option == 1)
@@ -106,7 +107,6 @@ status_t input_csr_matrix(void)
 {
     status_t ec = SUCCESS_CODE;
     matrix_element_t *elems = NULL;
-    size_t current_row = 0;
 
     if (CSR_matr.A)
         free_csr_matr();
@@ -151,14 +151,15 @@ status_t input_csr_matrix(void)
         CSR_matr.JA[i] = elems[i].col;
     }
 
-    for (size_t i = 0; ec == SUCCESS_CODE && i < CSR_matr.non_zero; ) 
+    size_t elem_index = 0;
+    for (size_t row = 0; row < CSR_matr.rows; row++) 
     {
-        CSR_matr.IA[current_row++] = i;
-        while (i < CSR_matr.non_zero) i++;
+        CSR_matr.IA[row] = elem_index;
+        while (elem_index < CSR_matr.non_zero && elems[elem_index].row == row)
+            elem_index++;
     }
+    CSR_matr.IA[CSR_matr.rows] = CSR_matr.non_zero;
 
-    while (current_row <= CSR_matr.rows && ec == SUCCESS_CODE)
-        CSR_matr.IA[current_row++] = CSR_matr.non_zero;
 
     matrices_initialized_quantity += (ec == SUCCESS_CODE);
 
@@ -174,8 +175,7 @@ status_t input_csr_matrix(void)
 status_t input_csc_matrix(void)
 {
     status_t ec = SUCCESS_CODE;
-
-    // TODO поменять систему ввода: строка/столбец -> элемент
+    matrix_element_t *elems = NULL;
 
     if (CSC_matr.B)
         free_csc_matr();
@@ -188,30 +188,58 @@ status_t input_csc_matrix(void)
         ec = allocate_csc_matrix(CSC_matr.non_zero, CSC_matr.cols);
 
     if (ec == SUCCESS_CODE)
-        ec = input_non_zero_elements(CSC_matr.B, CSC_matr.non_zero);
+    {
+        elems = calloc(CSC_matr.non_zero, sizeof(matrix_element_t));
+        if (elems == NULL)
+            ec = ERR_MEM;
+    }
 
     if (ec == SUCCESS_CODE)
-        ec = input_indexes_array(CSC_matr.IB, CSC_matr.non_zero, CSC_matr.cols);
+    {
+        printf("%sВведите N ненулевых элементов (значение, индекс строки, индекс столбца):%s\n", BLUE, RESET);
+        for (size_t n = 0; ec == SUCCESS_CODE && n < CSC_matr.non_zero; n++)
+        {
+            if (scanf("%d %lu %lu", &elems[n].value, &elems[n].row, &elems[n].col) != 3)
+                ec = ERR_IO;
+            else if (elems[n].row >= CSC_matr.rows || elems[n].col >= CSC_matr.cols)
+                ec = ERR_RANGE;
+        }
+    }
+
+    for (size_t i = 0; ec == SUCCESS_CODE && i < CSC_matr.non_zero - 1; i++)
+        for (size_t j = i + 1; ec == SUCCESS_CODE && j < CSC_matr.non_zero; j++)
+            if (elems[i].row == elems[j].row && elems[i].col == elems[j].col)
+                ec = ERR_RANGE;
 
     if (ec == SUCCESS_CODE)
-        ec = input_max_non_zero_for_each_col_or_row(CSC_matr.JB, CSC_matr.cols, CSC_matr.non_zero);
+        qsort(elems, CSC_matr.non_zero, sizeof(matrix_element_t), compare_csc);
 
-    if (ec == SUCCESS_CODE)
-        if (CSC_matr.JB[0] != 0 || CSC_matr.JB[CSC_matr.cols] != (int)CSC_matr.non_zero)
-            ec = ERR_IO;
+    for (size_t i = 0; ec == SUCCESS_CODE && i < CSC_matr.non_zero; i++) 
+    {
+        CSC_matr.B[i] = elems[i].value;
+        CSC_matr.IB[i] = elems[i].row;
+    }
 
-    // проверка монотонности JB
-    if (ec == SUCCESS_CODE)
-        for (size_t i = 1; i <= CSC_matr.cols && ec == SUCCESS_CODE; i++)
-            if (CSC_matr.JB[i] < CSC_matr.JB[i - 1])
-                ec = ERR_IO; 
+    size_t elem_index = 0;
+    for (size_t col = 0; col < CSC_matr.cols; col++) 
+    {
+        CSC_matr.JB[col] = elem_index;
+        while (elem_index < CSC_matr.non_zero && elems[elem_index].col == col)
+            elem_index++;
+    }
+    CSC_matr.JB[CSC_matr.cols] = CSC_matr.non_zero;
 
-    matrices_initialized_quantity += 1;
-    if (ec != SUCCESS_CODE) 
+    matrices_initialized_quantity += (ec == SUCCESS_CODE);
+
+    if (ec != SUCCESS_CODE)
         free_csc_matr();
+
+    if (elems)
+        free(elems);
 
     return ec;
 }
+
 
 status_t input_dense_matr(dense_matrix_t *dense_matr)
 {

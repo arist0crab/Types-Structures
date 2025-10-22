@@ -27,6 +27,21 @@ status_t print_compare_algorithms_warning(void)
     return SUCCESS_CODE;
 }
 
+status_t print_file_input_warning(void)
+{
+    printf("%s", BLUE);
+    printf("===========  В Н И М А Н И Е  ===========\n");
+    printf("В файлах данные должны храниться определенным образом.\n");
+    printf("- для плотных матриц должны быть сначала указаны строки и столбцы,\n");
+    printf("  затем все элементы матрицы в порядке их записи в матрицу\n");
+    printf("- для CSR и CSC сначала в файле должны быть указаны размеры матрицы,\n");
+    printf("  затем кол-во ненулевых, затем значение массивов JA/IB, затем значения\n");
+    printf("  массивов IA/JB\n");
+    printf("%s", RESET);
+
+    return SUCCESS_CODE;
+}
+
 status_t print_final_common_result(status_t exit_code)
 {
     if (exit_code == SUCCESS_CODE)
