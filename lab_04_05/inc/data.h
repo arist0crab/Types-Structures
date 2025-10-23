@@ -1,12 +1,18 @@
 #ifndef __DATA_H__
 #define __DATA_H__
 
+#define MAX_EXPRESSION_SIZE 128
+
 typedef enum 
 {
     SUCCESS_CODE,
     ERR_IO,
     ERR_RANGE,
-    ERR_MEM
+    ERR_MEM,
+    ERR_OVERFLOW,
+    ERR_POP_EMPTY,
+    ERR_INVALID_POINTER,
+    ERR_ZERO_DIVISION
 } status_t;
 
 typedef enum 

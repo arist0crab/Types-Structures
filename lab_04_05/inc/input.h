@@ -4,7 +4,9 @@
 #include "data.h"
 #include "color.h"
 #include <stdio.h>
+#include <string.h>
 
 status_t input_cur_menu_opt(menu_option_t *cur_menu_opt);
+status_t get_expression(char *expression);
 
 #endif
