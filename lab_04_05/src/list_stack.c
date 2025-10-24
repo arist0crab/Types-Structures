@@ -1,8 +1,8 @@
 #include "list_stack.h"
 
 status_t create_node(node_t **new_node, int value);
-status_t execute_list_stack_operation(list_stack_t *operand_stack, list_stack_t *operator_stack);
-status_t handle_char_for_list_stack(list_stack_t *operand_stack, list_stack_t *operator_stack, char ch, int *reading_number, int *number);
+status_t execute_list_stack_operation(list_stack_t *operand_stack, list_stack_t *operator_stack, free_blocks_array_t *free_blocks);
+status_t handle_char_for_list_stack(list_stack_t *operand_stack, list_stack_t *operator_stack, char ch, int *reading_number, int *number, free_blocks_array_t *free_blocks);
 
 /** @brief Выводит на экран (в терминал) стек (список).
 */
@@ -27,7 +27,6 @@ status_t print_list_stack(list_stack_t *list_stack)
         occupied_memory = i * sizeof(node_t) + sizeof(list_stack_t);
         printf("%sДлина данного стека (списка): %lu%s\n", BLUE, i, RESET);
         printf("%sЗанимаемая память стека (списка): %lu байт(-ов)%s\n", BLUE, occupied_memory, RESET);
-        // TODO освобожденные ячейки памяти
     }
 
     return ec;
@@ -85,7 +84,7 @@ status_t free_list_stack(list_stack_t *list_stack)
  * данному указателю. Если popped_value == NULL, тогда удаляемое значение
  * не присваивается. 
 */
-status_t pop_list_stack(list_stack_t *list_stack, int *value)
+status_t pop_list_stack(list_stack_t *list_stack, int *value, free_blocks_array_t *free_blocks)
 {
     status_t ec = (list_stack) ? SUCCESS_CODE : ERR_INVALID_POINTER;
     node_t *tmp_node = NULL;
@@ -104,7 +103,10 @@ status_t pop_list_stack(list_stack_t *list_stack, int *value)
         *value = tmp_node->value;
 
     if (ec == SUCCESS_CODE && tmp_node)
+    {
+        add_to_free_blocks_array(free_blocks, (void *)tmp_node);
         free(tmp_node);
+    }
 
     return ec;
 }
@@ -137,7 +139,7 @@ status_t create_node(node_t **new_node, int value)
 
 /** @brief Главная функция вычисления выражения.
  */
-status_t calc_arithmetic_expr_by_list(const char *expression, int *result)
+status_t calc_arithmetic_expr_by_list(const char *expression, int *result, free_blocks_array_t *free_blocks)
 {
     status_t ec = (expression && result) ? SUCCESS_CODE : ERR_INVALID_POINTER;
     list_stack_t operand_stack = { NULL, 0, MAX_LIST_SIZE };
@@ -152,12 +154,12 @@ status_t calc_arithmetic_expr_by_list(const char *expression, int *result)
     for (int i = 0; ec == SUCCESS_CODE && i <= len; i++)
     {
         ch = expression[i];
-        ec = handle_char_for_list_stack(&operand_stack, &operator_stack, ch, &reading_number, &number);
+        ec = handle_char_for_list_stack(&operand_stack, &operator_stack, ch, &reading_number, &number, free_blocks);
     }
 
     if (ec == SUCCESS_CODE)
     {
-        ec = pop_list_stack(&operand_stack, &final_res);
+        ec = pop_list_stack(&operand_stack, &final_res, free_blocks);
         if (ec == SUCCESS_CODE)
             *result = final_res;
     }
@@ -170,22 +172,21 @@ status_t calc_arithmetic_expr_by_list(const char *expression, int *result)
     return ec;
 }
 
-
 /** @brief Выполняет одну операцию из стека.
  */
-status_t execute_list_stack_operation(list_stack_t *operand_stack, list_stack_t *operator_stack)
+status_t execute_list_stack_operation(list_stack_t *operand_stack, list_stack_t *operator_stack, free_blocks_array_t *free_blocks)
 {
     status_t ec = SUCCESS_CODE;
     int op1, op2, res, op_temp;
     char op;
 
-    ec = pop_list_stack(operand_stack, &op2);
+    ec = pop_list_stack(operand_stack, &op2, free_blocks);
     
     if (ec == SUCCESS_CODE)
-        ec = pop_list_stack(operand_stack, &op1);
+        ec = pop_list_stack(operand_stack, &op1, free_blocks);
 
     if (ec == SUCCESS_CODE)
-        ec = pop_list_stack(operator_stack, &op_temp);
+        ec = pop_list_stack(operator_stack, &op_temp, free_blocks);
 
     if (ec == SUCCESS_CODE)
     {
@@ -201,7 +202,7 @@ status_t execute_list_stack_operation(list_stack_t *operand_stack, list_stack_t 
 
 /** @brief Обрабатывает один символ строки выражения.
  */
-status_t handle_char_for_list_stack(list_stack_t *operand_stack, list_stack_t *operator_stack, char ch, int *reading_number, int *number)
+status_t handle_char_for_list_stack(list_stack_t *operand_stack, list_stack_t *operator_stack, char ch, int *reading_number, int *number, free_blocks_array_t *free_blocks)
 {
     status_t ec = SUCCESS_CODE;
 
@@ -220,7 +221,7 @@ status_t handle_char_for_list_stack(list_stack_t *operand_stack, list_stack_t *o
         }
 
         if (ec == SUCCESS_CODE && operator_stack->curr_size > 0)
-            ec = execute_list_stack_operation(operand_stack, operator_stack);
+            ec = execute_list_stack_operation(operand_stack, operator_stack, free_blocks);
 
         if (ec == SUCCESS_CODE && ch != '\0')
             ec = push_list_stack(operator_stack, ch);

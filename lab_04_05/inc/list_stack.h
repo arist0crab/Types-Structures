@@ -5,6 +5,7 @@
 #include "color.h"
 #include "input.h"
 #include "arr_stack.h"
+#include "free_blocks.h"
 #include <stdlib.h>
 #include <ctype.h>
 #include <stdbool.h>
@@ -27,8 +28,8 @@ typedef struct
 
 status_t print_list_stack(list_stack_t *list_stack);
 status_t push_list_stack(list_stack_t *list_stack, int value);
-status_t pop_list_stack(list_stack_t *list_stack, int *value);
+status_t pop_list_stack(list_stack_t *list_stack, int *value, free_blocks_array_t *free_blocks);
 status_t free_list_stack(list_stack_t *list_stack);
-status_t calc_arithmetic_expr_by_list(const char *expression, int *result);
+status_t calc_arithmetic_expr_by_list(const char *expression, int *result, free_blocks_array_t *free_blocks);
 
 #endif
