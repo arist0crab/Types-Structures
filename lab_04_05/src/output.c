@@ -80,3 +80,9 @@ status_t print_calc_result(int result)
     printf("%sРезультат вычислений: %d\n%s", BLUE_BOLD, result, RESET);
     return SUCCESS_CODE;
 }
+
+status_t print_pop_result(int result)
+{
+    printf("%sУдаленный элемент стека: %d\n%s", BLUE, result, RESET);
+    return SUCCESS_CODE;
+}

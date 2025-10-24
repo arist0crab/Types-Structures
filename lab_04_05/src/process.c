@@ -23,6 +23,9 @@ status_t procces_menu_choice(int option, arr_stack_t *arr_stack)
             break;
 
         case DELETE_STACK_ELEMENT_FROM_ARRAY:
+            ec = pop_arr_stack(arr_stack, &stack_elem);
+            if (ec == SUCCESS_CODE)
+                print_pop_result(stack_elem);
             break;
 
         case PRINT_STACK_FROM_ARRAY:
