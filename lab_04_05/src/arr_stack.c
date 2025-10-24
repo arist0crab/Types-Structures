@@ -4,6 +4,25 @@ status_t push_arr_stack(arr_stack_t *arr_stack, int value);
 status_t pop_arr_stack(arr_stack_t *arr_stack, int *popped_value);
 status_t do_operation(int op1, int op2, char operator, int *result);
 
+/** @brief Выводит на экран (в терминал) стек (массив).
+*/
+status_t print_arr_stack(arr_stack_t *arr_stack)
+{
+    status_t ec = (arr_stack) ? SUCCESS_CODE : ERR_INVALID_POINTER;
+
+    if (ec == SUCCESS_CODE && arr_stack->current_size == 0)
+        printf("%s============ ТЕКУЩИЙ СТЕК ПУСТ ============%s\n", BLUE_BOLD, RESET);
+    else if (ec == SUCCESS_CODE)
+    {
+        printf("%s============ ТЕКУЩИЙ СТЕК ============%s\n", BLUE_BOLD, RESET);
+        printf("Размер стека: %lu\n", arr_stack->current_size);
+        for (size_t i = 0; i < arr_stack->current_size; i++)
+            printf("%d ", arr_stack->data[i]);
+        printf("\n");
+    }
+
+    return ec;
+}       
 
 /**
  * @brief Добавляет элемент в конец стека (массив). Возвращает код завершения

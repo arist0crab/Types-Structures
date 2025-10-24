@@ -6,6 +6,6 @@
 #include "arr_stack.h"
 #include "output.h"
 
-status_t procces_menu_choice(int option);
+status_t procces_menu_choice(int option, arr_stack_t *arr_stack);
 
 #endif
