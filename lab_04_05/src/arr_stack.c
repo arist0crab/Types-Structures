@@ -3,7 +3,7 @@
 status_t push_arr_stack(arr_stack_t *arr_stack, int value);
 status_t pop_arr_stack(arr_stack_t *arr_stack, int *popped_value);
 status_t execute_operation(arr_stack_t *operand_stack, arr_stack_t *operator_stack);
-static status_t handle_char(arr_stack_t *operand_stack, arr_stack_t *operator_stack, char ch, int *reading_number, int *number);
+status_t handle_char(arr_stack_t *operand_stack, arr_stack_t *operator_stack, char ch, int *reading_number, int *number);
 status_t do_operation(int op1, int op2, char operator, int *result);
 bool is_operator(char ch);
 
@@ -124,7 +124,7 @@ status_t execute_operation(arr_stack_t *operand_stack, arr_stack_t *operator_sta
 
 /** @brief Обрабатывает один символ выражения.
  */
-static status_t handle_char(arr_stack_t *operand_stack, arr_stack_t *operator_stack, char ch, int *reading_number, int *number)
+status_t handle_char(arr_stack_t *operand_stack, arr_stack_t *operator_stack, char ch, int *reading_number, int *number)
 {
     status_t ec = SUCCESS_CODE;
 
