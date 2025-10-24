@@ -1,6 +1,6 @@
 #include "process.h"
 
-status_t procces_menu_choice(int option, arr_stack_t *arr_stack)
+status_t procces_menu_choice(int option, arr_stack_t *arr_stack, list_stack_t *list_stack)
 {
     status_t ec = SUCCESS_CODE;
     char expression[MAX_EXPRESSION_SIZE];
@@ -42,12 +42,19 @@ status_t procces_menu_choice(int option, arr_stack_t *arr_stack)
             break;
 
         case ADD_STACK_ELEMENT_TO_LIST:
+            ec = get_stack_elem(&stack_elem);
+            if (ec == SUCCESS_CODE)
+                ec = push_list_stack(list_stack, stack_elem);
             break;
 
         case DELETE_STACK_ELEMENT_FROM_LIST:
+            ec = pop_list_stack(list_stack, &stack_elem);
+            if (ec == SUCCESS_CODE)
+                print_pop_result(stack_elem);
             break;
 
         case PRINT_STACK_FROM_LIST:
+            ec = print_list_stack(list_stack);
             break;
 
         case COMPARE_PERFORMANCE:

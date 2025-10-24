@@ -4,8 +4,9 @@
 #include "data.h"
 #include "input.h"
 #include "arr_stack.h"
+#include "list_stack.h"
 #include "output.h"
 
-status_t procces_menu_choice(int option, arr_stack_t *arr_stack);
+status_t procces_menu_choice(int option, arr_stack_t *arr_stack, list_stack_t *list_stack);
 
 #endif
