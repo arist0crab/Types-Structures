@@ -66,6 +66,85 @@ status_t pop_arr_stack(arr_stack_t *arr_stack, int *popped_value)
     return ec;
 }
 
+status_t calc_arithmetic_expr_by_arr(const char *expression, int *result)
+{
+    status_t ec = (expression && result) ? SUCCESS_CODE : ERR_INVALID_POINTER;
+
+    int final_res, number = 0, reading_number = 0;
+    arr_stack_t operand_stack = { {0}, 0 };
+    arr_stack_t operator_stack = { {0}, 0 };
+    int len = strlen(expression);
+    int op_temp, op2, op1, res;
+    char ch, op;
+    int i = 0;
+
+    if (ec == SUCCESS_CODE && len == 0)
+        ec = ERR_RANGE;
+
+    while (i <= len && ec == SUCCESS_CODE)
+    {
+        ch = expression[i];
+
+        if (ch == ' ')
+        {
+            i++;
+            continue;
+        }
+
+        if (isdigit(ch))
+        {
+            number = number * 10 + (ch - '0');
+            reading_number = 1;
+        }
+        else if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '\0')
+        {
+            if (reading_number)
+            {
+                ec = push_arr_stack(&operand_stack, number);
+                number = 0;
+                reading_number = 0;
+            }
+
+            if (ec == SUCCESS_CODE && operator_stack.current_size > 0)
+            {
+                // выполняем предыдущую операцию слева направо
+                ec = pop_arr_stack(&operand_stack, &op2);
+                if (ec == SUCCESS_CODE)
+                    ec = pop_arr_stack(&operand_stack, &op1);
+
+                if (ec == SUCCESS_CODE)
+                    ec = pop_arr_stack(&operator_stack, &op_temp);
+
+                if (ec == SUCCESS_CODE)
+                {
+                    op = (char)op_temp;
+                    ec = do_operation(op1, op2, op, &res);
+                }
+
+                if (ec == SUCCESS_CODE)
+                    ec = push_arr_stack(&operand_stack, res);
+            }
+
+            if (ch != '\0')
+                ec = push_arr_stack(&operator_stack, ch);
+        }
+        else
+            ec = ERR_RANGE;
+
+        i++;
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        ec = pop_arr_stack(&operand_stack, &final_res);
+        if (ec == SUCCESS_CODE)
+            *result = final_res;
+    }
+
+    return ec;
+}
+
+
 
 /** @brief Вычисляет операцию между двумя операндами. Результат записывает 
  * в result. Возвращает статус своего завершения.

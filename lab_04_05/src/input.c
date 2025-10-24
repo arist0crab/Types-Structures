@@ -30,19 +30,20 @@ status_t input_cur_menu_opt(menu_option_t *cur_menu_opt)
 status_t get_expression(char *expression)
 {
     status_t ec = SUCCESS_CODE;
-    char buf;
-
+ 
     if (expression == NULL)
         ec = ERR_MEM;
     else
     {
         printf("%sВведите арифметическое выражение: %s", BLUE, RESET);
-        while ((buf = getchar()) != '\n' && buf != EOF);
-        if (fgets(expression, sizeof(expression), stdin) != NULL)
+        if (fgets(expression, MAX_EXPRESSION_SIZE, stdin) != NULL)
             expression[strcspn(expression, "\n")] = '\0';
         else
             ec = ERR_IO;
     }
+
+    if (ec == SUCCESS_CODE)
+        printf("Введеное выражение: %s\n", expression);
 
     return ec;
 }

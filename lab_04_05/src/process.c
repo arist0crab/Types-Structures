@@ -3,7 +3,8 @@
 status_t procces_menu_choice(int option, arr_stack_t *arr_stack)
 {
     status_t ec = SUCCESS_CODE;
-    int stack_elem;
+    char expression[MAX_EXPRESSION_SIZE];
+    int stack_elem = 0;
 
     if (arr_stack == NULL)
         return ERR_INVALID_POINTER;
@@ -14,6 +15,11 @@ status_t procces_menu_choice(int option, arr_stack_t *arr_stack)
             break;
 
         case CALC_ARITHMETIC_EXPRESSION_BY_ARRAY:
+            ec = get_expression(expression);
+            if (ec == SUCCESS_CODE)
+                ec = calc_arithmetic_expr_by_arr(expression, &stack_elem);
+            if (ec == SUCCESS_CODE)
+                print_calc_result(stack_elem);
             break;
 
         case ADD_STACK_ELEMENT_TO_ARRAY:
