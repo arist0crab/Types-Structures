@@ -21,5 +21,7 @@ status_t print_arr_stack(arr_stack_t *arr_stack);
 status_t push_arr_stack(arr_stack_t *arr_stack, int value);
 status_t pop_arr_stack(arr_stack_t *arr_stack, int *popped_value);
 status_t calc_arithmetic_expr_by_arr(const char *expression, int *result);
+status_t do_operation(int op1, int op2, char operator, int *result);
+bool is_operator(char ch);
 
 #endif

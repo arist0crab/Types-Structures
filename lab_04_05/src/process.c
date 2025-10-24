@@ -39,6 +39,11 @@ status_t procces_menu_choice(int option, arr_stack_t *arr_stack, list_stack_t *l
             break;
 
         case CALC_ARITHMETIC_EXPRESSION_BY_LIST:
+            ec = get_expression(expression);
+            if (ec == SUCCESS_CODE)
+                ec = calc_arithmetic_expr_by_list(expression, &stack_elem);
+            if (ec == SUCCESS_CODE)
+                print_calc_result(stack_elem);
             break;
 
         case ADD_STACK_ELEMENT_TO_LIST:

@@ -2,10 +2,8 @@
 
 status_t push_arr_stack(arr_stack_t *arr_stack, int value);
 status_t pop_arr_stack(arr_stack_t *arr_stack, int *popped_value);
-status_t execute_operation(arr_stack_t *operand_stack, arr_stack_t *operator_stack);
-status_t handle_char(arr_stack_t *operand_stack, arr_stack_t *operator_stack, char ch, int *reading_number, int *number);
-status_t do_operation(int op1, int op2, char operator, int *result);
-bool is_operator(char ch);
+status_t execute_array_stack_operation(arr_stack_t *operand_stack, arr_stack_t *operator_stack);
+status_t handle_char_for_array_stack(arr_stack_t *operand_stack, arr_stack_t *operator_stack, char ch, int *reading_number, int *number);
 
 /** @brief Выводит на экран (в терминал) стек (массив).
 */
@@ -83,7 +81,7 @@ status_t calc_arithmetic_expr_by_arr(const char *expression, int *result)
         ec = ERR_RANGE;
 
     for (int i = 0; i <= len && ec == SUCCESS_CODE; i++)
-        ec = handle_char(&operand_stack, &operator_stack, expression[i], &reading_number, &number);
+        ec = handle_char_for_array_stack(&operand_stack, &operator_stack, expression[i], &reading_number, &number);
 
     if (ec == SUCCESS_CODE)
         ec = pop_arr_stack(&operand_stack, &final_res);
@@ -96,7 +94,7 @@ status_t calc_arithmetic_expr_by_arr(const char *expression, int *result)
 
 /** @brief Вычисляет одно выражение из операндов и операций, хранящихся в стеках.
  */
-status_t execute_operation(arr_stack_t *operand_stack, arr_stack_t *operator_stack)
+status_t execute_array_stack_operation(arr_stack_t *operand_stack, arr_stack_t *operator_stack)
 {
     status_t ec = SUCCESS_CODE;
     int op1, op2, res, op_tmp;
@@ -124,7 +122,7 @@ status_t execute_operation(arr_stack_t *operand_stack, arr_stack_t *operator_sta
 
 /** @brief Обрабатывает один символ выражения.
  */
-status_t handle_char(arr_stack_t *operand_stack, arr_stack_t *operator_stack, char ch, int *reading_number, int *number)
+status_t handle_char_for_array_stack(arr_stack_t *operand_stack, arr_stack_t *operator_stack, char ch, int *reading_number, int *number)
 {
     status_t ec = SUCCESS_CODE;
 
@@ -143,7 +141,7 @@ status_t handle_char(arr_stack_t *operand_stack, arr_stack_t *operator_stack, ch
         }
 
         if (ec == SUCCESS_CODE && operator_stack->current_size > 0)
-            ec = execute_operation(operand_stack, operator_stack);
+            ec = execute_array_stack_operation(operand_stack, operator_stack);
 
         if (ec == SUCCESS_CODE && ch != '\0')
             ec = push_arr_stack(operator_stack, ch);

@@ -4,7 +4,12 @@
 #include "data.h"
 #include "color.h"
 #include "input.h"
+#include "arr_stack.h"
 #include <stdlib.h>
+#include <ctype.h>
+#include <stdbool.h>
+
+#define MAX_LIST_SIZE 100
 
 typedef struct node
 {
@@ -23,5 +28,7 @@ typedef struct
 status_t print_list_stack(list_stack_t *list_stack);
 status_t push_list_stack(list_stack_t *list_stack, int value);
 status_t pop_list_stack(list_stack_t *list_stack, int *value);
+status_t free_list_stack(list_stack_t *list_stack);
+status_t calc_arithmetic_expr_by_list(const char *expression, int *result);
 
 #endif

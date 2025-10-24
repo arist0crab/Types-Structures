@@ -1,6 +1,8 @@
 #include "list_stack.h"
 
 status_t create_node(node_t **new_node, int value);
+status_t execute_list_stack_operation(list_stack_t *operand_stack, list_stack_t *operator_stack);
+status_t handle_char_for_list_stack(list_stack_t *operand_stack, list_stack_t *operator_stack, char ch, int *reading_number, int *number);
 
 /** @brief Выводит на экран (в терминал) стек (список).
 */
@@ -57,6 +59,27 @@ status_t push_list_stack(list_stack_t *list_stack, int value)
     return ec;
 }
 
+/** @brief Функция для освобождения из памяти всех элементов списка.
+ * Возвращает статус своего выполнения.
+*/
+status_t free_list_stack(list_stack_t *list_stack)
+{
+    status_t ec = (list_stack) ? SUCCESS_CODE : ERR_INVALID_POINTER;
+    node_t *cur_node = list_stack->stack_pointer;
+    node_t *next_node = NULL;
+
+    while (ec == SUCCESS_CODE && cur_node)
+    {
+        next_node = cur_node->next;
+        free(cur_node);
+        cur_node = next_node;
+    }
+
+    list_stack->curr_size = 0;
+
+    return ec;    
+}
+
 /** @brief Удаляет элемент из конца стека (список). Если указан 
  * popped_value, то значение, которое будет удалено из стека, присваивается
  * данному указателю. Если popped_value == NULL, тогда удаляемое значение
@@ -107,6 +130,104 @@ status_t create_node(node_t **new_node, int value)
     {
         (*new_node)->value = value;
         (*new_node)->next = NULL;
+    }
+
+    return ec;
+}
+
+/** @brief Главная функция вычисления выражения.
+ */
+status_t calc_arithmetic_expr_by_list(const char *expression, int *result)
+{
+    status_t ec = (expression && result) ? SUCCESS_CODE : ERR_INVALID_POINTER;
+    list_stack_t operand_stack = { NULL, 0, MAX_LIST_SIZE };
+    list_stack_t operator_stack = { NULL, 0, MAX_LIST_SIZE };
+    int number = 0, reading_number = 0, final_res = 0;
+    int len = strlen(expression);
+    char ch;
+
+    if (ec == SUCCESS_CODE && len == 0)
+        ec = ERR_RANGE;
+
+    for (int i = 0; ec == SUCCESS_CODE && i <= len; i++)
+    {
+        ch = expression[i];
+        ec = handle_char_for_list_stack(&operand_stack, &operator_stack, ch, &reading_number, &number);
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        ec = pop_list_stack(&operand_stack, &final_res);
+        if (ec == SUCCESS_CODE)
+            *result = final_res;
+    }
+
+    if (operand_stack.stack_pointer)
+        free_list_stack(&operand_stack);
+    if (operator_stack.stack_pointer)
+        free_list_stack(&operator_stack);
+
+    return ec;
+}
+
+
+/** @brief Выполняет одну операцию из стека.
+ */
+status_t execute_list_stack_operation(list_stack_t *operand_stack, list_stack_t *operator_stack)
+{
+    status_t ec = SUCCESS_CODE;
+    int op1, op2, res, op_temp;
+    char op;
+
+    ec = pop_list_stack(operand_stack, &op2);
+    
+    if (ec == SUCCESS_CODE)
+        ec = pop_list_stack(operand_stack, &op1);
+
+    if (ec == SUCCESS_CODE)
+        ec = pop_list_stack(operator_stack, &op_temp);
+
+    if (ec == SUCCESS_CODE)
+    {
+        op = (char)op_temp;
+        ec = do_operation(op1, op2, op, &res);
+    }
+
+    if (ec == SUCCESS_CODE)
+        ec = push_list_stack(operand_stack, res);
+
+    return ec;
+}
+
+/** @brief Обрабатывает один символ строки выражения.
+ */
+status_t handle_char_for_list_stack(list_stack_t *operand_stack, list_stack_t *operator_stack, char ch, int *reading_number, int *number)
+{
+    status_t ec = SUCCESS_CODE;
+
+    if (isdigit(ch))
+    {
+        *number = (*number * 10) + (ch - '0');
+        *reading_number = 1;
+    }
+    else if (is_operator(ch) || ch == '\0')
+    {
+        if (*reading_number)
+        {
+            ec = push_list_stack(operand_stack, *number);
+            *number = 0;
+            *reading_number = 0;
+        }
+
+        if (ec == SUCCESS_CODE && operator_stack->curr_size > 0)
+            ec = execute_list_stack_operation(operand_stack, operator_stack);
+
+        if (ec == SUCCESS_CODE && ch != '\0')
+            ec = push_list_stack(operator_stack, ch);
+    }
+    else if (ch != ' ')
+    {
+        ec = ERR_RANGE;
     }
 
     return ec;
