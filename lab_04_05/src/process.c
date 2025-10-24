@@ -62,14 +62,11 @@ status_t procces_menu_choice(int option, arr_stack_t *arr_stack, list_stack_t *l
             ec = print_list_stack(list_stack);
             break;
 
-        case PRINT_FREE_BLOCKS_ARRAY:
-            ec = print_free_blocks(free_blocks);
-            break;
-
         case COMPARE_PERFORMANCE:
             break;
 
         case PRINT_ARRAY_OF_FREE_MEMORY_AREAS:
+            ec = print_free_blocks(free_blocks);
             break;
         
         default:

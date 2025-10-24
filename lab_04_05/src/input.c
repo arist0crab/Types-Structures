@@ -17,7 +17,7 @@ status_t input_cur_menu_opt(menu_option_t *cur_menu_opt)
     {
         if (sscanf(buffer, "%d %c", &temp, &extra) != 1)
             ec = ERR_IO;
-        else if (temp < 0 || temp > 11)
+        else if (temp < 0 || temp > 10)
             ec = ERR_RANGE;
         else
             *cur_menu_opt = (menu_option_t)temp;
