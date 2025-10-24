@@ -2,7 +2,10 @@
 
 status_t push_arr_stack(arr_stack_t *arr_stack, int value);
 status_t pop_arr_stack(arr_stack_t *arr_stack, int *popped_value);
+status_t execute_operation(arr_stack_t *operand_stack, arr_stack_t *operator_stack);
+static status_t handle_char(arr_stack_t *operand_stack, arr_stack_t *operator_stack, char ch, int *reading_number, int *number);
 status_t do_operation(int op1, int op2, char operator, int *result);
+bool is_operator(char ch);
 
 /** @brief Выводит на экран (в терминал) стек (массив).
 */
@@ -66,85 +69,90 @@ status_t pop_arr_stack(arr_stack_t *arr_stack, int *popped_value)
     return ec;
 }
 
+/** @brief Главная функция вычисления выражения.
+ */
 status_t calc_arithmetic_expr_by_arr(const char *expression, int *result)
 {
     status_t ec = (expression && result) ? SUCCESS_CODE : ERR_INVALID_POINTER;
-
-    int final_res, number = 0, reading_number = 0;
-    arr_stack_t operand_stack = { {0}, 0 };
-    arr_stack_t operator_stack = { {0}, 0 };
+    arr_stack_t operand_stack = {{0}, 0};
+    arr_stack_t operator_stack = {{0}, 0};
+    int number = 0, reading_number = 0, final_res = 0;
     int len = strlen(expression);
-    int op_temp, op2, op1, res;
-    char ch, op;
-    int i = 0;
 
     if (ec == SUCCESS_CODE && len == 0)
         ec = ERR_RANGE;
 
-    while (i <= len && ec == SUCCESS_CODE)
-    {
-        ch = expression[i];
-
-        if (ch == ' ')
-        {
-            i++;
-            continue;
-        }
-
-        if (isdigit(ch))
-        {
-            number = number * 10 + (ch - '0');
-            reading_number = 1;
-        }
-        else if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '\0')
-        {
-            if (reading_number)
-            {
-                ec = push_arr_stack(&operand_stack, number);
-                number = 0;
-                reading_number = 0;
-            }
-
-            if (ec == SUCCESS_CODE && operator_stack.current_size > 0)
-            {
-                // выполняем предыдущую операцию слева направо
-                ec = pop_arr_stack(&operand_stack, &op2);
-                if (ec == SUCCESS_CODE)
-                    ec = pop_arr_stack(&operand_stack, &op1);
-
-                if (ec == SUCCESS_CODE)
-                    ec = pop_arr_stack(&operator_stack, &op_temp);
-
-                if (ec == SUCCESS_CODE)
-                {
-                    op = (char)op_temp;
-                    ec = do_operation(op1, op2, op, &res);
-                }
-
-                if (ec == SUCCESS_CODE)
-                    ec = push_arr_stack(&operand_stack, res);
-            }
-
-            if (ch != '\0')
-                ec = push_arr_stack(&operator_stack, ch);
-        }
-        else
-            ec = ERR_RANGE;
-
-        i++;
-    }
+    for (int i = 0; i <= len && ec == SUCCESS_CODE; i++)
+        ec = handle_char(&operand_stack, &operator_stack, expression[i], &reading_number, &number);
 
     if (ec == SUCCESS_CODE)
-    {
         ec = pop_arr_stack(&operand_stack, &final_res);
-        if (ec == SUCCESS_CODE)
-            *result = final_res;
-    }
+
+    if (ec == SUCCESS_CODE)
+        *result = final_res;
 
     return ec;
 }
 
+/** @brief Вычисляет одно выражение из операндов и операций, хранящихся в стеках.
+ */
+status_t execute_operation(arr_stack_t *operand_stack, arr_stack_t *operator_stack)
+{
+    status_t ec = SUCCESS_CODE;
+    int op1, op2, res, op_tmp;
+    char op;
 
+    ec = pop_arr_stack(operand_stack, &op2);
+
+    if (ec == SUCCESS_CODE)
+        ec = pop_arr_stack(operand_stack, &op1);
+
+    if (ec == SUCCESS_CODE)
+        ec = pop_arr_stack(operator_stack, &op_tmp);
+
+    if (ec == SUCCESS_CODE)
+    {
+        op = (char)op_tmp;
+        ec = do_operation(op1, op2, op, &res);
+    }
+
+    if (ec == SUCCESS_CODE)
+        ec = push_arr_stack(operand_stack, res);
+
+    return ec;
+}
+
+/** @brief Обрабатывает один символ выражения.
+ */
+static status_t handle_char(arr_stack_t *operand_stack, arr_stack_t *operator_stack, char ch, int *reading_number, int *number)
+{
+    status_t ec = SUCCESS_CODE;
+
+    if (isdigit(ch))
+    {
+        *number = *number * 10 + (ch - '0');
+        *reading_number = 1;
+    }
+    else if (is_operator(ch) || ch == '\0')
+    {
+        if (*reading_number)
+        {
+            ec = push_arr_stack(operand_stack, *number);
+            *number = 0;
+            *reading_number = 0;
+        }
+
+        if (ec == SUCCESS_CODE && operator_stack->current_size > 0)
+            ec = execute_operation(operand_stack, operator_stack);
+
+        if (ec == SUCCESS_CODE && ch != '\0')
+            ec = push_arr_stack(operator_stack, ch);
+    }
+    else if (ch != ' ')
+        ec = ERR_RANGE; // недопустимый символ
+
+    return ec;
+}
 
 /** @brief Вычисляет операцию между двумя операндами. Результат записывает 
  * в result. Возвращает статус своего завершения.
@@ -177,4 +185,11 @@ status_t do_operation(int op1, int op2, char operator, int *result)
     }
 
     return ec;
+}
+
+/** @brief Проверяет символ на допустимость как арифметического оператора.
+ */
+bool is_operator(char ch)
+{
+    return (ch == '+' || ch == '-' || ch == '*' || ch == '/');
 }

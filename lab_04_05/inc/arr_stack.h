@@ -7,6 +7,7 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
 #define MAX_ARR_STACK_SIZE 100
 
