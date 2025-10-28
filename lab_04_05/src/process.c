@@ -4,8 +4,6 @@
 status_t compare_pop_push(free_blocks_array_t *free_blocks);
 status_t compare_performance(free_blocks_array_t *free_blocks);
 status_t create_random_expression(char *expression, char operation);
-status_t get_list_stack_used_memory(const list_stack_t *stack, size_t *result);
-
 
 status_t procces_menu_choice(int option, arr_stack_t *arr_stack, list_stack_t *list_stack, free_blocks_array_t *free_blocks)
 {
