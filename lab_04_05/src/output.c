@@ -23,8 +23,21 @@ status_t print_menu(void)
     printf("| 8 - вывести стек                                 |\n");
     printf("+--------------------------------------------------+\n");
     printf("| 9 - сравнить производительность                  |\n");
-    printf("| 10 - вывести массив свободных областей памяти    |\n");
+    printf("| 10 - сравнить pop и push                         |\n");
+    printf("| 11 - вывести массив свободных областей памяти    |\n");
     printf("+--------------------------------------------------+\n");
+
+    return SUCCESS_CODE;
+}
+
+status_t print_push_pop_table(double arr_push_time, double arr_pop_time, double list_push_time, double list_pop_time)
+{
+    printf("+-------+---------------+----------------+\n");
+    printf("|       | push operation | pop operation |\n");
+    printf("+-------+---------------+----------------+\n");
+    printf("| array | %-14.2lf | %-13.2lf |\n", arr_push_time, arr_pop_time);
+    printf("| list  | %-14.2lf | %-13.2lf |\n", list_push_time, list_pop_time);
+    printf("+-------+---------------+----------------+\n");
 
     return SUCCESS_CODE;
 }

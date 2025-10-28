@@ -1,6 +1,7 @@
 #define _POSIX_C_SOURCE 199309L
 #include "process.h"
 
+status_t compare_pop_push(free_blocks_array_t *free_blocks);
 status_t compare_performance(free_blocks_array_t *free_blocks);
 status_t create_random_expression(char *expression, char operation);
 status_t get_list_stack_used_memory(const list_stack_t *stack, size_t *result);
@@ -72,6 +73,10 @@ status_t procces_menu_choice(int option, arr_stack_t *arr_stack, list_stack_t *l
             ec = compare_performance(free_blocks);
             break;
 
+        case COMPARE_POP_PUSH:
+            ec = compare_pop_push(free_blocks);
+            break;
+
         case PRINT_ARRAY_OF_FREE_MEMORY_AREAS:
             ec = print_free_blocks(free_blocks);
             break;
@@ -84,6 +89,68 @@ status_t procces_menu_choice(int option, arr_stack_t *arr_stack, list_stack_t *l
     return ec;
 }
 
+status_t compare_pop_push(free_blocks_array_t *free_blocks)
+{
+    status_t ec = SUCCESS_CODE;
+    arr_stack_t arr_stack = { { 0 }, 0 };
+    list_stack_t list_stack = { NULL, 0, MAX_LIST_SIZE };;
+    struct timespec start_time, end_time;
+
+    double time_array_push = 0.0;
+    double time_array_pop = 0.0;
+    double time_list_push = 0.0;
+    double time_list_pop = 0.0;
+
+    srand(time(NULL));
+
+    // замеряем время push для array
+    for (size_t i = 0; i < MAX_ARR_STACK_SIZE; i++)
+    {
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
+        push_arr_stack(&arr_stack, rand() % 100 + 1);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);
+        time_array_push += (end_time.tv_sec - start_time.tv_sec) * 10e9 + (end_time.tv_nsec - start_time.tv_nsec);
+    }
+
+    // замеряем время pop для array
+    for (size_t i = 0; i < MAX_ARR_STACK_SIZE; i++)
+    {
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
+        pop_arr_stack(&arr_stack, NULL);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);
+        time_array_pop += (end_time.tv_sec - start_time.tv_sec) * 10e9 + (end_time.tv_nsec - start_time.tv_nsec);
+    }
+
+    // замеряем время push для list
+    for (size_t i = 0; i < MAX_ARR_STACK_SIZE; i++)
+    {
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
+        push_list_stack(&list_stack, rand() % 100 + 1);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);
+        time_list_push += (end_time.tv_sec - start_time.tv_sec) * 10e9 + (end_time.tv_nsec - start_time.tv_nsec);
+    }
+
+    // замеряем время pop для list
+    for (size_t i = 0; i < MAX_ARR_STACK_SIZE; i++)
+    {
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
+        pop_list_stack(&list_stack, NULL, free_blocks);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);
+        time_list_pop += (end_time.tv_sec - start_time.tv_sec) * 10e9 + (end_time.tv_nsec - start_time.tv_nsec);
+    }
+
+    time_array_push /= MAX_ARR_STACK_SIZE;
+    time_array_pop /= MAX_ARR_STACK_SIZE;
+    time_list_push /= MAX_ARR_STACK_SIZE;
+    time_list_pop /= MAX_ARR_STACK_SIZE;
+
+    print_push_pop_table(time_array_push, time_array_pop, time_list_push, time_list_pop);
+
+    // освобождаем list
+    free_list_stack(&list_stack);
+
+    return ec;
+}
 
 status_t compare_performance(free_blocks_array_t *free_blocks)
 {

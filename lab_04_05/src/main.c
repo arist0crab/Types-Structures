@@ -12,7 +12,7 @@ int main(void)
     status_t menu_opt_processing_status = SUCCESS_CODE;
     menu_option_t cur_menu_opt = 0;  // выбранная опция меню
 
-    arr_stack_t main_arr_stack = { {0}, 0 };
+    arr_stack_t main_arr_stack = { { 0 }, 0 };
     list_stack_t main_list_stack = { NULL, 0, MAX_LIST_SIZE };
     free_blocks_array_t free_blocks = { { 0 }, 0 };
 
