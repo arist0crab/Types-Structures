@@ -29,6 +29,23 @@ status_t print_menu(void)
     return SUCCESS_CODE;
 }
 
+status_t print_compare_table_header(void)
+{
+    printf("+-----------+------------+----------------+---------------+--------------+-------------+\n");
+    printf("| operation | stack size | memory (array) | memory (list) | time (array) | time (list) |\n");
+    printf("+-----------+------------+----------------+---------------+--------------+-------------+\n");
+
+    return SUCCESS_CODE;
+}
+
+status_t print_table_raw(char op_char, size_t stack_size, size_t memus_array, size_t memus_list, double time_array, double time_list)
+{
+    printf("|     %c     | %-10lu | %-14lu | %-13lu | %-12.2lf | %-11.2lf |\n", op_char, stack_size, memus_array, memus_list, time_array, time_list);
+    printf("+-----------+------------+----------------+---------------+--------------+-------------+\n");
+       
+    return SUCCESS_CODE;
+}
+
 status_t print_exit_code_result(status_t exit_code)
 {
     status_t ec = SUCCESS_CODE;

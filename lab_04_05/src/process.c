@@ -101,9 +101,8 @@ status_t compare_performance(free_blocks_array_t *free_blocks)
 
     srand(time(NULL));
 
-    printf("+-----------+------------+----------------+---------------+--------------+-------------+\n");
-    printf("| operation | stack size | memory (array) | memory (list) | time (array) | time (list) |\n");
-    printf("+-----------+------------+----------------+---------------+--------------+-------------+\n");
+    if (ec == SUCCESS_CODE)
+        print_compare_table_header(); 
 
     for (size_t i = 0; ec == SUCCESS_CODE && i < OPERATIONS_QUANTITY; i++)
     {
@@ -143,8 +142,7 @@ status_t compare_performance(free_blocks_array_t *free_blocks)
             total_time_array /= PERFORMANCE_ITERATIONS;
             total_time_list /= PERFORMANCE_ITERATIONS;
 
-            printf("|     %c     | %-10lu | %-14lu | %-13lu | %-12.2lf | %-11.2lf |\n", operations[i], stack_sizes[j], memory_usage_array, memory_usage_list, total_time_array, total_time_list);
-            printf("+-----------+------------+----------------+---------------+--------------+-------------+\n");
+            print_table_raw(operations[i], stack_sizes[j], memory_usage_array, memory_usage_list, total_time_array, total_time_list);
         }
     }
 
