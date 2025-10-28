@@ -1,7 +1,11 @@
 #ifndef __DATA_H__
 #define __DATA_H__
 
-#define MAX_EXPRESSION_SIZE 128
+#define MAX_EXPRESSION_SIZE 256
+#define MAX_OPERANDS_QUANTITY 50
+#define PERFORMANCE_ITERATIONS 1000
+#define OPERATIONS_QUANTITY 4
+#define STACK_SIZES_QUANTITY 5
 
 typedef enum 
 {
