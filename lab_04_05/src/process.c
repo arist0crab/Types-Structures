@@ -138,7 +138,7 @@ status_t compare_performance(free_blocks_array_t *free_blocks)
             }
 
             memory_usage_array += sizeof(arr_stack_t);
-            memory_usage_list += sizeof(list_stack_t) + sizeof(node_t) * PERFORMANCE_ITERATIONS;
+            memory_usage_list += sizeof(list_stack_t) + sizeof(node_t) * stack_sizes[j];
             total_time_array /= PERFORMANCE_ITERATIONS;
             total_time_list /= PERFORMANCE_ITERATIONS;
 
