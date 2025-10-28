@@ -18,7 +18,6 @@ typedef struct node
     struct node *next; // указатель на следующий узел
 } node_t;
 
-
 typedef struct 
 {
     node_t *stack_pointer;  // указатель на вершину стека

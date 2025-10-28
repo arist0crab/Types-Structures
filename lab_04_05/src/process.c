@@ -1,7 +1,10 @@
 #define _POSIX_C_SOURCE 199309L
 #include "process.h"
 
-status_t compare_performance(void);
+status_t compare_performance(free_blocks_array_t *free_blocks);
+status_t create_random_expression(char *expression, char operation);
+status_t get_list_stack_used_memory(const list_stack_t *stack, size_t *result);
+
 
 status_t procces_menu_choice(int option, arr_stack_t *arr_stack, list_stack_t *list_stack, free_blocks_array_t *free_blocks)
 {
@@ -66,7 +69,7 @@ status_t procces_menu_choice(int option, arr_stack_t *arr_stack, list_stack_t *l
             break;
 
         case COMPARE_PERFORMANCE:
-            ec = compare_performance();
+            ec = compare_performance(free_blocks);
             break;
 
         case PRINT_ARRAY_OF_FREE_MEMORY_AREAS:
@@ -82,14 +85,14 @@ status_t procces_menu_choice(int option, arr_stack_t *arr_stack, list_stack_t *l
 }
 
 
-status_t compare_performance(void)
+status_t compare_performance(free_blocks_array_t *free_blocks)
 {
     status_t ec = SUCCESS_CODE;
     char expression[MAX_EXPRESSION_SIZE];
     char operations[OPERATIONS_QUANTITY] = { '+', '-', '/', '*' };
     size_t stack_sizes[STACK_SIZES_QUANTITY] = { 10, 50, 100, 500, 1000 };
     struct timespec start_time, end_time;
-    int rand_num = 0, offset = 0;
+    int calculation_result = 0;
 
     double total_time_array = 0.0;
     double total_time_list = 0.0;
@@ -98,27 +101,49 @@ status_t compare_performance(void)
 
     srand(time(NULL));
 
-    // printf("+-----------+------------+----------------+---------------+--------------+-------------+\n");
-    // printf("| operation | stack size | memory (array) | memory (list) | time (array) | time (list) |\n");
-    // printf("+-----------+------------+----------------+---------------+--------------+-------------+\n");
+    printf("+-----------+------------+----------------+---------------+--------------+-------------+\n");
+    printf("| operation | stack size | memory (array) | memory (list) | time (array) | time (list) |\n");
+    printf("+-----------+------------+----------------+---------------+--------------+-------------+\n");
 
-    for (size_t i = 0; i < OPERATIONS_QUANTITY; i++)
+    for (size_t i = 0; ec == SUCCESS_CODE && i < OPERATIONS_QUANTITY; i++)
     {
-        for (size_t j = 0; j < STACK_SIZES_QUANTITY; j++)
+        for (size_t j = 0; ec == SUCCESS_CODE && j < STACK_SIZES_QUANTITY; j++)
         {
             total_time_array = 0.0;
             total_time_list = 0.0;
             memory_usage_array = 0;
             memory_usage_list = 0;
 
-            for (size_t k = 0; k < PERFORMANCE_ITERATIONS; k++)
+            for (size_t k = 0; ec == SUCCESS_CODE && k < PERFORMANCE_ITERATIONS; k++)
             {
-                
-
-
+                ec = create_random_expression(expression, operations[i]);
+                if (ec == SUCCESS_CODE)
+                {
+                    clock_gettime(CLOCK_MONOTONIC, &start_time);
+                    ec = calc_arithmetic_expr_by_arr(expression, &calculation_result);
+                    clock_gettime(CLOCK_MONOTONIC, &end_time);
+                    total_time_array += (end_time.tv_sec - start_time.tv_sec) * 10e9 + (end_time.tv_nsec - start_time.tv_nsec);
+                }
             }
 
-            printf("|     %c     | %-10lu | %-14lu | %-13lu | %-12lf | %-11lf |\n", operations[i], stack_sizes[j], memory_usage_array, memory_usage_list, total_time_array, total_time_list);
+            for (size_t k = 0; ec == SUCCESS_CODE && k < PERFORMANCE_ITERATIONS; k++)
+            {
+                ec = create_random_expression(expression, operations[i]);
+                if (ec == SUCCESS_CODE)
+                {
+                    clock_gettime(CLOCK_MONOTONIC, &start_time);
+                    ec = calc_arithmetic_expr_by_list(expression, &calculation_result, free_blocks);
+                    clock_gettime(CLOCK_MONOTONIC, &end_time);
+                    total_time_list += (end_time.tv_sec - start_time.tv_sec) * 10e9 + (end_time.tv_nsec - start_time.tv_nsec);
+                }
+            }
+
+            memory_usage_array += sizeof(arr_stack_t);
+            memory_usage_list += sizeof(list_stack_t) + sizeof(node_t) * PERFORMANCE_ITERATIONS;
+            total_time_array /= PERFORMANCE_ITERATIONS;
+            total_time_list /= PERFORMANCE_ITERATIONS;
+
+            printf("|     %c     | %-10lu | %-14lu | %-13lu | %-12.2lf | %-11.2lf |\n", operations[i], stack_sizes[j], memory_usage_array, memory_usage_list, total_time_array, total_time_list);
             printf("+-----------+------------+----------------+---------------+--------------+-------------+\n");
         }
     }
@@ -133,11 +158,9 @@ status_t create_random_expression(char *expression, char operation)
 
     if (expression == NULL)
         ec = ERR_INVALID_POINTER;
-    else if (operation != '+' || operation != '-' || operation != '*' || operation != '/')
+    else if (operation != '+' && operation != '-' && operation != '*' && operation != '/')
         ec = ERR_RANGE;
     
-    // TODO
-
     // создаем случайное выражение для экспримента
     if (ec == SUCCESS_CODE)
     {
@@ -148,7 +171,7 @@ status_t create_random_expression(char *expression, char operation)
         for (size_t num_index = 0; num_index < MAX_OPERANDS_QUANTITY - 1; num_index++)
         {
             rand_num = rand() % 100 + 1;
-            offset += snprintf(expression + offset, MAX_EXPRESSION_SIZE - offset, " %c %d",  operations[i], rand_num);
+            offset += snprintf(expression + offset, MAX_EXPRESSION_SIZE - offset, " %c %d",  operation, rand_num);
         }
     }
 
