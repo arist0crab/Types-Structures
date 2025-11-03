@@ -14,7 +14,7 @@ typedef enum
 
 typedef enum 
 {
-    EXIT_PROGRAMM,
+    EXIT_PROGRAM,
     RUN_ARRAY_SIMULATION,
     RUN_LIST_SIMULATION,
     EVALUATE_EFFECTIVENESS,

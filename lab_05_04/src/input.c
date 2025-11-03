@@ -1,5 +1,4 @@
-// FIXME: починить заголовочные файлы
-#include "../inc/input.h"
+#include "input.h"
 
 status_t input_cur_menu_opt(menu_option_t *cur_menu_opt)
 {
