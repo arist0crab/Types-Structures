@@ -1,0 +1,25 @@
+#ifndef __DATA_H__
+#define __DATA_H__
+
+#define MAX_STRING_LENGTH 256
+#define MENU_OPTIONS_QUANTITY 6
+
+typedef enum
+{
+    SUCCESS_CODE,
+    ERR_IO,
+    ERR_INVALID_POINTER,
+    ERR_RANGE
+} status_t;
+
+typedef enum 
+{
+    EXIT_PROGRAMM,
+    RUN_ARRAY_SIMULATION,
+    RUN_LIST_SIMULATION,
+    EVALUATE_EFFECTIVENESS,
+    VIEW_MEMORY_INFORMATION,
+    CONFIGURE_SIMULATION_PARAMETERS
+} menu_option_t;
+
+#endif
