@@ -2,6 +2,7 @@
 #define __PROCESS_H__
 
 #include "data.h"
+#include "simulate.h"
 
 status_t procces_menu_choice(menu_option_t menu_option);
 

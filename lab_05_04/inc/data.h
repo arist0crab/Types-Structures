@@ -3,13 +3,16 @@
 
 #define MAX_STRING_LENGTH 256
 #define MENU_OPTIONS_QUANTITY 6
+#define EPS 1e-9
 
 typedef enum
 {
     SUCCESS_CODE,
     ERR_IO,
     ERR_INVALID_POINTER,
-    ERR_RANGE
+    ERR_RANGE,
+    ERR_OVERFLOW,
+    ERR_POP_EMPTY
 } status_t;
 
 typedef enum 
@@ -21,5 +24,23 @@ typedef enum
     VIEW_MEMORY_INFORMATION,
     CONFIGURE_SIMULATION_PARAMETERS
 } menu_option_t;
+
+typedef enum
+{
+    TYPE_1,
+    TYPE_2
+} request_class_t;
+
+typedef struct
+{
+    request_class_t request_class;
+    double arrival_time;
+} request_t;
+
+typedef struct
+{
+    double min_time;
+    double max_time;
+} time_range_t;
 
 #endif

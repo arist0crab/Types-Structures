@@ -10,6 +10,7 @@ status_t procces_menu_choice(menu_option_t menu_option)
             break;
 
         case RUN_ARRAY_SIMULATION:
+            ec = simulate_service_unit_by_arr();
             break;
 
         case RUN_LIST_SIMULATION:

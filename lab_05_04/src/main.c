@@ -2,12 +2,13 @@
 #include "input.h"
 #include "output.h"
 #include "proccess.h"
+#include "arr.h"
 
 int main(void)
 {
     status_t exit_code = SUCCESS_CODE;
     status_t menu_opt_processing_status = SUCCESS_CODE;
-    menu_option_t cur_menu_opt = RUN_ARRAY_SIMULATION;  // выбранная опция меню
+    menu_option_t cur_menu_opt = RUN_ARRAY_SIMULATION;
 
     print_menu();
     exit_code = input_cur_menu_opt(&cur_menu_opt);
