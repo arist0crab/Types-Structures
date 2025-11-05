@@ -5,6 +5,7 @@
 #include "arr.h"
 #include "color.h"
 #include "output.h"
+#include "list.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <math.h>
@@ -32,5 +33,8 @@ typedef struct
  * @return Статус выполнения функции.
 */
 status_t simulate_service_unit_by_arr(void);
+
+// TODO написать документацию по рофлу
+status_t simulate_service_unit_by_list(void);
 
 #endif

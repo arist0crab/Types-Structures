@@ -12,7 +12,8 @@ typedef enum
     ERR_INVALID_POINTER,
     ERR_RANGE,
     ERR_OVERFLOW,
-    ERR_POP_EMPTY
+    ERR_POP_EMPTY,
+    ERR_MEM
 } status_t;
 
 typedef enum 

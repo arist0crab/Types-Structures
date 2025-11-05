@@ -8,7 +8,8 @@ status_t min3(double a, double b, double c, double *min_val);
 status_t print_interim_results_table_header(void);
 status_t print_interim_results_table_bottom(void);
 status_t print_simulation_summary(double total_time, const simulation_log_t *log1, const simulation_log_t *log2, double downtime);
-status_t print_interim_results_table_content(const arr_queue_t *queue1, const simulation_log_t *log1, const arr_queue_t *queue2, const simulation_log_t *log2);
+status_t print_interim_results_table_content_arr(const arr_queue_t *queue1, const simulation_log_t *log1, const arr_queue_t *queue2, const simulation_log_t *log2);
+status_t print_interim_results_table_content_list(const list_queue_t *queue1, const simulation_log_t *log1, const list_queue_t *queue2, const simulation_log_t *log2);
 
 // задаем временные промежутки
 time_range_t arrival_time_of_type_1 = { .min_time = 1, .max_time = 5 };  // время прибытия для 1 типа
@@ -128,7 +129,7 @@ status_t simulate_service_unit_by_arr(void)
         // каждые 100 записей печатаем промежуточную информацию
         if (log1.request_out_count % 100 == 0 && last_print_checkpoint != log1.request_out_count)
         {
-            print_interim_results_table_content(&queue1, &log1, &queue2, &log2);
+            print_interim_results_table_content_arr(&queue1, &log1, &queue2, &log2);
             last_print_checkpoint = log1.request_out_count;
         }
     }
@@ -138,6 +139,127 @@ status_t simulate_service_unit_by_arr(void)
     
     return SUCCESS_CODE;
 }
+
+status_t simulate_service_unit_by_list(void)
+{
+    status_t ec = SUCCESS_CODE;
+
+    // инициализируем очереди и их логи
+    list_queue_t queue1 = { 0, 0, 0, MAX_LIST_LENGTH }, queue2 = { 0, 0, 0, MAX_LIST_LENGTH };
+    simulation_log_t log1 = { 0 }, log2 = { 0 };
+    size_t last_print_checkpoint = 0;
+
+    double current_time = 0.0;  // "виртуальное" (модельное) время
+    double next_event_time = 0.0;  // время следующего события
+    double current_service_end_time = INFINITY;  // время, когда закончится текущее обслуживание
+
+    // временные переменные
+    double temp_time = 0.0;
+    double system_downtime = 0.0;
+    double next_arrival_type1 = 0.0, next_arrival_type2 = 0.0;
+    random_double(arrival_time_of_type_1.min_time, arrival_time_of_type_1.max_time, &next_arrival_type1);
+    random_double(arrival_time_of_type_2.min_time, arrival_time_of_type_2.max_time, &next_arrival_type2);
+
+    request_t current_request = { 0 };
+    request_t popped_request = { 0 };
+    request_class_t last_served_type = TYPE_1;
+
+    print_interim_results_table_header();
+
+    while (ec == SUCCESS_CODE && log1.request_out_count < REQUESTS_1_TYPE_QUEUE_LENGTH)
+    {
+        min3(next_arrival_type1, next_arrival_type2, current_service_end_time, &next_event_time);
+        current_time = next_event_time;
+
+        // если появилась заявка типа 1
+        if (fabs(next_arrival_type1 - next_event_time) < EPS)
+        {
+            current_request.request_class = TYPE_1;
+            current_request.arrival_time = current_time;
+
+            if (queue1.curr_size < queue1.max_size)
+                push_list(&queue1, &current_request);
+            else
+                log1.failed_request_count++;
+
+            if (current_service_end_time == INFINITY)
+            {
+                random_double(service_time_of_type_1.min_time, service_time_of_type_1.max_time, &temp_time);
+                current_service_end_time = current_time + temp_time;
+            }
+            log1.request_in_count++;
+            random_double(arrival_time_of_type_1.min_time, arrival_time_of_type_1.max_time, &temp_time);
+            next_arrival_type1 += temp_time;
+        }
+        // если появилась заявка типа 2
+        else if (fabs(next_arrival_type2 - next_event_time) < EPS)
+        {
+            current_request.request_class = TYPE_2;
+            current_request.arrival_time = current_time;
+
+            if (queue2.curr_size < queue2.max_size)
+                push_list(&queue2, &current_request);
+            else
+                log2.failed_request_count++;
+
+            if (current_service_end_time == INFINITY)
+            {
+                random_double(service_time_of_type_2.min_time, service_time_of_type_2.max_time, &temp_time);
+                current_service_end_time = current_time + temp_time;
+            }
+            log2.request_in_count++;
+            random_double(arrival_time_of_type_2.min_time, arrival_time_of_type_2.max_time, &temp_time);
+            next_arrival_type2 += temp_time;
+        }
+        // если завершилось обслуживание (пытаемся обработать как можно скорее заявки первого типа)
+        else if (fabs(current_service_end_time - next_event_time) < EPS || (queue1.curr_size || queue2.curr_size))
+        {
+            if (queue1.curr_size && (queue2.curr_size == 0 || last_served_type == TYPE_1))
+            {
+                pop_list(&queue1, &popped_request);
+                log1.request_out_count++;
+                log1.total_wait_time += current_time - popped_request.arrival_time;
+                log1.total_length += queue1.curr_size;
+                random_double(service_time_of_type_1.min_time, service_time_of_type_1.max_time, &temp_time);
+                last_served_type = TYPE_1;
+            }
+            else if (queue2.curr_size && (queue1.curr_size == 0 || last_served_type == TYPE_2))
+            {
+                pop_list(&queue2, &popped_request);
+                log2.request_out_count++;
+                log2.total_wait_time += current_time - popped_request.arrival_time;
+                log2.total_length += queue2.curr_size;
+                random_double(service_time_of_type_2.min_time, service_time_of_type_2.max_time, &temp_time);
+                last_served_type = TYPE_2;
+            }
+            else if (queue1.curr_size == 0 && queue2.curr_size == 0)
+            {
+                system_downtime += (fmin(next_arrival_type1, next_arrival_type2) - current_time);
+                current_service_end_time = INFINITY;
+            }
+            log1.function_call_count++;
+            log2.function_call_count++;
+            // назначаем новый момент окончания обслуживания
+            current_service_end_time = current_time + temp_time;
+        }
+
+        // каждые 100 записей печатаем промежуточную информацию
+        if (log1.request_out_count % 100 == 0 && last_print_checkpoint != log1.request_out_count)
+        {
+            print_interim_results_table_content_list(&queue1, &log1, &queue2, &log2);
+            last_print_checkpoint = log1.request_out_count;
+        }
+    }
+
+    print_interim_results_table_bottom();
+    print_simulation_summary(current_time, &log1, &log2, system_downtime);
+    
+    destroy_list_queue(&queue1);
+    destroy_list_queue(&queue2);
+
+    return SUCCESS_CODE;
+}
+
 
 status_t min3(double a, double b, double c, double *min_val)
 {
@@ -174,7 +296,7 @@ status_t print_interim_results_table_header(void)
     return SUCCESS_CODE;
 }
 
-status_t print_interim_results_table_content(const arr_queue_t *queue1, const simulation_log_t *log1, const arr_queue_t *queue2, const simulation_log_t *log2) 
+status_t print_interim_results_table_content_arr(const arr_queue_t *queue1, const simulation_log_t *log1, const arr_queue_t *queue2, const simulation_log_t *log2) 
 {
     if (queue1 == NULL || log1 == NULL || queue2 == NULL || log2 == NULL)
         return ERR_INVALID_POINTER;
@@ -188,6 +310,22 @@ status_t print_interim_results_table_content(const arr_queue_t *queue1, const si
     
     return SUCCESS_CODE;
 }
+
+status_t print_interim_results_table_content_list(const list_queue_t *queue1, const simulation_log_t *log1, const list_queue_t *queue2, const simulation_log_t *log2) 
+{
+    if (queue1 == NULL || log1 == NULL || queue2 == NULL || log2 == NULL)
+        return ERR_INVALID_POINTER;
+
+    printf("%s", BLUE);
+    printf("╠════════════════════════════╬════════════╬═════════════╬══════════════╬═══════════════╬════════════════╬════════════════╣\n");
+    printf("║ %-26lu ║ %-10s ║ %-11lu ║ %-12lu ║ %-13lu ║ %-14lu ║ %-14.2lf ║\n", log1->request_out_count, "queue_1", log1->request_in_count, log1->request_out_count, log1->failed_request_count, queue1->curr_size, log1->request_out_count > 0 ? (double)log1->total_length / log1->request_out_count : 0.0);
+    printf("╠════════════════════════════╬════════════╬═════════════╬══════════════╬═══════════════╬════════════════╬════════════════╣\n");
+    printf("║ %-26lu ║ %-10s ║ %-11lu ║ %-12lu ║ %-13lu ║ %-14lu ║ %-14.2lf ║\n", log1->request_out_count, "queue_2", log2->request_in_count, log2->request_out_count, log2->failed_request_count, queue2->curr_size, log2->request_out_count > 0 ? (double)log2->total_length / log2->request_out_count : 0.0);
+    printf("%s", RESET);
+    
+    return SUCCESS_CODE;
+}
+
 
 status_t print_interim_results_table_bottom(void)
 {
