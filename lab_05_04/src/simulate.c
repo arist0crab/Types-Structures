@@ -1,9 +1,14 @@
 #include "simulate.h"
 
-status_t print_simulation_summary(double total_time, const simulation_log_t *log1, const simulation_log_t *log2, double downtime);
-status_t print_queue_lengths(const size_t records_processed_quantity, const arr_queue_t *queue1, const simulation_log_t *log1, const arr_queue_t *queue2, const simulation_log_t *log2);
+// вспомогательные функции
 status_t random_double(double min, double max, double *rand_result);
 status_t min3(double a, double b, double c, double *min_val);
+
+// функции печати
+status_t print_interim_results_table_header(void);
+status_t print_interim_results_table_bottom(void);
+status_t print_simulation_summary(double total_time, const simulation_log_t *log1, const simulation_log_t *log2, double downtime);
+status_t print_interim_results_table_content(const arr_queue_t *queue1, const simulation_log_t *log1, const arr_queue_t *queue2, const simulation_log_t *log2);
 
 // задаем временные промежутки
 time_range_t arrival_time_of_type_1 = { .min_time = 1, .max_time = 5 };  // время прибытия для 1 типа
@@ -34,6 +39,8 @@ status_t simulate_service_unit_by_arr(void)
     request_t current_request = { 0 };  // текущая заявка
     request_t popped_request = { 0 };  // заявка, которая будет удаляться
     request_class_t last_served_type = TYPE_1;  // тип последней обслуживаемой заявки
+
+    print_interim_results_table_header();  // печатаем заголовок таблицы и понеслась
 
     while (ec == SUCCESS_CODE && log1.request_out_count < REQUESTS_1_TYPE_QUEUE_LENGTH)
     {
@@ -121,48 +128,16 @@ status_t simulate_service_unit_by_arr(void)
         // каждые 100 записей печатаем промежуточную информацию
         if (log1.request_out_count % 100 == 0 && last_print_checkpoint != log1.request_out_count)
         {
-            print_queue_lengths(log1.request_out_count, &queue1, &log1, &queue2, &log2);
+            print_interim_results_table_content(&queue1, &log1, &queue2, &log2);
             last_print_checkpoint = log1.request_out_count;
         }
     }
 
+    print_interim_results_table_bottom();
     print_simulation_summary(current_time, &log1, &log2, system_downtime);
     
     return SUCCESS_CODE;
 }
-
-status_t print_queue_lengths(const size_t records_processed_quantity, const arr_queue_t *queue1, const simulation_log_t *log1, const arr_queue_t *queue2, const simulation_log_t *log2) 
-{
-    if (queue1 == NULL || log1 == NULL || queue2 == NULL || log2 == NULL)
-        return ERR_INVALID_POINTER;
-
-    printf("%s", BLUE);
-    printf("=============== ОБРАБОТАНО %lu ЗАПИСЕЙ ===============\n", records_processed_quantity);
-    printf("Очередь 1: текущая длина = %zu, средняя длина = %.2f\n", queue1->size, log1->request_out_count > 0 ? log1->total_length / log1->request_out_count : 0.0);
-    printf("Очередь 2: текущая длина = %zu, средняя длина = %.2f\n", queue2->size, log2->request_out_count > 0 ? log2->total_length / log2->request_out_count : 0.0);
-    printf("\n");
-    printf("%s", RESET);
-    
-    return SUCCESS_CODE;
-}
-
-status_t print_simulation_summary(double total_time, const simulation_log_t *log1, const simulation_log_t *log2, double downtime) 
-{
-    if (log1 == NULL || log2 == NULL)
-        return ERR_INVALID_POINTER;
-
-    printf("%s", BLUE_BOLD);
-    printf("Общее время моделирования: %.2f\n", total_time);
-    printf("-----------------------------\n");
-    printf("Заявки типа 1: вошло: %zu, вышло: %zu\n", log1->request_in_count, log1->request_out_count);
-    printf("Заявки типа 2: вошло: %zu, вышло: %zu\n", log2->request_in_count, log2->request_out_count);
-    printf("Время простоя аппарата: %lf\n", downtime);
-    printf("\n");
-    printf("%s", RESET);
-
-    return SUCCESS_CODE;
-}
-
 
 status_t min3(double a, double b, double c, double *min_val)
 {
@@ -185,4 +160,67 @@ status_t random_double(double min, double max, double *rand_result)
 
     *rand_result = min + (max - min) * (rand() / (double)RAND_MAX);   
     return SUCCESS_CODE; 
+}
+
+status_t print_interim_results_table_header(void)
+{
+    printf("%s", BLUE);
+    printf("╔════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗\n");
+    printf("║                                                     INTERIM RESULTS                                                    ║\n");
+    printf("╠════════════════════════════╦════════════╦═════════════╦══════════════╦═══════════════╦════════════════╦════════════════╣\n");
+    printf("║ requests (type1) processed ║ queue name ║ requests in ║ requests out ║ requests lost ║ current length ║ average length ║\n");
+    printf("%s", RESET);
+
+    return SUCCESS_CODE;
+}
+
+status_t print_interim_results_table_content(const arr_queue_t *queue1, const simulation_log_t *log1, const arr_queue_t *queue2, const simulation_log_t *log2) 
+{
+    if (queue1 == NULL || log1 == NULL || queue2 == NULL || log2 == NULL)
+        return ERR_INVALID_POINTER;
+
+    printf("%s", BLUE);
+    printf("╠════════════════════════════╬════════════╬═════════════╬══════════════╬═══════════════╬════════════════╬════════════════╣\n");
+    printf("║ %-26lu ║ %-10s ║ %-11lu ║ %-12lu ║ %-13lu ║ %-14lu ║ %-14.2lf ║\n", log1->request_out_count, "queue_1", log1->request_in_count, log1->request_out_count, log1->failed_request_count, queue1->size, log1->request_out_count > 0 ? log1->total_length / log1->request_out_count : 0.0);
+    printf("╠════════════════════════════╬════════════╬═════════════╬══════════════╬═══════════════╬════════════════╬════════════════╣\n");
+    printf("║ %-26lu ║ %-10s ║ %-11lu ║ %-12lu ║ %-13lu ║ %-14lu ║ %-14.2lf ║\n", log1->request_out_count, "queue_2", log2->request_in_count, log2->request_out_count, log2->failed_request_count, queue1->size, log2->request_out_count > 0 ? log2->total_length / log2->request_out_count : 0.0);
+    printf("%s", RESET);
+    
+    return SUCCESS_CODE;
+}
+
+status_t print_interim_results_table_bottom(void)
+{
+    printf("%s", BLUE);
+    printf("╚════════════════════════════╩════════════╩═════════════╩══════════════╩═══════════════╩════════════════╩════════════════╝\n");
+    printf("%s", RESET);
+
+    return SUCCESS_CODE;
+}
+
+status_t print_simulation_summary(double total_time, const simulation_log_t *log1, const simulation_log_t *log2, double downtime) 
+{
+    if (log1 == NULL || log2 == NULL)
+        return ERR_INVALID_POINTER;
+
+    printf("%s", BLUE_BOLD);
+    printf("╔════════════════════════════════════════════╗\n");
+    printf("║              SIMULATION SUMMARY            ║\n");
+    printf("╠═══════════════╦═════════════╦══════════════╣\n");
+    printf("║ requests type ║ requests in ║ requests out ║\n");
+    printf("╠═══════════════╬═════════════╬══════════════╣\n");
+    printf("║ queue type 1  ║ %-11lu ║ %-12lu ║\n", log1->request_in_count, log1->request_out_count);
+    printf("╠═══════════════╬═════════════╬══════════════╣\n");
+    printf("║ queue type 2  ║ %-11lu ║ %-12lu ║\n", log2->request_in_count, log2->request_out_count);
+    printf("╠╦╦╦╦╦╦╦╦╦╦╦╦╦╦╦╬╦╦╦╦╦╦╦╦╦╦╦╦╦╬╦╦╦╦╦╦╦╦╦╦╦╦╦╦╣\n");
+    printf("║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║║\n");
+    printf("╠╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╬╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╩╣\n");
+    printf("║ total simulation time ║ %-18.2lf ║\n", total_time);
+    printf("╠═══════════════════════╬════════════════════╣\n");
+    printf("║    system dowmtime    ║ %-18.2lf ║\n", downtime);
+    printf("╚═══════════════════════╩════════════════════╝\n");
+    printf("\n");
+    printf("%s", RESET);
+
+    return SUCCESS_CODE;
 }

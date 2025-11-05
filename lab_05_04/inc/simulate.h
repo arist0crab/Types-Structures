@@ -4,6 +4,7 @@
 #include "data.h"
 #include "arr.h"
 #include "color.h"
+#include "output.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <math.h>
