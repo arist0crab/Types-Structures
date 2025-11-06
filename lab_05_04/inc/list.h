@@ -5,8 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_LIST_LENGTH 1000
-
 typedef struct node
 {
     request_t request;
@@ -26,7 +24,8 @@ status_t pop_list(list_queue_t *list_queue, request_t *popped_request);
 // TODO написать документацию
 status_t push_list(list_queue_t *list_queue, request_t *request);
 // TODO написать документацию
+status_t allocate_list_node(node_t **new_node, const request_t *request);
+// TODO написать документацию
 status_t destroy_list_queue(list_queue_t *list_queue);
-
 
 #endif

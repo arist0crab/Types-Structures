@@ -1,7 +1,5 @@
 #include "list.h"
 
-status_t allocate_list_node(node_t **new_node, const request_t *request);
-
 status_t push_list(list_queue_t *list_queue, request_t *request)
 {
     node_t *cur_node;

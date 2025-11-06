@@ -4,8 +4,6 @@
 #include "data.h"
 #include <stdio.h>
 
-#define MAX_QUEUE_SIZE 1000
-
 typedef struct 
 {
     request_t data[MAX_QUEUE_SIZE];

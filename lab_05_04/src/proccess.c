@@ -21,7 +21,12 @@ status_t procces_menu_choice(menu_option_t menu_option)
             ec = measure_efficiency();
             break;
 
-        case VIEW_MEMORY_INFORMATION:
+        case VIEW_MEMORY_INFORMATION_ARR:
+            ec = fill_and_empty_arr_queue();
+            break;
+
+        case VIEW_MEMORY_INFORMATION_LIST:
+            ec = fill_and_empty_list_queue();
             break;
 
         case CONFIGURE_SIMULATION_PARAMETERS:

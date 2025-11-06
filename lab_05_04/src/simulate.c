@@ -149,7 +149,7 @@ status_t simulate_service_unit_by_list(bool verbose_mode)
     status_t ec = SUCCESS_CODE;
 
     // инициализируем очереди и их логи
-    list_queue_t queue1 = { 0, 0, 0, MAX_LIST_LENGTH }, queue2 = { 0, 0, 0, MAX_LIST_LENGTH };
+    list_queue_t queue1 = { 0, 0, 0, MAX_QUEUE_SIZE }, queue2 = { 0, 0, 0, MAX_QUEUE_SIZE };
     simulation_log_t log1 = { 0 }, log2 = { 0 };
     size_t last_print_checkpoint = 0;
 
