@@ -10,14 +10,15 @@ status_t procces_menu_choice(menu_option_t menu_option)
             break;
 
         case RUN_ARRAY_SIMULATION:
-            ec = simulate_service_unit_by_arr();
+            ec = simulate_service_unit_by_arr(true);
             break;
 
         case RUN_LIST_SIMULATION:
-            ec = simulate_service_unit_by_list();
+            ec = simulate_service_unit_by_list(true);
             break;
 
         case EVALUATE_EFFECTIVENESS:
+            ec = measure_efficiency();
             break;
 
         case VIEW_MEMORY_INFORMATION:

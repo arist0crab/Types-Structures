@@ -32,9 +32,9 @@ typedef struct
  * основе работы со статическим массивом для хранения очередей.
  * @return Статус выполнения функции.
 */
-status_t simulate_service_unit_by_arr(void);
+status_t simulate_service_unit_by_arr(bool verbose_mode);
 
 // TODO написать документацию по рофлу
-status_t simulate_service_unit_by_list(void);
+status_t simulate_service_unit_by_list(bool verbose_mode);
 
 #endif

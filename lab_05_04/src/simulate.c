@@ -17,7 +17,7 @@ time_range_t arrival_time_of_type_2 = { .min_time = 0, .max_time = 3 };  // вр
 time_range_t service_time_of_type_1 = { .min_time = 0, .max_time = 4 };  // время обслуживания для 1 типа
 time_range_t service_time_of_type_2 = { .min_time = 0, .max_time = 1 };  // время обслуживания для 2 типа
 
-status_t simulate_service_unit_by_arr(void)
+status_t simulate_service_unit_by_arr(bool verbose_mode)
 {
     status_t ec = SUCCESS_CODE;
 
@@ -41,7 +41,8 @@ status_t simulate_service_unit_by_arr(void)
     request_t popped_request = { 0 };  // заявка, которая будет удаляться
     request_class_t last_served_type = TYPE_1;  // тип последней обслуживаемой заявки
 
-    print_interim_results_table_header();  // печатаем заголовок таблицы и понеслась
+    if (verbose_mode)
+        print_interim_results_table_header();  // печатаем заголовок таблицы и понеслась
 
     while (ec == SUCCESS_CODE && log1.request_out_count < REQUESTS_1_TYPE_QUEUE_LENGTH)
     {
@@ -127,20 +128,23 @@ status_t simulate_service_unit_by_arr(void)
         }
 
         // каждые 100 записей печатаем промежуточную информацию
-        if (log1.request_out_count % 100 == 0 && last_print_checkpoint != log1.request_out_count)
+        if (verbose_mode && log1.request_out_count % 100 == 0 && last_print_checkpoint != log1.request_out_count)
         {
             print_interim_results_table_content_arr(&queue1, &log1, &queue2, &log2);
             last_print_checkpoint = log1.request_out_count;
         }
     }
 
-    print_interim_results_table_bottom();
-    print_simulation_summary(current_time, &log1, &log2, system_downtime);
+    if (verbose_mode)
+    {
+        print_interim_results_table_bottom();
+        print_simulation_summary(current_time, &log1, &log2, system_downtime);
+    }
     
     return SUCCESS_CODE;
 }
 
-status_t simulate_service_unit_by_list(void)
+status_t simulate_service_unit_by_list(bool verbose_mode)
 {
     status_t ec = SUCCESS_CODE;
 
@@ -164,7 +168,8 @@ status_t simulate_service_unit_by_list(void)
     request_t popped_request = { 0 };
     request_class_t last_served_type = TYPE_1;
 
-    print_interim_results_table_header();
+    if (verbose_mode)
+        print_interim_results_table_header();
 
     while (ec == SUCCESS_CODE && log1.request_out_count < REQUESTS_1_TYPE_QUEUE_LENGTH)
     {
@@ -244,15 +249,18 @@ status_t simulate_service_unit_by_list(void)
         }
 
         // каждые 100 записей печатаем промежуточную информацию
-        if (log1.request_out_count % 100 == 0 && last_print_checkpoint != log1.request_out_count)
+        if (verbose_mode && log1.request_out_count % 100 == 0 && last_print_checkpoint != log1.request_out_count)
         {
             print_interim_results_table_content_list(&queue1, &log1, &queue2, &log2);
             last_print_checkpoint = log1.request_out_count;
         }
     }
 
-    print_interim_results_table_bottom();
-    print_simulation_summary(current_time, &log1, &log2, system_downtime);
+    if (verbose_mode)
+    {
+        print_interim_results_table_bottom();
+        print_simulation_summary(current_time, &log1, &log2, system_downtime);
+    }
     
     destroy_list_queue(&queue1);
     destroy_list_queue(&queue2);
