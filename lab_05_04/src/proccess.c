@@ -30,6 +30,7 @@ status_t procces_menu_choice(menu_option_t menu_option)
             break;
 
         case CONFIGURE_SIMULATION_PARAMETERS:
+            ec = change_simulation_configurations();
             break;
         
         default:

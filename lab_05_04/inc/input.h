@@ -5,6 +5,6 @@
 #include "color.h"
 #include <stdio.h>
 
-status_t input_cur_menu_opt(menu_option_t *cur_menu_opt);
+status_t input_cur_menu_opt(int *cur_menu_opt, int const menu_points_quantity);
 
 #endif

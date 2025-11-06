@@ -4,6 +4,7 @@
 #include "data.h"
 #include "arr.h"
 #include "color.h"
+#include "input.h"
 #include "output.h"
 #include "list.h"
 #include <stdbool.h>
@@ -36,5 +37,8 @@ status_t simulate_service_unit_by_arr(bool verbose_mode);
 
 // TODO написать документацию по рофлу
 status_t simulate_service_unit_by_list(bool verbose_mode);
+
+// TODO
+status_t change_simulation_configurations(void);
 
 #endif

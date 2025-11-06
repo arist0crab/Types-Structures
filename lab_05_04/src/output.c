@@ -20,6 +20,23 @@ status_t print_menu(void)
     return SUCCESS_CODE;
 }
 
+status_t print_simulation_config_menu(void)
+{
+    printf("%s", BLUE);
+    printf("╔═════════════════════════════════════════════╗\n");
+    printf("║          C O N F I G    M E N U             ║\n");
+    printf("╠═════════════════════════════════════════════╣\n");
+    printf("║ 0. Назад                                    ║\n");
+    printf("║ 1. Изменить время поступления заявок Т1     ║\n");
+    printf("║ 2. Изменить время поступления заявок Т2     ║\n");
+    printf("║ 3. Изменить время обработки заявок Т1       ║\n");
+    printf("║ 4. Изменить время обработки заявок Т2       ║\n");
+    printf("╚═════════════════════════════════════════════╝\n");
+    printf("%s", RESET);
+
+    return SUCCESS_CODE;
+}
+
 status_t print_exit_code_result(status_t exit_code)
 {
     status_t ec = SUCCESS_CODE;

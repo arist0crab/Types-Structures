@@ -11,13 +11,13 @@ int main(void)
     menu_option_t cur_menu_opt = RUN_ARRAY_SIMULATION;
 
     print_menu();
-    exit_code = input_cur_menu_opt(&cur_menu_opt);
+    exit_code = input_cur_menu_opt((int *)&cur_menu_opt, MENU_OPTIONS_QUANTITY);
     while (cur_menu_opt != EXIT_PROGRAM && exit_code == SUCCESS_CODE)
     {
         menu_opt_processing_status = procces_menu_choice(cur_menu_opt);
         print_exit_code_result(menu_opt_processing_status);
         print_menu();
-        exit_code = input_cur_menu_opt(&cur_menu_opt);
+        exit_code = input_cur_menu_opt((int *)&cur_menu_opt, MENU_OPTIONS_QUANTITY);
     }
 
     return exit_code;

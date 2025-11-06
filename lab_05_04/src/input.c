@@ -1,6 +1,6 @@
 #include "input.h"
 
-status_t input_cur_menu_opt(menu_option_t *cur_menu_opt)
+status_t input_cur_menu_opt(int *cur_menu_opt, int const menu_points_quantity)
 {
     
     status_t ec = (cur_menu_opt) ? SUCCESS_CODE : ERR_INVALID_POINTER;
@@ -17,10 +17,10 @@ status_t input_cur_menu_opt(menu_option_t *cur_menu_opt)
     {
         if (sscanf(buffer, "%d %c", &temp, &extra) != 1)
             ec = ERR_IO;
-        else if (temp < 0 || temp >= MENU_OPTIONS_QUANTITY)
+        else if (temp < 0 || temp >= menu_points_quantity)
             ec = ERR_RANGE;
         else
-            *cur_menu_opt = (menu_option_t)temp;
+            *cur_menu_opt = temp;
     }
 
     return ec;

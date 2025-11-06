@@ -268,6 +268,46 @@ status_t simulate_service_unit_by_list(bool verbose_mode)
     return SUCCESS_CODE;
 }
 
+status_t change_simulation_configurations(void)
+{
+    status_t ec = SUCCESS_CODE;
+    config_menu_option_t cur_menu_option;
+
+    print_simulation_config_menu();
+    ec = input_cur_menu_opt((int *)&cur_menu_option, CONFIG_MENU_OPTIONS_QUANTITY);
+
+    if (ec == SUCCESS_CODE)
+    {
+        switch (cur_menu_option)
+        {
+            case GO_BACK:
+                printf("GO_BACK\n");
+                break;
+
+            case CHANGE_ENTARANCE_T1:
+                printf("CHANGE_ENTARANCE_T1\n");
+                break;
+
+            case CHANGE_ENTARANCE_T2:
+                printf("CHANGE_ENTARANCE_T2\n");
+                break;
+
+            case CHANGE_PROCESSING_T1:
+                printf("CHANGE_PROCESSING_T1\n");
+                break;
+
+            case CHANGE_PROCESSING_T2:
+                printf("CHANGE_PROCESSING_T2\n");
+                break;
+            
+            default:
+                ec = ERR_IO;
+                break;
+        }
+    }
+
+    return ec;
+}
 
 status_t min3(double a, double b, double c, double *min_val)
 {

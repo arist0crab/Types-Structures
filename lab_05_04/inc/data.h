@@ -4,6 +4,7 @@
 #define MAX_QUEUE_SIZE 1000
 #define MAX_STRING_LENGTH 256
 #define MENU_OPTIONS_QUANTITY 7
+#define CONFIG_MENU_OPTIONS_QUANTITY 5
 #define EPS 1e-9
 
 typedef enum
@@ -27,6 +28,15 @@ typedef enum
     VIEW_MEMORY_INFORMATION_LIST,
     CONFIGURE_SIMULATION_PARAMETERS
 } menu_option_t;
+
+typedef enum 
+{
+    GO_BACK,
+    CHANGE_ENTARANCE_T1,
+    CHANGE_ENTARANCE_T2,
+    CHANGE_PROCESSING_T1,
+    CHANGE_PROCESSING_T2
+} config_menu_option_t;
 
 typedef enum
 {
