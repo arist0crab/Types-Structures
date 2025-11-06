@@ -37,6 +37,22 @@ status_t print_simulation_config_menu(void)
     return SUCCESS_CODE;
 }
 
+status_t print_simulation_configs(time_range_t *arr_t1, time_range_t *arr_t2, time_range_t *serve_t1, time_range_t *serve_t2)
+{
+    printf("%s", BLUE);
+    printf("╔════════════════════════════════════════════════════╗\n");
+    printf("║            C U R R E N T  C O N F I G S            ║\n");
+    printf("╠════════════════════════════════════════════════════╣\n");
+    printf("║ Интервал поступления T1:  { %-6.2lf, %-6.2lf } ед.в. ║\n", arr_t1->min_time, arr_t1->max_time);
+    printf("║ Интервал поступления T2:  { %-6.2lf, %-6.2lf } ед.в. ║\n", arr_t2->min_time, arr_t2->max_time);
+    printf("║ Интервал обслуживания T1: { %-6.2lf, %-6.2lf } ед.в. ║\n", serve_t1->min_time, serve_t1->max_time);
+    printf("║ Интервал обслуживания T2: { %-6.2lf, %-6.2lf } ед.в. ║\n", serve_t2->min_time, serve_t2->max_time);
+    printf("╚════════════════════════════════════════════════════╝\n");
+    printf("%s", RESET);
+
+    return SUCCESS_CODE;
+}
+
 status_t print_exit_code_result(status_t exit_code)
 {
     status_t ec = SUCCESS_CODE;

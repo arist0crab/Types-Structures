@@ -273,6 +273,7 @@ status_t change_simulation_configurations(void)
     status_t ec = SUCCESS_CODE;
     config_menu_option_t cur_menu_option;
 
+    print_simulation_configs(&arrival_time_of_type_1, &arrival_time_of_type_2, &service_time_of_type_1, &service_time_of_type_2);
     print_simulation_config_menu();
     ec = input_cur_menu_opt((int *)&cur_menu_option, CONFIG_MENU_OPTIONS_QUANTITY);
 
@@ -281,23 +282,22 @@ status_t change_simulation_configurations(void)
         switch (cur_menu_option)
         {
             case GO_BACK:
-                printf("GO_BACK\n");
                 break;
 
             case CHANGE_ENTARANCE_T1:
-                printf("CHANGE_ENTARANCE_T1\n");
+                input_time_gap(&arrival_time_of_type_1.min_time, &arrival_time_of_type_1.max_time);
                 break;
 
             case CHANGE_ENTARANCE_T2:
-                printf("CHANGE_ENTARANCE_T2\n");
+                input_time_gap(&arrival_time_of_type_2.min_time, &arrival_time_of_type_2.max_time);
                 break;
 
             case CHANGE_PROCESSING_T1:
-                printf("CHANGE_PROCESSING_T1\n");
+                input_time_gap(&service_time_of_type_1.min_time, &service_time_of_type_1.max_time);
                 break;
 
             case CHANGE_PROCESSING_T2:
-                printf("CHANGE_PROCESSING_T2\n");
+                input_time_gap(&service_time_of_type_2.min_time, &service_time_of_type_2.max_time);
                 break;
             
             default:
