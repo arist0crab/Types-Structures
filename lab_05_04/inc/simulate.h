@@ -31,14 +31,20 @@ typedef struct
 
 /** @brief Функция для симуляции работы системы (обработки n-time раз записей 1-ого типа) на 
  * основе работы со статическим массивом для хранения очередей.
+ * @param verbose_mode Режим работы функции. При verbose_mode=true выводит информацию
+ * о симуляции в терминал.
  * @return Статус выполнения функции.
 */
 status_t simulate_service_unit_by_arr(bool verbose_mode);
 
-// TODO написать документацию по рофлу
+/** @brief Функция для симуляции работы системы (обработки n-time раз записей 1-ого типа) на 
+ * основе работы со списком для хранения очередей.
+ * @param verbose_mode Режим работы функции. При verbose_mode=true выводит информацию
+ * о симуляции в терминал.
+ * @return Статус выполнения функции.
+*/
 status_t simulate_service_unit_by_list(bool verbose_mode);
 
-// TODO
 status_t change_simulation_configurations(void);
 
 #endif

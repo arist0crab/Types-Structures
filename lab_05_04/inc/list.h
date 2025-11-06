@@ -19,13 +19,34 @@ typedef struct
     size_t max_size;
 } list_queue_t;
 
-// TODO написать документацию
-status_t pop_list(list_queue_t *list_queue, request_t *popped_request);
-// TODO написать документацию
+/** @brief Функция для добавления элемента request в конец очереди (список)
+ * @param list_queue Очередь, в которую добавляется элемент
+ * @param request Элемент, который будет добавлен в очередь
+ * @return Статус выполнения функции
+*/
 status_t push_list(list_queue_t *list_queue, request_t *request);
-// TODO написать документацию
+
+/** @brief Функция для удаления элемента из начала очереди (список).
+ * Если указан popped_request, то удаленный элемент передается в popped_request.
+ * @param list_queue Очередь, из которой удаляется элемент
+ * @param popped_request Указатель на элемент, куда будут передан удаляемый элемент,
+ * если popped_request != NULL
+ * @return Статус выполнения функции
+*/
+status_t pop_list(list_queue_t *list_queue, request_t *popped_request);
+
+/** @brief Динамически выделяет память для узла списка, выделенный адрес присваивается 
+ * new_node. Значение нового узла - request.
+ * @param new_node Указатель на новый узел списка.
+ * @param request Значение (запись), присваиваемое новому узлу.
+ * @return Статус выполнения функции
+*/
 status_t allocate_list_node(node_t **new_node, const request_t *request);
-// TODO написать документацию
+
+/** @brief Освобождает выделенные узелы списка list_queue.
+ * @param list_queue Список, чьи узлы будут освобождены.
+ * @return Статус выполнения функции
+*/
 status_t destroy_list_queue(list_queue_t *list_queue);
 
 #endif

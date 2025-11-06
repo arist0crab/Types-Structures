@@ -16,11 +16,7 @@ status_t input_cur_menu_opt(int *cur_menu_opt, int const menu_points_quantity)
     if (ec == SUCCESS_CODE)
     {
         if ((tt = sscanf(buffer, "%d %c", &temp, &extra)) != 1)
-        {
-            
-            printf("im fucking here 2, tt = %d, buf = %s\n", tt, buffer);
             ec = ERR_IO;
-        }
         else if (temp < 0 || temp >= menu_points_quantity)
             ec = ERR_RANGE;
         else
