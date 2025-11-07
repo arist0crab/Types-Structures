@@ -156,3 +156,135 @@ while (ec == SUCCESS_CODE && log1.request_out_count < REQUESTS_1_TYPE_QUEUE_LENG
 от него. Далее мы сразу переводим наши "виртуальные часы" на момент нового ближайщего события в строчке
 ```c current_time = next_event_time;```
 
+## Шаг 3. Обработка событий
+
+Вопрос в том, как определять, какое именно событие мы должны обрабатывать  каждую итерацию цикла. Да, у нас есть переменная ```next_event_time```, которая хранит время следующего события, но она не хранит информацию о том какое именно это будет событие. Все относительно просто: чтобы понять, какое именно из трех событий сейчас должно произойти, для для каждого события вычесть из времени его наступления ```next_event_time```. Если разница равна нулю, то время наступления события и время самого ближайщего события одинаковы, следовательно, совпадают. Рассмотрим на блоке ниже:
+
+```c
+// если появилась заявка типа 1
+if (fabs(next_arrival_type1 - next_event_time) < EPS)
+{
+    current_request.request_class = TYPE_1;
+    current_request.arrival_time = current_time;
+
+    if (queue1.size < MAX_QUEUE_SIZE)
+        push_arr(&queue1, &current_request);
+    else 
+        log1.failed_request_count++;
+
+    if (current_service_end_time == INFINITY)
+    {
+        random_double(service_time_of_type_1.min_time, service_time_of_type_1.max_time, &temp_time);
+        current_service_end_time = current_time + temp_time;
+    }
+    
+    log1.request_in_count++;
+    random_double(arrival_time_of_type_1.min_time, arrival_time_of_type_1.max_time, &temp_time);
+    next_arrival_type1 += temp_time;
+}
+```
+
+Условие ```if (fabs(next_arrival_type1 - next_event_time) < EPS)``` как раз проверяет равенство 
+```next_arrival_type1``` и ```next_event_time```. Если они равны, значит следующее событие - поступление заявки первого типа. Присваиваем поступающей заявке соответствующие поля:
+
+```c
+current_request.request_class = TYPE_1;
+current_request.arrival_time = current_time;
+```
+
+Если очередь не переполнена, мы можем засунуть в нее новую заявку, в противном случае она будет потеряна:
+
+```c
+if (queue1.size < MAX_QUEUE_SIZE)
+    push_arr(&queue1, &current_request);
+else 
+    log1.failed_request_count++;
+```
+
+Про блок с условием ```if (current_service_end_time == INFINITY)``` пояснение будет далее, сейчас логичнее увеличить счетчик поступивших заявок первого типа, выбрать cooldown до нового прибытия заявки первого типа и обновить ```next_arrival_type1```:
+
+```c
+log1.request_in_count++;
+random_double(arrival_time_of_type_1.min_time, arrival_time_of_type_1.max_time, &temp_time);
+next_arrival_type1 += temp_time;
+```
+
+Отдельно стоит рассмотреть следующий блок:
+
+```c
+if (current_service_end_time == INFINITY)
+{
+    random_double(service_time_of_type_1.min_time, service_time_of_type_1.max_time, &temp_time);
+    current_service_end_time = current_time + temp_time;
+}
+```
+
+Дело в том что при инициализации мы указывали ```double current_service_end_time = INFINITY;```, чтобы при первой итерации ```while``` переменная ```current_service_end_time``` никак не могла быть минимальной, потому что (сюрприз-сюрприз), когда мы запускаем нашу симуляцию, самым первым событием так или иначе должно быть поступление какой-либо заявки, но никак не ее обработка. Также, когда ОА простаивает, никакая заявка не находится в обработке, значит ```current_service_end_time``` следует назначить значение ```INFINITY```. Так вот, случаи, когда ```current_service_end_time == INFINITY``` (т.е. по сути это моменты времени, когда ОА не работает и мы ждем новой заявки, которая моментально поступит в обработку) необходимо корректно обрабатывать, иначе оно никогда не поменяет своего значения и цикл станет бесконечным. Именно поэтому в строчке ```current_service_end_time = current_time + temp_time;``` мы, по сути, назначаем время окончания обработки только что поступившей заявки. Это сложный, но важный момент.
+
+Блок обработки события "поступление заявки второго типа" фактически ничем не отличается от такого же блока для заявок первого типа, поэтому следующая точка интереса - событие "завершение обслуживания".
+
+```c
+// если завершилось обслуживание (пытаемся обработать как можно скорее заявки первого типа)
+else if (fabs(current_service_end_time - next_event_time) < EPS)
+{
+    if (queue1.size && (queue2.size == 0 || last_served_type == TYPE_1))
+    {
+        pop_arr(&queue1, &popped_request);
+        log1.request_out_count++;
+        log1.total_wait_time += current_time - popped_request.arrival_time;
+        log1.total_length += queue1.size;
+        random_double(service_time_of_type_1.min_time, service_time_of_type_1.max_time, &temp_time);
+        last_served_type = TYPE_1;
+    }
+    else if (queue2.size && (queue1.size == 0 || last_served_type == TYPE_2))
+    {
+        pop_arr(&queue2, &popped_request);
+        log2.request_out_count++;
+        log2.total_wait_time += current_time - popped_request.arrival_time;
+        log2.total_length += queue2.size;
+        random_double(service_time_of_type_2.min_time, service_time_of_type_2.max_time, &temp_time);
+        last_served_type = TYPE_2;
+    }
+    else if (queue1.size == 0 && queue2.size == 0)
+    {
+        system_downtime += (fmin(next_arrival_type1, next_arrival_type2) - current_time);
+        current_service_end_time = INFINITY;
+    }
+
+    log1.function_call_count++;
+    log2.function_call_count++;
+    // назначаем новый момент окончания обслуживания
+    current_service_end_time = current_time + temp_time; 
+}
+```
+
+Итак, вот обслуживание нашей заявки подошло к концу, про обработанную заявку мы радостно забываем: теперь система свободна, значит, мы можем просунуть следующую заявку в обработку. Наш приоритет - заявки первого типа, именно их мы пытаемся запихать побольше в ОА. Строчка ```if (queue1.size && (queue2.size == 0 || last_served_type == TYPE_1))``` проверяет условие "можем ли мы запихнуть заявку первого типа в ОА", если можем, то берем заявку из очереди первого типа (```pop_arr(&queue2, &popped_request);```), обновляем логи надлежащим образом и меняем переменную ```last_served_type = TYPE_1;```. Строка с обновлением ```temp_time``` обретет смысл позже.
+
+Если обработать заявку первого типа мы не можем, то пытаемся обработать заявку второго (по аналогии с первой, они почти идентичны). Если и этого мы сделать не можем то, остается только рассмотреть вариант, при котором ```queue1.size == 0 && queue2.size == 0```. Очевидно, заявок нет, в ОА положить нечего, система простаивает: ```system_downtime += ...```, а т.к. система проистаивает, необходимо выполнить ```current_service_end_time = INFINITY;``` по причинам, рассмотренным выше. После проверки всех трех подблоков (начало обработки заявки первого или второго типа или вариант с проставиванием ОА) необходимо обновить логи и назначить новый момент окончания обслуживания ```current_service_end_time = current_time + temp_time; ``` (вот тут нам и пригодится наше ```temp_time```).
+
+## Шаг 4. Печать результатов и завершение симуляции
+
+По условию каждые 100 обработанных заявок первого типа нам необходимо выводить информацию о том, как идут дела в симуляции. Делаем мы это только в том случае, если ```verbose_mode == true``` и ```last_print_checkpoint != log1.request_out_count```:
+
+```c
+// каждые 100 записей печатаем промежуточную информацию
+if (verbose_mode && log1.request_out_count % 100 == 0 && last_print_checkpoint != log1.request_out_count)
+{
+    print_interim_results_table_content_list(&queue1, &log1, &queue2, &log2);
+    last_print_checkpoint = log1.request_out_count;
+}
+```
+
+Последнее условие необходимо для того, чтобы некоторые строки таблицы не выводились дважды. Например, ОА только что выпустил 100 заявок первого типа. А потом в ОА поступила заявка второго типа, он ее успешно обработал и... обработанных заявок первого типа все еще 100 штук. Информация о процессе печатается дважды, информация в таблице дублируется. А вот ```last_print_checkpoint``` хранит в себе кол-во заявок первого типа, при котором последний раз была напечатана отладочная информация. Т.е. если мы единожды печатаем информацию на 100 заявках, то в следующий раз условие ```last_print_checkpoint != log1.request_out_count``` не допустит этого.
+
+После выхода из основного цикла просто печатаем еще раз всю важную информацию, подводя итоги:
+
+```c
+if (verbose_mode)
+{
+    print_interim_results_table_bottom();
+    print_simulation_summary(current_time, &log1, &log2, system_downtime);
+}
+```
+
+Собственно, это был буквально весь принцип работы алгоритма симуляции :)
