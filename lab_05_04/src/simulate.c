@@ -95,7 +95,7 @@ status_t simulate_service_unit_by_arr(bool verbose_mode)
         }
 
         // если завершилось обслуживание (пытаемся обработать как можно скорее заявки первого типа)
-        else if (fabs(current_service_end_time - next_event_time) < EPS || (queue1.size || queue2.size))
+        else if (fabs(current_service_end_time - next_event_time) < EPS)
         {
             if (queue1.size && (queue2.size == 0 || last_served_type == TYPE_1))
             {
@@ -104,6 +104,7 @@ status_t simulate_service_unit_by_arr(bool verbose_mode)
                 log1.total_wait_time += current_time - popped_request.arrival_time;
                 log1.total_length += queue1.size;
                 random_double(service_time_of_type_1.min_time, service_time_of_type_1.max_time, &temp_time);
+                current_service_end_time = current_time + temp_time;
                 last_served_type = TYPE_1;
             }
             else if (queue2.size && (queue1.size == 0 || last_served_type == TYPE_2))
@@ -113,6 +114,7 @@ status_t simulate_service_unit_by_arr(bool verbose_mode)
                 log2.total_wait_time += current_time - popped_request.arrival_time;
                 log2.total_length += queue2.size;
                 random_double(service_time_of_type_2.min_time, service_time_of_type_2.max_time, &temp_time);
+                current_service_end_time = current_time + temp_time;
                 last_served_type = TYPE_2;
             }
             else if (queue1.size == 0 && queue2.size == 0)
@@ -123,8 +125,6 @@ status_t simulate_service_unit_by_arr(bool verbose_mode)
 
             log1.function_call_count++;
             log2.function_call_count++;
-            // назначаем новый момент окончания обслуживания
-            current_service_end_time = current_time + temp_time; 
         }
 
         // каждые 100 записей печатаем промежуточную информацию
@@ -217,7 +217,7 @@ status_t simulate_service_unit_by_list(bool verbose_mode)
             next_arrival_type2 += temp_time;
         }
         // если завершилось обслуживание (пытаемся обработать как можно скорее заявки первого типа)
-        else if (fabs(current_service_end_time - next_event_time) < EPS || (queue1.curr_size || queue2.curr_size))
+        else if (fabs(current_service_end_time - next_event_time) < EPS)
         {
             if (queue1.curr_size && (queue2.curr_size == 0 || last_served_type == TYPE_1))
             {
@@ -226,6 +226,7 @@ status_t simulate_service_unit_by_list(bool verbose_mode)
                 log1.total_wait_time += current_time - popped_request.arrival_time;
                 log1.total_length += queue1.curr_size;
                 random_double(service_time_of_type_1.min_time, service_time_of_type_1.max_time, &temp_time);
+                current_service_end_time = current_time + temp_time;
                 last_served_type = TYPE_1;
             }
             else if (queue2.curr_size && (queue1.curr_size == 0 || last_served_type == TYPE_2))
@@ -235,6 +236,7 @@ status_t simulate_service_unit_by_list(bool verbose_mode)
                 log2.total_wait_time += current_time - popped_request.arrival_time;
                 log2.total_length += queue2.curr_size;
                 random_double(service_time_of_type_2.min_time, service_time_of_type_2.max_time, &temp_time);
+                current_service_end_time = current_time + temp_time;
                 last_served_type = TYPE_2;
             }
             else if (queue1.curr_size == 0 && queue2.curr_size == 0)
@@ -244,8 +246,6 @@ status_t simulate_service_unit_by_list(bool verbose_mode)
             }
             log1.function_call_count++;
             log2.function_call_count++;
-            // назначаем новый момент окончания обслуживания
-            current_service_end_time = current_time + temp_time;
         }
 
         // каждые 100 записей печатаем промежуточную информацию
