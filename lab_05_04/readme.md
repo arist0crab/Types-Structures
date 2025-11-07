@@ -234,6 +234,7 @@ else if (fabs(current_service_end_time - next_event_time) < EPS)
         log1.total_wait_time += current_time - popped_request.arrival_time;
         log1.total_length += queue1.size;
         random_double(service_time_of_type_1.min_time, service_time_of_type_1.max_time, &temp_time);
+        current_service_end_time = current_time + temp_time;
         last_served_type = TYPE_1;
     }
     else if (queue2.size && (queue1.size == 0 || last_served_type == TYPE_2))
@@ -243,6 +244,7 @@ else if (fabs(current_service_end_time - next_event_time) < EPS)
         log2.total_wait_time += current_time - popped_request.arrival_time;
         log2.total_length += queue2.size;
         random_double(service_time_of_type_2.min_time, service_time_of_type_2.max_time, &temp_time);
+        current_service_end_time = current_time + temp_time;
         last_served_type = TYPE_2;
     }
     else if (queue1.size == 0 && queue2.size == 0)
@@ -252,15 +254,13 @@ else if (fabs(current_service_end_time - next_event_time) < EPS)
     }
 
     log1.function_call_count++;
-    log2.function_call_count++;
-    // назначаем новый момент окончания обслуживания
-    current_service_end_time = current_time + temp_time; 
+    log2.function_call_count++; 
 }
 ```
 
-Итак, вот обслуживание нашей заявки подошло к концу, про обработанную заявку мы радостно забываем: теперь система свободна, значит, мы можем просунуть следующую заявку в обработку. Наш приоритет - заявки первого типа, именно их мы пытаемся запихать побольше в ОА. Строчка ```if (queue1.size && (queue2.size == 0 || last_served_type == TYPE_1))``` проверяет условие "можем ли мы запихнуть заявку первого типа в ОА", если можем, то берем заявку из очереди первого типа (```pop_arr(&queue2, &popped_request);```), обновляем логи надлежащим образом и меняем переменную ```last_served_type = TYPE_1;```. Строка с обновлением ```temp_time``` обретет смысл позже.
+Итак, вот обслуживание нашей заявки подошло к концу, про обработанную заявку мы радостно забываем: теперь система свободна, значит, мы можем просунуть следующую заявку в обработку. Наш приоритет - заявки первого типа, именно их мы пытаемся запихать побольше в ОА. Строчка ```if (queue1.size && (queue2.size == 0 || last_served_type == TYPE_1))``` проверяет условие "можем ли мы запихнуть заявку первого типа в ОА", если можем, то берем заявку из очереди первого типа (```pop_arr(&queue2, &popped_request);```), обновляем логи надлежащим образом и меняем переменную ```last_served_type = TYPE_1;```. Также назначаем новый ```temp_time``` и ```current_service_end_time = current_time + temp_time;```.
 
-Если обработать заявку первого типа мы не можем, то пытаемся обработать заявку второго (по аналогии с первой, они почти идентичны). Если и этого мы сделать не можем то, остается только рассмотреть вариант, при котором ```queue1.size == 0 && queue2.size == 0```. Очевидно, заявок нет, в ОА положить нечего, система простаивает: ```system_downtime += ...```, а т.к. система проистаивает, необходимо выполнить ```current_service_end_time = INFINITY;``` по причинам, рассмотренным выше. После проверки всех трех подблоков (начало обработки заявки первого или второго типа или вариант с проставиванием ОА) необходимо обновить логи и назначить новый момент окончания обслуживания ```current_service_end_time = current_time + temp_time; ``` (вот тут нам и пригодится наше ```temp_time```).
+Если обработать заявку первого типа мы не можем, то пытаемся обработать заявку второго (по аналогии с первой, они почти идентичны). Если и этого мы сделать не можем то, остается только рассмотреть вариант, при котором ```queue1.size == 0 && queue2.size == 0``` (спойлер: это все возможные оставшиеся случаи). Очевидно, заявок нет, в ОА положить нечего, система простаивает: ```system_downtime += ...```, а т.к. система простаивает, необходимо выполнить ```current_service_end_time = INFINITY;``` по причинам, рассмотренным выше. 
 
 ## Шаг 4. Печать результатов и завершение симуляции
 
