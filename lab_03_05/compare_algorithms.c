@@ -40,7 +40,7 @@ status_t compare_matrix_multiplication(void)
         printf("+---------------------------------------------------------------------+\n");
     }
     
-    for (size_t cur_fill_percent = 10; ec == SUCCESS_CODE && cur_fill_percent <= 100; cur_fill_percent += 10)
+    for (size_t cur_fill_percent = 1; ec == SUCCESS_CODE && cur_fill_percent <= 10; cur_fill_percent += 1)
     {
         cur_non_zero_quantity = (size_t)(common_rows * common_cols / 100.00 * cur_fill_percent);
         cur_non_zero_quantity = (!cur_non_zero_quantity) ? 1 : cur_non_zero_quantity;
