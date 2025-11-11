@@ -3,7 +3,7 @@
 
 status_t compare_pop_push(free_blocks_array_t *free_blocks);
 status_t compare_performance(free_blocks_array_t *free_blocks);
-status_t create_random_expression(char *expression, char operation);
+status_t create_random_expression(char *expression, const size_t expression_size, char operation);
 
 status_t procces_menu_choice(int option, arr_stack_t *arr_stack, list_stack_t *list_stack, free_blocks_array_t *free_blocks)
 {
@@ -153,7 +153,7 @@ status_t compare_pop_push(free_blocks_array_t *free_blocks)
 status_t compare_performance(free_blocks_array_t *free_blocks)
 {
     status_t ec = SUCCESS_CODE;
-    char expression[MAX_EXPRESSION_SIZE];
+    char expression[MAX_COMPARE_EXPRESSION_SIZE];
     char operations[OPERATIONS_QUANTITY] = { '+', '-', '/', '*' };
     size_t stack_sizes[STACK_SIZES_QUANTITY] = { 10, 50, 100, 500, 1000 };
     struct timespec start_time, end_time;
@@ -180,7 +180,7 @@ status_t compare_performance(free_blocks_array_t *free_blocks)
 
             for (size_t k = 0; ec == SUCCESS_CODE && k < PERFORMANCE_ITERATIONS; k++)
             {
-                ec = create_random_expression(expression, operations[i]);
+                ec = create_random_expression(expression,stack_sizes[j], operations[i]);
                 if (ec == SUCCESS_CODE)
                 {
                     clock_gettime(CLOCK_MONOTONIC, &start_time);
@@ -192,7 +192,7 @@ status_t compare_performance(free_blocks_array_t *free_blocks)
 
             for (size_t k = 0; ec == SUCCESS_CODE && k < PERFORMANCE_ITERATIONS; k++)
             {
-                ec = create_random_expression(expression, operations[i]);
+                ec = create_random_expression(expression, stack_sizes[j], operations[i]);
                 if (ec == SUCCESS_CODE)
                 {
                     clock_gettime(CLOCK_MONOTONIC, &start_time);
@@ -214,7 +214,7 @@ status_t compare_performance(free_blocks_array_t *free_blocks)
     return ec;
 }
 
-status_t create_random_expression(char *expression, char operation)
+status_t create_random_expression(char *expression, const size_t expression_size, char operation)
 {
     status_t ec = SUCCESS_CODE;
     int offset = 0, rand_num = 0;
@@ -223,18 +223,18 @@ status_t create_random_expression(char *expression, char operation)
         ec = ERR_INVALID_POINTER;
     else if (operation != '+' && operation != '-' && operation != '*' && operation != '/')
         ec = ERR_RANGE;
-    
+
     // создаем случайное выражение для экспримента
     if (ec == SUCCESS_CODE)
     {
-        memset(expression, 0, MAX_EXPRESSION_SIZE);
+        memset(expression, 0, MAX_COMPARE_EXPRESSION_SIZE);
         offset = 0;
         rand_num = rand() % 100 + 1;
-        offset += snprintf(expression + offset, MAX_EXPRESSION_SIZE - offset, "%d", rand_num);
-        for (size_t num_index = 0; num_index < MAX_OPERANDS_QUANTITY - 1; num_index++)
+        offset += snprintf(expression + offset, MAX_COMPARE_EXPRESSION_SIZE - offset, "%d", rand_num);
+        for (size_t num_index = 0; num_index < expression_size - 1; num_index++)
         {
             rand_num = rand() % 100 + 1;
-            offset += snprintf(expression + offset, MAX_EXPRESSION_SIZE - offset, " %c %d",  operation, rand_num);
+            offset += snprintf(expression + offset, MAX_COMPARE_EXPRESSION_SIZE - offset, " %c %d",  operation, rand_num);
         }
     }
 
