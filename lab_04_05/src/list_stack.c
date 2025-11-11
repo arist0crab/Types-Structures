@@ -46,7 +46,7 @@ status_t push_list_stack(list_stack_t *list_stack, int value)
         ec = create_node(&new_node, value);
 
     if (ec == SUCCESS_CODE && list_stack->curr_size == list_stack->max_size)
-        list_stack->curr_size *= 2;
+        list_stack->max_size *= 2;
 
     if (ec == SUCCESS_CODE)
     {
