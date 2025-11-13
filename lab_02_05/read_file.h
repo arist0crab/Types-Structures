@@ -8,5 +8,7 @@
 #include <string.h>
 
 status_t read_file(theater_play_t *theater_plays_arr, int *theater_plays_keys, size_t *theater_plays_q);
+status_t get_and_open_file(FILE **filestream);
+status_t main_read_file_cycle(FILE *filestream, theater_play_t *theater_plays_arr, size_t *theater_plays_q);
 
 #endif

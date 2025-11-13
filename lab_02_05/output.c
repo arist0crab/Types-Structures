@@ -139,13 +139,13 @@ status_t print_efficiency_table(long long average_quick_sort_data_time, long lon
     printf("+--------------------------------------------------+\n");
     printf("|           Сортировка           |   Наносекунды   |\n");
     printf("+--------------------------------------------------+\n");
-    printf("| Быстрая сортировка             | %-14lld |\n", average_quick_sort_data_time);
+    printf("| Быстрая сортировка             | %-15lld |\n", average_quick_sort_data_time);
     printf("+--------------------------------------------------+\n");
-    printf("| Медленная сортировка           | %-14lld |\n", average_slow_sort_data_time);
+    printf("| Медленная сортировка           | %-15lld |\n", average_slow_sort_data_time);
     printf("+--------------------------------------------------+\n");
-    printf("| Быстрая сортировка по ключу    | %-14lld |\n", average_quick_sort_key_time);
+    printf("| Быстрая сортировка по ключу    | %-15lld |\n", average_quick_sort_key_time);
     printf("+--------------------------------------------------+\n");
-    printf("| Медленная сортировка по ключу  | %-14lld |\n", average_slow_sort_key_time);
+    printf("| Медленная сортировка по ключу  | %-15lld |\n", average_slow_sort_key_time);
     printf("+--------------------------------------------------+\n");
 
     return SUCCCESS_CODE;
