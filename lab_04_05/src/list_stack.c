@@ -45,9 +45,6 @@ status_t push_list_stack(list_stack_t *list_stack, int value)
     if (ec == SUCCESS_CODE)
         ec = create_node(&new_node, value);
 
-    if (ec == SUCCESS_CODE && list_stack->curr_size == list_stack->max_size)
-        list_stack->max_size *= 2;
-
     if (ec == SUCCESS_CODE)
     {
         new_node->next = list_stack->stack_pointer;  // указывает на прежнюю вершину (stack_pointer)
@@ -142,8 +139,8 @@ status_t create_node(node_t **new_node, int value)
 status_t calc_arithmetic_expr_by_list(const char *expression, int *result, free_blocks_array_t *free_blocks)
 {
     status_t ec = (expression && result) ? SUCCESS_CODE : ERR_INVALID_POINTER;
-    list_stack_t operand_stack = { NULL, 0, MAX_LIST_SIZE };
-    list_stack_t operator_stack = { NULL, 0, MAX_LIST_SIZE };
+    list_stack_t operand_stack = { NULL, 0 };
+    list_stack_t operator_stack = { NULL, 0 };
     int number = 0, reading_number = 0, final_res = 0;
     int len = strlen(expression);
     char ch;

@@ -91,7 +91,7 @@ status_t compare_pop_push(free_blocks_array_t *free_blocks)
 {
     status_t ec = SUCCESS_CODE;
     arr_stack_t arr_stack = { { 0 }, 0 };
-    list_stack_t list_stack = { NULL, 0, MAX_LIST_SIZE };;
+    list_stack_t list_stack = { NULL, 0 };;
     struct timespec start_time, end_time;
 
     double time_array_push = 0.0;

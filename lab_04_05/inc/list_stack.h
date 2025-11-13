@@ -10,8 +10,6 @@
 #include <ctype.h>
 #include <stdbool.h>
 
-#define MAX_LIST_SIZE 100
-
 typedef struct node
 {
     int value;  // значение узла
@@ -22,7 +20,6 @@ typedef struct
 {
     node_t *stack_pointer;  // указатель на вершину стека
     int curr_size;  // текущий размер стека
-    int max_size;  // максимальный размер стека
 } list_stack_t;
 
 status_t print_list_stack(list_stack_t *list_stack);
