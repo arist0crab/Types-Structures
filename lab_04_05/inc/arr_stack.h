@@ -9,7 +9,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#define MAX_ARR_STACK_SIZE 100
+#define MAX_ARR_STACK_SIZE 1000
 
 typedef struct
 {
