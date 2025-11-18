@@ -16,7 +16,6 @@ typedef struct
     node_t *pin; 
     node_t *pout; 
     size_t curr_size;
-    size_t max_size;
 } list_queue_t;
 
 /** @brief Функция для добавления элемента request в конец очереди (список)

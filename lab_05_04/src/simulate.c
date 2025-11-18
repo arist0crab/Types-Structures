@@ -149,7 +149,7 @@ status_t simulate_service_unit_by_list(bool verbose_mode)
     status_t ec = SUCCESS_CODE;
 
     // инициализируем очереди и их логи
-    list_queue_t queue1 = { 0, 0, 0, MAX_QUEUE_SIZE }, queue2 = { 0, 0, 0, MAX_QUEUE_SIZE };
+    list_queue_t queue1 = { 0, 0, 0 }, queue2 = { 0, 0, 0 };
     simulation_log_t log1 = { 0 }, log2 = { 0 };
     size_t last_print_checkpoint = 0;
 
@@ -182,10 +182,7 @@ status_t simulate_service_unit_by_list(bool verbose_mode)
             current_request.request_class = TYPE_1;
             current_request.arrival_time = current_time;
 
-            if (queue1.curr_size < queue1.max_size)
-                push_list(&queue1, &current_request);
-            else
-                log1.failed_request_count++;
+            push_list(&queue1, &current_request);
 
             if (current_service_end_time == INFINITY)
             {
@@ -202,10 +199,7 @@ status_t simulate_service_unit_by_list(bool verbose_mode)
             current_request.request_class = TYPE_2;
             current_request.arrival_time = current_time;
 
-            if (queue2.curr_size < queue2.max_size)
-                push_list(&queue2, &current_request);
-            else
-                log2.failed_request_count++;
+            push_list(&queue2, &current_request);
 
             if (current_service_end_time == INFINITY)
             {
@@ -353,7 +347,7 @@ status_t print_interim_results_table_content_arr(const arr_queue_t *queue1, cons
     printf("╠════════════════════════════╬════════════╬═════════════╬══════════════╬═══════════════╬════════════════╬════════════════╣\n");
     printf("║ %-26lu ║ %-10s ║ %-11lu ║ %-12lu ║ %-13lu ║ %-14lu ║ %-14.2lf ║\n", log1->request_out_count, "queue_1", log1->request_in_count, log1->request_out_count, log1->failed_request_count, queue1->size, log1->request_out_count > 0 ? log1->total_length / log1->request_out_count : 0.0);
     printf("╠════════════════════════════╬════════════╬═════════════╬══════════════╬═══════════════╬════════════════╬════════════════╣\n");
-    printf("║ %-26lu ║ %-10s ║ %-11lu ║ %-12lu ║ %-13lu ║ %-14lu ║ %-14.2lf ║\n", log1->request_out_count, "queue_2", log2->request_in_count, log2->request_out_count, log2->failed_request_count, queue1->size, log2->request_out_count > 0 ? log2->total_length / log2->request_out_count : 0.0);
+    printf("║ %-26lu ║ %-10s ║ %-11lu ║ %-12lu ║ %-13lu ║ %-14lu ║ %-14.2lf ║\n", log1->request_out_count, "queue_2", log2->request_in_count, log2->request_out_count, log2->failed_request_count, queue2->size, log2->request_out_count > 0 ? log2->total_length / log2->request_out_count : 0.0);
     printf("%s", RESET);
     
     return SUCCESS_CODE;

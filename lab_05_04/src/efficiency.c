@@ -33,6 +33,7 @@ status_t measure_efficiency(void)
     average_arr_time = total_arr_time / EFFICIENCY_ITERATIONS_QUANTITY;
     average_list_time = total_list_time / EFFICIENCY_ITERATIONS_QUANTITY;
     arr_memory = sizeof(arr_queue_t);
+    // TODO не MAX_QUEUE_SIZE, а брать максимум суммы двух очередей которые получились в процессе симуляции
     list_memory = sizeof(list_queue_t) + MAX_QUEUE_SIZE * sizeof(node_t);
 
     print_efficiency_table(average_arr_time, arr_memory, average_list_time, list_memory);
@@ -97,7 +98,6 @@ status_t fill_and_empty_list_queue(void)
     list_queue_t list_queue = { 0 };
     request_t request = { 0 };
 
-    list_queue.max_size = FILL_N_EMPTY_ITERATIONS_QUANTITY;
     void *added_addrs[FILL_N_EMPTY_ITERATIONS_QUANTITY];
     void *removed_addrs[FILL_N_EMPTY_ITERATIONS_QUANTITY];
     size_t added_count = 0, removed_count = 0;

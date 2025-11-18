@@ -4,6 +4,8 @@
 #include "data.h"
 #include <stdio.h>
 
+// TODO в случае переполнение очереди на массиве прекратить симмуляцию
+
 typedef struct 
 {
     request_t data[MAX_QUEUE_SIZE];
