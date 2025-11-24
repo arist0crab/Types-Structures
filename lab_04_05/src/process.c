@@ -155,7 +155,7 @@ status_t compare_performance(free_blocks_array_t *free_blocks)
     status_t ec = SUCCESS_CODE;
     char expression[MAX_COMPARE_EXPRESSION_SIZE];
     char operations[OPERATIONS_QUANTITY] = { '+', '-', '/', '*' };
-    size_t stack_sizes[STACK_SIZES_QUANTITY] = { 10, 50, 100, 500, 1000 };
+    size_t stack_sizes[STACK_SIZES_QUANTITY] = { 10, 50, 100, 250, 500, 1000 };
     struct timespec start_time, end_time;
     int calculation_result = 0;
 
