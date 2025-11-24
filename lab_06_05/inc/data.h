@@ -1,0 +1,38 @@
+#ifndef __DATA_H__
+#define __DATA_H__
+
+#define MENU_OPTIONS_QUANTITY 8
+#define MAX_STRING_LENGTH 256
+
+#include <stdio.h>
+
+typedef enum 
+{
+    SUCCESS_CODE,
+    ERR_IO,
+    ERR_RANGE,
+    ERR_MEM,
+    ERR_INVALID_POINTER
+} status_t;
+
+typedef enum
+{
+    EXIT_PROGRAM,
+    READ_FILE_AND_CREATE_TREE,
+    PRINT_TREE,
+    ADD_TREE_NODE,
+    DELETE_TREE_NODE,
+    FIND_WORD_IN_FILE,
+    FIND_WORD_IN_TREE,
+    COMPARE_FIND_TIME
+} menu_option_t;
+
+typedef struct three_node
+{
+    char *word;
+    size_t counted;
+    struct three_node *left;
+    struct three_node *right;
+}  tree_node_t;
+
+#endif
