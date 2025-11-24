@@ -12,7 +12,8 @@ typedef enum
     ERR_IO,
     ERR_RANGE,
     ERR_MEM,
-    ERR_INVALID_POINTER
+    ERR_ARGS,
+    ERR_NOT_FOUND
 } status_t;
 
 typedef enum
@@ -27,12 +28,12 @@ typedef enum
     COMPARE_FIND_TIME
 } menu_option_t;
 
-typedef struct three_node
+typedef struct tree_node
 {
     char *word;
     size_t counted;
-    struct three_node *left;
-    struct three_node *right;
-}  tree_node_t;
+    struct tree_node *left;
+    struct tree_node *right;
+} tree_node_t;
 
 #endif

@@ -42,8 +42,12 @@ status_t print_exit_code_result(status_t exit_code)
             printf("%sПроизошла ошибка при работе с памятью :(\n%s", RED_BOLD, RESET);
             break;
             
-        case ERR_INVALID_POINTER:
-            printf("%sПроизошла ошибка при работе с указателем%s\n", RED_BOLD, RESET);
+        case ERR_ARGS:
+            printf("%sПроизошла ошибка при работе с аргументами функии%s\n", RED_BOLD, RESET);
+            break;
+
+        case ERR_NOT_FOUND:
+            printf("%sПроизошла ошиюка при поиске чего-нибудь: мы ничего не нашли :(%s\n", RED_BOLD, RESET);
             break;
         
         default:

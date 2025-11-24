@@ -2,8 +2,7 @@
 
 status_t input_cur_menu_opt(int *cur_menu_opt, int const menu_points_quantity)
 {
-    
-    status_t ec = (cur_menu_opt) ? SUCCESS_CODE : ERR_INVALID_POINTER;
+    status_t ec = (cur_menu_opt) ? SUCCESS_CODE : ERR_ARGS;
     char buffer[MAX_STRING_LENGTH], extra;
     int temp, tt;
    
@@ -22,6 +21,38 @@ status_t input_cur_menu_opt(int *cur_menu_opt, int const menu_points_quantity)
         else
             *cur_menu_opt = temp;
     }
+
+    return ec;
+}
+
+status_t input_word(char **word)
+{
+    status_t ec = SUCCESS_CODE;
+    char buffer[MAX_STRING_LENGTH];
+    char extra;
+
+    if (!word)
+        ec = ERR_ARGS;
+
+    if (ec == SUCCESS_CODE)
+    {
+        printf("%sВведите слово: %s", BLUE, RESET);
+        if (scanf("%s", buffer) != 1)
+            ec = ERR_IO;
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        *word = malloc(strlen(buffer) + 1);
+        if (!(*word))
+            ec = ERR_MEM;
+    }
+
+    if (ec == SUCCESS_CODE)
+        strcpy(*word, buffer);
+
+    // чистим буфе
+    while ((extra = getchar()) != '\n' && extra != EOF);
 
     return ec;
 }
