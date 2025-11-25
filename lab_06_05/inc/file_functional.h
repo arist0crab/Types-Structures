@@ -8,5 +8,6 @@
 
 status_t read_tree_from_file(tree_node_t **root, char *filename);
 status_t find_word_in_file(char *filename, char *word, ssize_t *word_num);
+status_t insert_word_to_file(const char *filename, char *target_word);
 
 #endif

@@ -1,7 +1,8 @@
 #include "../inc/process.h"
 
-status_t find_in_file_general_process(ssize_t *file_word_index);
-status_t find_in_tree_general_process(tree_node_t *root);
+status_t find_in_file_general_process(tree_node_t **root, ssize_t *file_word_index);
+status_t find_in_tree_general_process(tree_node_t **root);
+status_t suggest_to_add_word_to_file_and_tree(tree_node_t **root, char *filename, char *target_word);
 
 status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
 {
@@ -37,11 +38,11 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
             break;
 
         case FIND_WORD_IN_FILE:
-            ec = find_in_file_general_process(&file_word_index);
+            ec = find_in_file_general_process(root, &file_word_index);
             break;
 
         case FIND_WORD_IN_TREE:
-            ec = find_in_tree_general_process(*root);
+            ec = find_in_tree_general_process(root);
             break;
 
         case COMPARE_FIND_TIME:
@@ -57,12 +58,13 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
     return ec;
 }
 
-status_t find_in_file_general_process(ssize_t *file_word_index)
+// TODO эти три функции мне вот прям вообще не нравятся, переделать?
+status_t find_in_file_general_process(tree_node_t **root, ssize_t *file_word_index)
 {
     status_t ec = SUCCESS_CODE;
     char *target_word = NULL, *filename = NULL;
 
-    if (!file_word_index)
+    if (!file_word_index || !root)
         ec = SUCCESS_CODE;
 
     if (ec == SUCCESS_CODE)
@@ -80,17 +82,18 @@ status_t find_in_file_general_process(ssize_t *file_word_index)
     else if (ec == SUCCESS_CODE)
     {
         printf("%sСлово не было найдено в файле\n%s", BLUE, RESET);
-        // TODO реализовать добавление по желанию пользователя
+        ec = suggest_to_add_word_to_file_and_tree(root, filename, target_word);
     }
     
     return ec;
 }
 
-status_t find_in_tree_general_process(tree_node_t *root)
+// TODO эти три функции мне вот прям вообще не нравятся, переделать?
+status_t find_in_tree_general_process(tree_node_t **root)
 {
     status_t ec = SUCCESS_CODE;
     tree_node_t *target_root = NULL;
-    char *target_word = NULL;
+    char *target_word = NULL, *filename = NULL;
 
     if (!root || !target_root)
         ec = ERR_ARGS;
@@ -99,7 +102,7 @@ status_t find_in_tree_general_process(tree_node_t *root)
     if (ec == SUCCESS_CODE)
     {
         target_root = NULL;
-        ec = find_word_in_tree(root, &target_root, target_word);
+        ec = find_word_in_tree(*root, &target_root, target_word);
     }
 
     if (ec == SUCCESS_CODE && target_root)
@@ -107,7 +110,40 @@ status_t find_in_tree_general_process(tree_node_t *root)
     else if (ec == SUCCESS_CODE && !target_root)
     {
         printf("%sСлово не было найдено\n%s", BLUE, RESET);
-        // TODO реализовать добавление по желанию пользователя
+        if (ec == SUCCESS_CODE)
+            ec = suggest_to_add_word_to_file_and_tree(root, filename, target_word);
+    }
+
+    return ec;
+}
+
+// TODO эти три функции мне вот прям вообще не нравятся, переделать?
+status_t suggest_to_add_word_to_file_and_tree(tree_node_t **root, char *filename, char *target_word)
+{
+    status_t ec = SUCCESS_CODE;
+    int insert_menu_option = 0;
+    char *cur_filename = NULL;
+
+    if (!root || !target_word)
+        ec = ERR_ARGS;
+
+    if (ec == SUCCESS_CODE && filename)
+        cur_filename = filename;
+
+    if (ec == SUCCESS_CODE)
+    {
+        print_insert_menu(target_word);
+        ec = input_cur_menu_opt(&insert_menu_option, 2);
+    }
+
+    if (ec == SUCCESS_CODE && insert_menu_option == 0 && !filename)
+        ec = input_string(&cur_filename, "Введите имя файла для добавления: ");
+
+    if (ec == SUCCESS_CODE && insert_menu_option == 0)
+    {
+        ec = insert_tree_node(root, (const char *)target_word);
+        if (ec == SUCCESS_CODE)
+            ec = insert_word_to_file(cur_filename, target_word);
     }
 
     return ec;

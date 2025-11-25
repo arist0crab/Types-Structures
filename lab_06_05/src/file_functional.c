@@ -60,6 +60,31 @@ status_t read_tree_from_file(tree_node_t **root, char *filename)
     return ec;
 }
 
+status_t insert_word_to_file(const char *filename, char *target_word)
+{
+    status_t ec = SUCCESS_CODE;
+    FILE *filestream = NULL;
+
+    if (!filename || !target_word)
+        ec = ERR_ARGS;
+
+    if (ec == SUCCESS_CODE)
+    {
+        filestream = fopen(filename, "a");
+        if (!filestream)
+            ec = ERR_FILE;
+    }
+
+    if (ec == SUCCESS_CODE)
+        if (fprintf(filestream, " %s", target_word) < 0)
+            ec = ERR_FILE;
+
+    if (filestream)
+        fclose(filestream);
+
+    return ec;
+}
+
 status_t safe_open_file(char *filename, FILE **filestream)
 {
     status_t ec = SUCCESS_CODE;

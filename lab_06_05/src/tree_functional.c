@@ -143,6 +143,7 @@ status_t find_word_in_tree(tree_node_t *root, tree_node_t **target_root, const c
 
 status_t print_tree(tree_node_t *root, size_t nesting_level)
 {
+    // TODO учесть если дерево пустое
     if (root)
     {
         print_tree(root->right, nesting_level + 1);

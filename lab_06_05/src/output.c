@@ -61,3 +61,17 @@ status_t print_exit_code_result(status_t exit_code)
 
     return ec;
 }
+
+status_t print_insert_menu(char *target_word)
+{
+    status_t ec = SUCCESS_CODE;
+
+    if (!target_word)
+        ec = ERR_ARGS;
+
+    printf("%sХотели бы вы добавить слово '%s' в дерево и файл?%s\n", BLUE, target_word, RESET);
+    printf("%s0 - да%s\n", BLUE, RESET);
+    printf("%s1 - нет%s\n", BLUE, RESET);
+
+    return ec;
+}
