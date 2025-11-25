@@ -15,7 +15,7 @@ status_t read_tree_from_file(tree_node_t **root, char *filename)
         ec = safe_open_file(filename, &filestream);
 
     if (ec == SUCCESS_CODE)
-        while (fscanf(filestream, "%s", buf) == 1 && !feof(filestream))
+        while (fscanf(filestream, "%s", buf) == 1)
             insert_tree_node(root, buf);
     
     if (filestream)

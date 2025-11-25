@@ -120,7 +120,6 @@ status_t delete_tree_node(tree_node_t **root, const char *word)
     return ec;
 }
 
-// FIXME: в test.txt находит только 1 rame, хотя их там два
 status_t find_word_in_tree(tree_node_t *root, tree_node_t **target_root, const char *word)
 {
     status_t ec = SUCCESS_CODE;
