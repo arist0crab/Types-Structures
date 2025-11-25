@@ -4,6 +4,7 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
 {
     status_t ec = SUCCESS_CODE;
     char *target_word = NULL;
+    tree_node_t *target_root = NULL;
 
     switch (menu_option)
     {
@@ -36,6 +37,14 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
             break;
 
         case FIND_WORD_IN_TREE:
+            ec = input_string(&target_word, "Введите слово для поиска: ");
+            if (ec == SUCCESS_CODE)
+            {
+                ec = find_word_in_tree(*root, &target_root, target_word);
+                if (ec == SUCCESS_CODE)
+                    print_find_result((const tree_node_t **)&target_root);
+            }
+
             break;
 
         case COMPARE_FIND_TIME:

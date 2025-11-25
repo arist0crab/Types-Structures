@@ -3,6 +3,7 @@
 
 #include "data.h"
 #include "input.h"
+#include "output.h"
 #include "tree_functional.h"
 #include "file_functional.h"
 
