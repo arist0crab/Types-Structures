@@ -47,7 +47,11 @@ status_t print_exit_code_result(status_t exit_code)
             break;
 
         case ERR_NOT_FOUND:
-            printf("%sПроизошла ошиюка при поиске чего-нибудь: мы ничего не нашли :(%s\n", RED_BOLD, RESET);
+            printf("%sПроизошла ошибка при поиске чего-нибудь: мы ничего не нашли :(%s\n", RED_BOLD, RESET);
+            break;
+
+        case ERR_FILE:
+            printf("%sПроизошла ошибка при работе с файлом%s\n", RED_BOLD, RESET);
             break;
         
         default:

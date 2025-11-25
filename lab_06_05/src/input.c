@@ -25,7 +25,7 @@ status_t input_cur_menu_opt(int *cur_menu_opt, int const menu_points_quantity)
     return ec;
 }
 
-status_t input_word(char **word)
+status_t input_string(char **word, char *message)
 {
     status_t ec = SUCCESS_CODE;
     char buffer[MAX_STRING_LENGTH];
@@ -36,7 +36,7 @@ status_t input_word(char **word)
 
     if (ec == SUCCESS_CODE)
     {
-        printf("%sВведите слово: %s", BLUE, RESET);
+        printf("%s%s%s", BLUE, message, RESET);
         if (scanf("%s", buffer) != 1)
             ec = ERR_IO;
     }

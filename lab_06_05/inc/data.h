@@ -13,13 +13,14 @@ typedef enum
     ERR_RANGE,
     ERR_MEM,
     ERR_ARGS,
-    ERR_NOT_FOUND
+    ERR_NOT_FOUND,
+    ERR_FILE
 } status_t;
 
 typedef enum
 {
     EXIT_PROGRAM,
-    READ_FILE_AND_CREATE_TREE,
+    READ_TREE_FROM_FILE,
     PRINT_TREE,
     ADD_TREE_NODE,
     DELETE_TREE_NODE,

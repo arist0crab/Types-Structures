@@ -10,7 +10,10 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
         case EXIT_PROGRAM:
             break;
 
-        case READ_FILE_AND_CREATE_TREE:
+        case READ_TREE_FROM_FILE:
+            ec = input_string(&target_word, "Введите имя файла: ");
+            if (ec == SUCCESS_CODE)
+                ec = read_tree_from_file(root, target_word);
             break;
 
         case PRINT_TREE:
@@ -18,13 +21,13 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
             break;
 
         case ADD_TREE_NODE:
-            ec = input_word(&target_word);
+            ec = input_string(&target_word, "Введите слово: ");
             if (ec == SUCCESS_CODE)
                 ec = insert_tree_node(root, target_word);
             break;
 
         case DELETE_TREE_NODE:
-            ec = input_word(&target_word);
+            ec = input_string(&target_word, "Введите слово: ");
             if (ec == SUCCESS_CODE)
                 ec = delete_tree_node(root, target_word);
             break;

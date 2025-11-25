@@ -127,7 +127,7 @@ status_t print_tree(tree_node_t *root, size_t nesting_level)
         print_tree(root->right, nesting_level + 1);
 
         for (size_t i = 0; i < nesting_level; i++)
-            printf("    ");
+            printf("        ");
 
         printf("%s (%lu)\n", root->word, root->counted);
         print_tree(root->left, nesting_level + 1);
