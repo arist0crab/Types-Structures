@@ -61,18 +61,3 @@ status_t print_exit_code_result(status_t exit_code)
 
     return ec;
 }
-
-status_t print_find_result(const tree_node_t **root)
-{
-    status_t ec = SUCCESS_CODE;
-
-    if (!root)
-        ec = ERR_ARGS;
-
-    if (ec == SUCCESS_CODE && *root)
-        printf("%sСлово было успешно найдено: %s (%lu)\n%s", BLUE, (*root)->word, (*root)->counted, RESET);
-    else if (ec == SUCCESS_CODE && !(*root))
-        printf("%sСлово не было найдено\n%s", BLUE, RESET);
-
-    return ec;
-}
