@@ -1,7 +1,11 @@
+#define _POSIX_C_SOURCE 199309L
 #include "../inc/process.h"
+
+#define N_TESTS 1000
 
 status_t find_in_file_general_process(tree_node_t **root, ssize_t *file_word_index);
 status_t find_in_tree_general_process(tree_node_t **root);
+status_t compare_find_times(tree_node_t *root, const char *filename);
 status_t suggest_to_add_word_to_file_and_tree(tree_node_t **root, char *filename, char *target_word);
 
 status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
@@ -46,6 +50,9 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
             break;
 
         case COMPARE_FIND_TIME:
+            ec = input_string(&filename, "Введите имя файла: ");
+            if (ec == SUCCESS_CODE)
+                ec = compare_find_times(*root, filename);
             break;
         
         default:
@@ -58,7 +65,6 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
     return ec;
 }
 
-// TODO эти три функции мне вот прям вообще не нравятся, переделать?
 status_t find_in_file_general_process(tree_node_t **root, ssize_t *file_word_index)
 {
     status_t ec = SUCCESS_CODE;
@@ -88,7 +94,6 @@ status_t find_in_file_general_process(tree_node_t **root, ssize_t *file_word_ind
     return ec;
 }
 
-// TODO эти три функции мне вот прям вообще не нравятся, переделать?
 status_t find_in_tree_general_process(tree_node_t **root)
 {
     status_t ec = SUCCESS_CODE;
@@ -117,7 +122,54 @@ status_t find_in_tree_general_process(tree_node_t **root)
     return ec;
 }
 
-// TODO эти три функции мне вот прям вообще не нравятся, переделать?
+status_t compare_find_times(tree_node_t *root, const char *filename)
+{
+    status_t ec = SUCCESS_CODE;
+    struct timespec start_time, end_time;  // переменные для замера времени
+    double total_tree_time_ns = 0, total_file_time_ns = 0;  // общее время поиска
+    double average_tree_time_ns = 0, average_file_time_ns = 0;  // среднее время поиска
+    size_t words_in_tree_quantity = 0;  // количество уникальных слов в дереве
+    ssize_t word_index_in_file = -1;  // переменная для индекса слова в файле (при поиске)
+    tree_node_t *target_root = NULL;  // найденный узел дерева
+    char *current_word = NULL;  // текущее слово по которому мы ищем
+
+    if (!root || !filename)
+        ec = ERR_ARGS;
+
+    if (ec == SUCCESS_CODE)
+        count_nodes(root, &words_in_tree_quantity);
+
+    // дерево
+    for (size_t i = 0; ec == SUCCESS_CODE && i < N_TESTS; i++)
+    {
+        get_random_word_from_tree(root, &current_word, words_in_tree_quantity);
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
+        ec = find_word_in_tree(root, &target_root, current_word);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);
+        total_tree_time_ns += (end_time.tv_sec - start_time.tv_sec) * 1e9 + (end_time.tv_nsec - start_time.tv_nsec);
+    }
+
+    // файл
+    for (size_t i = 0; ec == SUCCESS_CODE && i < N_TESTS; i++)
+    {
+        get_random_word_from_file(filename, &current_word);
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
+        ec = find_word_in_file((char *)filename, current_word, &word_index_in_file);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);
+        total_file_time_ns += (end_time.tv_sec - start_time.tv_sec) * 1e9 + (end_time.tv_nsec - start_time.tv_nsec);
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        average_tree_time_ns = total_tree_time_ns / N_TESTS;
+        average_file_time_ns = total_file_time_ns / N_TESTS;
+    }
+
+    print_compare_table(average_tree_time_ns, average_file_time_ns);
+    
+    return ec;
+}
+
 status_t suggest_to_add_word_to_file_and_tree(tree_node_t **root, char *filename, char *target_word)
 {
     status_t ec = SUCCESS_CODE;

@@ -1,7 +1,5 @@
 #include "file_functional.h"
 
-status_t safe_open_file(char *filename, FILE **filestream);
-
 // TODO подумать как сделать эту функцию проще
 status_t find_word_in_file(char *filename, char *word, ssize_t *word_num)
 {

@@ -1,7 +1,6 @@
 #include "tree_functional.h"
 
 status_t create_tree_node(tree_node_t **new_tree_node, const char *word);
-char *str_dynamic_copy(const char *s);
 
 status_t create_tree_node(tree_node_t **new_tree_node, const char *word)
 {
