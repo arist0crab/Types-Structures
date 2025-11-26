@@ -1,6 +1,5 @@
 #include "file_functional.h"
 
-// TODO подумать как сделать эту функцию проще
 status_t find_word_in_file(char *filename, char *word, ssize_t *word_num)
 {
     status_t ec = SUCCESS_CODE;

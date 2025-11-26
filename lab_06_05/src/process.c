@@ -145,7 +145,7 @@ status_t find_in_tree_general_process(tree_node_t **root)
 {
     status_t ec = SUCCESS_CODE;
     tree_node_t *target_root = NULL;
-    char *target_word = NULL, *filename = NULL;
+    char *target_word = NULL;
 
     if (!root || !target_root)
         ec = ERR_ARGS;
@@ -163,7 +163,7 @@ status_t find_in_tree_general_process(tree_node_t **root)
     {
         printf("%sСлово не было найдено\n%s", BLUE, RESET);
         if (ec == SUCCESS_CODE)
-            ec = suggest_to_add_word_to_file_and_tree(root, filename, target_word);
+            ec = suggest_to_add_word_to_file_and_tree(root, NULL, target_word);
     }
 
     return ec;
