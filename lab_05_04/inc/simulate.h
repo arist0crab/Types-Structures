@@ -41,9 +41,10 @@ status_t simulate_service_unit_by_arr(bool verbose_mode);
  * основе работы со списком для хранения очередей.
  * @param verbose_mode Режим работы функции. При verbose_mode=true выводит информацию
  * о симуляции в терминал.
+ * @param max_total_len_two_queues Указатель на самую большую сумму длин двух очередей.
  * @return Статус выполнения функции.
 */
-status_t simulate_service_unit_by_list(bool verbose_mode);
+status_t simulate_service_unit_by_list(bool verbose_mode, size_t *max_total_len_two_queues);
 
 status_t change_simulation_configurations(void);
 

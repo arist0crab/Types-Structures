@@ -14,7 +14,7 @@ status_t procces_menu_choice(menu_option_t menu_option)
             break;
 
         case RUN_LIST_SIMULATION:
-            ec = simulate_service_unit_by_list(true);
+            ec = simulate_service_unit_by_list(true, NULL);
             break;
 
         case EVALUATE_EFFECTIVENESS:

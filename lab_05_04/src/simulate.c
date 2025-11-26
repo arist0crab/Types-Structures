@@ -59,7 +59,10 @@ status_t simulate_service_unit_by_arr(bool verbose_mode)
             if (queue1.size < MAX_QUEUE_SIZE)
                 push_arr(&queue1, &current_request);
             else 
-                log1.failed_request_count++;
+            {
+                ec = ERR_OVERFLOW;
+                break;
+            }
 
             if (current_service_end_time == INFINITY)
             {
@@ -81,7 +84,10 @@ status_t simulate_service_unit_by_arr(bool verbose_mode)
             if (queue2.size < MAX_QUEUE_SIZE)
                 push_arr(&queue2, &current_request);
             else 
-                log2.failed_request_count++;
+            {
+                ec = ERR_OVERFLOW;
+                break;
+            }
 
             if (current_service_end_time == INFINITY)
             {
@@ -135,16 +141,16 @@ status_t simulate_service_unit_by_arr(bool verbose_mode)
         }
     }
 
-    if (verbose_mode)
+    if (ec == SUCCESS_CODE && verbose_mode)
     {
         print_interim_results_table_bottom();
         print_simulation_summary(current_time, &log1, &log2, system_downtime);
     }
     
-    return SUCCESS_CODE;
+    return ec;
 }
 
-status_t simulate_service_unit_by_list(bool verbose_mode)
+status_t simulate_service_unit_by_list(bool verbose_mode, size_t *max_total_len_two_queues)
 {
     status_t ec = SUCCESS_CODE;
 
@@ -156,6 +162,10 @@ status_t simulate_service_unit_by_list(bool verbose_mode)
     double current_time = 0.0;  // "виртуальное" (модельное) время
     double next_event_time = 0.0;  // время следующего события
     double current_service_end_time = INFINITY;  // время, когда закончится текущее обслуживание
+
+    // заводим переменные для отлова максимальных длин очередей
+    size_t max_length_queue_1 = 0;
+    size_t max_length_queue_2 = 0;
 
     // временные переменные
     double temp_time = 0.0;
@@ -183,6 +193,8 @@ status_t simulate_service_unit_by_list(bool verbose_mode)
             current_request.arrival_time = current_time;
 
             push_list(&queue1, &current_request);
+            if (queue1.curr_size > max_length_queue_1)
+                max_length_queue_1 = queue1.curr_size;
 
             if (current_service_end_time == INFINITY)
             {
@@ -200,6 +212,8 @@ status_t simulate_service_unit_by_list(bool verbose_mode)
             current_request.arrival_time = current_time;
 
             push_list(&queue2, &current_request);
+            if (queue2.curr_size > max_length_queue_2)
+                max_length_queue_2 = queue2.curr_size;
 
             if (current_service_end_time == INFINITY)
             {
@@ -255,11 +269,14 @@ status_t simulate_service_unit_by_list(bool verbose_mode)
         print_interim_results_table_bottom();
         print_simulation_summary(current_time, &log1, &log2, system_downtime);
     }
+
+    if (max_total_len_two_queues)
+        *max_total_len_two_queues = max_length_queue_1 + max_length_queue_2;
     
     destroy_list_queue(&queue1);
     destroy_list_queue(&queue2);
 
-    return SUCCESS_CODE;
+    return ec;
 }
 
 status_t change_simulation_configurations(void)

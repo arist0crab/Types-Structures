@@ -10,6 +10,7 @@ status_t measure_efficiency(void)
     double total_arr_time = 0, total_list_time = 0;
     double average_arr_time = 0, average_list_time = 0;
     size_t arr_memory = 0, list_memory = 0;
+    size_t max_total_len_two_queues = 0, temp_max = 0;
     struct timespec start_time, end_time;
     
     // замер эффективности для массива
@@ -25,16 +26,16 @@ status_t measure_efficiency(void)
     for (size_t i = 0; ec == SUCCESS_CODE && i < EFFICIENCY_ITERATIONS_QUANTITY; i++)
     {
         clock_gettime(CLOCK_MONOTONIC, &start_time);
-        ec = simulate_service_unit_by_list(false);
+        ec = simulate_service_unit_by_list(false, &temp_max);
         clock_gettime(CLOCK_MONOTONIC, &end_time);
+        max_total_len_two_queues = (max_total_len_two_queues < temp_max) ? temp_max : max_total_len_two_queues;
         total_list_time += (end_time.tv_sec - start_time.tv_sec) * 1e9 + (end_time.tv_nsec - start_time.tv_nsec);
     }
 
     average_arr_time = total_arr_time / EFFICIENCY_ITERATIONS_QUANTITY;
     average_list_time = total_list_time / EFFICIENCY_ITERATIONS_QUANTITY;
     arr_memory = sizeof(arr_queue_t);
-    // TODO не MAX_QUEUE_SIZE, а брать максимум суммы двух очередей которые получились в процессе симуляции
-    list_memory = sizeof(list_queue_t) + MAX_QUEUE_SIZE * sizeof(node_t);
+    list_memory = sizeof(list_queue_t) * 2 + max_total_len_two_queues * sizeof(node_t);
 
     print_efficiency_table(average_arr_time, arr_memory, average_list_time, list_memory);
 
