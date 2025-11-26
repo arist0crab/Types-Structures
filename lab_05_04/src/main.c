@@ -22,5 +22,3 @@ int main(void)
 
     return exit_code;
 }
-
-// TODO сделать сравнение эффективности для push pop
