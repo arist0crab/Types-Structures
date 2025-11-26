@@ -1,8 +1,5 @@
 #include "list.h"
 
-// FIXME длина очерели списка не увеличивается после 1000 элементов
-// FIXME я кажется починила это, но надо проверить
-
 status_t push_list(list_queue_t *list_queue, request_t *request)
 {
     node_t *cur_node;

@@ -256,15 +256,18 @@ status_t simulate_service_unit_by_list(bool verbose_mode, size_t *max_total_len_
             log2.function_call_count++;
         }
 
-        // каждые 100 записей печатаем промежуточную информацию
+        /* каждые 100 записей печатаем промежуточную информацию и проверяем
+        соотношение поступлений и обработок, чтобы выйти заблаговременно*/
         if (verbose_mode && log1.request_out_count % 100 == 0 && last_print_checkpoint != log1.request_out_count)
         {
             print_interim_results_table_content_list(&queue1, &log1, &queue2, &log2);
             last_print_checkpoint = log1.request_out_count;
+            if (queue1.curr_size / log1.request_out_count >= CRITICAL_RECORDS_ATTITUDE || queue2.curr_size / log2.request_out_count >= CRITICAL_RECORDS_ATTITUDE)
+                ec = ERR_CRITICAL_RECORDS_ATTITUDE;
         }
     }
 
-    if (verbose_mode)
+    if (ec == SUCCESS_CODE && verbose_mode)
     {
         print_interim_results_table_bottom();
         print_simulation_summary(current_time, &log1, &log2, system_downtime);

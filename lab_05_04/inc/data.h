@@ -15,7 +15,8 @@ typedef enum
     ERR_RANGE,
     ERR_OVERFLOW,
     ERR_POP_EMPTY,
-    ERR_MEM
+    ERR_MEM,
+    ERR_CRITICAL_RECORDS_ATTITUDE
 } status_t;
 
 typedef enum 

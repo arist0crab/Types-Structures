@@ -12,6 +12,7 @@
 #include <math.h>
 
 #define REQUESTS_1_TYPE_QUEUE_LENGTH 1000
+#define CRITICAL_RECORDS_ATTITUDE 1000
 
 extern time_range_t arrival_time_of_type_1;
 extern time_range_t arrival_time_of_type_2;

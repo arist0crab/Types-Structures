@@ -86,6 +86,10 @@ status_t print_exit_code_result(status_t exit_code)
         case ERR_INVALID_POINTER:
             printf("%sПроизошла ошибка при работе с указателем%s\n", RED_BOLD, RESET);
             break;
+
+        case ERR_CRITICAL_RECORDS_ATTITUDE:
+            printf("%sКритическое отношение обработанных/необработанных заявок. Симуляция остановлена%s\n", RED_BOLD, RESET);
+            break;
         
         default:
             ec = ERR_RANGE;
