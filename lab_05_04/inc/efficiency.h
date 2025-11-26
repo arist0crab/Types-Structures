@@ -3,7 +3,10 @@
 
 #include "data.h"
 #include "simulate.h"
+#include "output.h"
 #include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 #define EFFICIENCY_ITERATIONS_QUANTITY 1000
 #define FILL_N_EMPTY_ITERATIONS_QUANTITY 100
@@ -40,5 +43,12 @@ status_t fill_and_empty_arr_queue(void);
  * @return Статус выполнения функции
 */
 status_t fill_and_empty_list_queue(void);
+
+/** @brief Функция для сравнения времени выполнения операций push и pop в контексте
+ * их выполнения на массивной очереди и очереди на основе списка.
+ * 
+ * @return Статус выполнения функции.
+*/
+status_t compare_push_and_pop(void);
 
 #endif

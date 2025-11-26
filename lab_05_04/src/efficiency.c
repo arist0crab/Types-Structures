@@ -42,6 +42,68 @@ status_t measure_efficiency(void)
     return ec;
 }
 
+status_t compare_push_and_pop(void)
+{
+    status_t ec = SUCCESS_CODE;
+    list_queue_t list_queue = { 0 };
+    arr_queue_t arr_queue = { 0 };
+    request_t request = { 0 };
+    request_class_t request_classes[] = { TYPE_1, TYPE_2 };
+    struct timespec start_time, end_time;
+
+    double total_arr_push_time_ns = 0;
+    double total_arr_pop_time_ns = 0;
+    double total_list_push_time_ns = 0;
+    double total_list_pop_time_ns = 0;
+
+    srand(time(NULL));
+
+    // push для массива
+    for (size_t i = 0; ec == SUCCESS_CODE && i < MAX_QUEUE_SIZE; i++)
+    {
+        random_double(0, 10, &request.arrival_time);
+        request.request_class = request_classes[rand() % 2];
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
+        ec = push_arr(&arr_queue, &request);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);
+        total_arr_push_time_ns += (end_time.tv_sec - start_time.tv_sec) * 1e9 + (end_time.tv_nsec - start_time.tv_nsec);
+    }
+
+    // pop для массива
+    for (size_t i = 0; ec == SUCCESS_CODE && i < MAX_QUEUE_SIZE; i++)
+    {
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
+        ec = pop_arr(&arr_queue, NULL);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);
+        total_arr_pop_time_ns += (end_time.tv_sec - start_time.tv_sec) * 1e9 + (end_time.tv_nsec - start_time.tv_nsec);
+    }
+
+    // push для списка
+    for (size_t i = 0; ec == SUCCESS_CODE && i < MAX_QUEUE_SIZE; i++)
+    {
+        random_double(0, 10, &request.arrival_time);
+        request.request_class = request_classes[rand() % 2];
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
+        ec = push_list(&list_queue, &request);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);
+        total_list_push_time_ns += (end_time.tv_sec - start_time.tv_sec) * 1e9 + (end_time.tv_nsec - start_time.tv_nsec);
+    }
+
+    // pop для списка
+    for (size_t i = 0; ec == SUCCESS_CODE && i < MAX_QUEUE_SIZE; i++)
+    {
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
+        ec = pop_list(&list_queue, NULL);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);
+        total_list_pop_time_ns += (end_time.tv_sec - start_time.tv_sec) * 1e9 + (end_time.tv_nsec - start_time.tv_nsec);
+    }
+
+    if (ec == SUCCESS_CODE)
+        print_push_pop_table(total_arr_push_time_ns / MAX_QUEUE_SIZE, total_arr_pop_time_ns / MAX_QUEUE_SIZE, total_list_push_time_ns / MAX_QUEUE_SIZE, total_list_pop_time_ns / MAX_QUEUE_SIZE);
+    
+    return ec;
+}
+
 status_t print_efficiency_table(double average_arr_time, size_t average_arr_memory, double average_list_time, size_t average_list_memory)
 {
     printf("%s", BLUE);

@@ -13,7 +13,8 @@ status_t print_menu(void)
     printf("║ 3. Оценить эффективность                    ║\n");
     printf("║ 4. Посмотреть информацию о памяти (массив)  ║\n");
     printf("║ 5. Посмотреть информацию о памяти (список)  ║\n");
-    printf("║ 6. Настроить параметры симуляции            ║\n");
+    printf("║ 6. Таблица сравнения push и pop             ║\n");
+    printf("║ 7. Настроить параметры симуляции            ║\n");
     printf("╚═════════════════════════════════════════════╝\n");
     printf("%s", RESET);
 
@@ -48,6 +49,21 @@ status_t print_simulation_configs(time_range_t *arr_t1, time_range_t *arr_t2, ti
     printf("║ Интервал обслуживания T1: { %-6.2lf, %-6.2lf } ед.в. ║\n", serve_t1->min_time, serve_t1->max_time);
     printf("║ Интервал обслуживания T2: { %-6.2lf, %-6.2lf } ед.в. ║\n", serve_t2->min_time, serve_t2->max_time);
     printf("╚════════════════════════════════════════════════════╝\n");
+    printf("%s", RESET);
+
+    return SUCCESS_CODE;
+}
+
+status_t print_push_pop_table(double arr_push_time, double arr_pop_time, double list_push_time, double list_pop_time)
+{
+    printf("%s", BLUE);
+    printf("╔═══════╦════════════════╦═══════════════╗\n");
+    printf("║       ║ push operation ║ pop operation ║\n");
+    printf("╠═══════╬════════════════╬═══════════════╣\n");
+    printf("║ array ║ %-14.2lf ║ %-13.2lf ║\n", arr_push_time, arr_pop_time);
+    printf("╠═══════╬════════════════╬═══════════════╣\n");
+    printf("║ list  ║ %-14.2lf ║ %-13.2lf ║\n", list_push_time, list_pop_time);
+    printf("╚═══════╩════════════════╩═══════════════╝\n");
     printf("%s", RESET);
 
     return SUCCESS_CODE;

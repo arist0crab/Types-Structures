@@ -1,7 +1,6 @@
 #include "simulate.h"
 
 // вспомогательные функции
-status_t random_double(double min, double max, double *rand_result);
 status_t min3(double a, double b, double c, double *min_val);
 
 // функции печати

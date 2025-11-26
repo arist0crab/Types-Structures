@@ -32,6 +32,10 @@ status_t procces_menu_choice(menu_option_t menu_option)
         case CONFIGURE_SIMULATION_PARAMETERS:
             ec = change_simulation_configurations();
             break;
+
+        case COMPARE_PUSH_POP:
+            ec = compare_push_and_pop();
+            break;
         
         default:
             ec = ERR_RANGE;

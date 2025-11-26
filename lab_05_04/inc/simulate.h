@@ -48,5 +48,6 @@ status_t simulate_service_unit_by_arr(bool verbose_mode);
 status_t simulate_service_unit_by_list(bool verbose_mode, size_t *max_total_len_two_queues);
 
 status_t change_simulation_configurations(void);
+status_t random_double(double min, double max, double *rand_result);
 
 #endif
