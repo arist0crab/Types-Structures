@@ -2,6 +2,7 @@
 #define __TREE_FUNCTIONAL_H__
 
 #include "data.h"
+#include "color.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
