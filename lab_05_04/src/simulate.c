@@ -255,14 +255,16 @@ status_t simulate_service_unit_by_list(bool verbose_mode, size_t *max_total_len_
             log2.function_call_count++;
         }
 
+        if (log1.request_out_count == 0 && queue1.curr_size == CRITICAL_RECORDS_ATTITUDE)
+            ec = ERR_CRITICAL_RECORDS_ATTITUDE;
+
+        // TODO
         /* каждые 100 записей печатаем промежуточную информацию и проверяем
         соотношение поступлений и обработок, чтобы выйти заблаговременно*/
         if (verbose_mode && log1.request_out_count % 100 == 0 && last_print_checkpoint != log1.request_out_count)
         {
             print_interim_results_table_content_list(&queue1, &log1, &queue2, &log2);
             last_print_checkpoint = log1.request_out_count;
-            if (queue1.curr_size / log1.request_out_count >= CRITICAL_RECORDS_ATTITUDE || queue2.curr_size / log2.request_out_count >= CRITICAL_RECORDS_ATTITUDE)
-                ec = ERR_CRITICAL_RECORDS_ATTITUDE;
         }
     }
 
