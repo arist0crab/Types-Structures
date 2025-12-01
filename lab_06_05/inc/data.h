@@ -1,7 +1,7 @@
 #ifndef __DATA_H__
 #define __DATA_H__
 
-#define MENU_OPTIONS_QUANTITY 8
+#define MENU_OPTIONS_QUANTITY 9
 #define MAX_STRING_LENGTH 256
 
 #include <stdio.h>
@@ -25,6 +25,7 @@ typedef enum
     PRINT_TREE,
     ADD_TREE_NODE,
     DELETE_TREE_NODE,
+    CLEAR_TREE,
     FIND_WORD_IN_FILE,
     FIND_WORD_IN_TREE,
     COMPARE_FIND_TIME

@@ -41,6 +41,10 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
                 ec = delete_tree_node(root, target_word);
             break;
 
+        case CLEAR_TREE:
+            ec = clear_tree(root);
+            break;
+
         case FIND_WORD_IN_FILE:
             ec = find_in_file_general_process(root, &file_word_index);
             break;

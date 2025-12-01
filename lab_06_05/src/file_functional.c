@@ -45,6 +45,9 @@ status_t read_tree_from_file(tree_node_t **root, char *filename)
         ec = ERR_ARGS;
 
     if (ec == SUCCESS_CODE)
+        ec = clear_tree(root);
+
+    if (ec == SUCCESS_CODE)
         ec = safe_open_file(filename, &filestream);
 
     if (ec == SUCCESS_CODE)
