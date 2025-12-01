@@ -5,7 +5,7 @@
 
 status_t find_in_file_general_process(tree_node_t **root, ssize_t *file_word_index);
 status_t find_in_tree_general_process(tree_node_t **root);
-status_t compare_find_times(tree_node_t *root, const char *filename);
+status_t compare_find_times(tree_node_t **root, const char *filename);
 status_t suggest_to_add_word_to_file_and_tree(tree_node_t **root, char *filename, char *target_word);
 
 status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
@@ -56,7 +56,7 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
         case COMPARE_FIND_TIME:
             ec = input_string(&filename, "Введите имя файла: ");
             if (ec == SUCCESS_CODE)
-                ec = compare_find_times(*root, filename);
+                ec = compare_find_times(root, filename);
             break;
         
         default:
@@ -69,7 +69,7 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
     return ec;
 }
 
-status_t compare_find_times(tree_node_t *root, const char *filename)
+status_t compare_find_times(tree_node_t **root, const char *filename)
 {
     status_t ec = SUCCESS_CODE;
     struct timespec start_time, end_time;  // переменные для замера времени
@@ -84,14 +84,18 @@ status_t compare_find_times(tree_node_t *root, const char *filename)
         ec = ERR_ARGS;
 
     if (ec == SUCCESS_CODE)
-        count_nodes(root, &words_in_tree_quantity);
+        count_nodes(*root, &words_in_tree_quantity);
+
+    // читаем дерево с файла
+    if (ec == SUCCESS_CODE)
+        ec = read_tree_from_file(root, (char *)filename);
 
     // дерево
     for (size_t i = 0; ec == SUCCESS_CODE && i < N_TESTS; i++)
     {
-        get_random_word_from_tree(root, &current_word, words_in_tree_quantity);
+        get_random_word_from_tree(*root, &current_word, words_in_tree_quantity);
         clock_gettime(CLOCK_MONOTONIC, &start_time);
-        ec = find_word_in_tree(root, &target_root, current_word);
+        ec = find_word_in_tree(*root, &target_root, current_word);
         clock_gettime(CLOCK_MONOTONIC, &end_time);
         total_tree_time_ns += (end_time.tv_sec - start_time.tv_sec) * 1e9 + (end_time.tv_nsec - start_time.tv_nsec);
     }
