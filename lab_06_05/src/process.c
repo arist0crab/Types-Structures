@@ -26,7 +26,7 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
             break;
 
         case PRINT_TREE:
-            ec = print_tree(*root, 0);
+            ec = print_pretty_tree(*root);
             break;
 
         case ADD_TREE_NODE:

@@ -14,7 +14,8 @@ typedef enum
     ERR_MEM,
     ERR_ARGS,
     ERR_NOT_FOUND,
-    ERR_FILE
+    ERR_FILE,
+    ERR_EMPTY_TREE
 } status_t;
 
 typedef enum

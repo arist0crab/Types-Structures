@@ -53,6 +53,10 @@ status_t print_exit_code_result(status_t exit_code)
         case ERR_FILE:
             printf("%sПроизошла ошибка при работе с файлом%s\n", RED_BOLD, RESET);
             break;
+
+        case ERR_EMPTY_TREE:
+            printf("%sПроизошла ошибка: невозможно выполнить для пустого дерева%s\n", RED_BOLD, RESET);
+            break;
         
         default:
             ec = ERR_RANGE;

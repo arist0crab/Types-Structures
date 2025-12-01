@@ -2,6 +2,9 @@
 
 status_t get_node_by_index(tree_node_t *root, size_t *k, tree_node_t **target_root);
 
+// TODO искать каждое слово в файле, ищем среднее время
+// TODO ищем каждое слово в дереве по одному разу и делим время на кол-во вершин
+
 status_t get_random_word_from_file(const char *filename, char **out_word)
 {
     status_t ec = SUCCESS_CODE;
