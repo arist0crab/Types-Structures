@@ -75,25 +75,28 @@ status_t compare_find_times(tree_node_t **root, const char *filename)
     struct timespec start_time, end_time;  // переменные для замера времени
     double total_tree_time_ns = 0, total_file_time_ns = 0;  // общее время поиска
     double average_tree_time_ns = 0, average_file_time_ns = 0;  // среднее время поиска
-    size_t words_in_tree_quantity = 0;  // количество уникальных слов в дереве
     ssize_t word_index_in_file = -1;  // переменная для индекса слова в файле (при поиске)
     tree_node_t *target_root = NULL;  // найденный узел дерева
     char *current_word = NULL;  // текущее слово по которому мы ищем
+
+    // массив для хранения слов из файла
+    char **words_arr = NULL;
+    size_t words_arr_length = 0;
 
     if (!root || !filename)
         ec = ERR_ARGS;
 
     if (ec == SUCCESS_CODE)
-        count_nodes(*root, &words_in_tree_quantity);
+        ec = get_words_arr_from_file(filename, &words_arr, &words_arr_length);
 
     // читаем дерево с файла
     if (ec == SUCCESS_CODE)
         ec = read_tree_from_file(root, (char *)filename);
 
     // дерево
-    for (size_t i = 0; ec == SUCCESS_CODE && i < N_TESTS; i++)
+    for (size_t i = 0; ec == SUCCESS_CODE && i < words_arr_length; i++)
     {
-        get_random_word_from_tree(*root, &current_word, words_in_tree_quantity);
+        current_word = words_arr[i];
         clock_gettime(CLOCK_MONOTONIC, &start_time);
         ec = find_word_in_tree(*root, &target_root, current_word);
         clock_gettime(CLOCK_MONOTONIC, &end_time);
@@ -101,9 +104,9 @@ status_t compare_find_times(tree_node_t **root, const char *filename)
     }
 
     // файл
-    for (size_t i = 0; ec == SUCCESS_CODE && i < N_TESTS; i++)
+    for (size_t i = 0; ec == SUCCESS_CODE && i < words_arr_length; i++)
     {
-        get_random_word_from_file(filename, &current_word);
+        current_word = words_arr[i];
         clock_gettime(CLOCK_MONOTONIC, &start_time);
         ec = find_word_in_file((char *)filename, current_word, &word_index_in_file);
         clock_gettime(CLOCK_MONOTONIC, &end_time);
@@ -112,10 +115,12 @@ status_t compare_find_times(tree_node_t **root, const char *filename)
 
     if (ec == SUCCESS_CODE)
     {
-        average_tree_time_ns = total_tree_time_ns / N_TESTS;
-        average_file_time_ns = total_file_time_ns / N_TESTS;
+        average_tree_time_ns = total_tree_time_ns / words_arr_length;
+        average_file_time_ns = total_file_time_ns / words_arr_length;
         print_compare_table(average_tree_time_ns, average_file_time_ns);
     }
+
+    free_words_arr(&words_arr, words_arr_length);
     
     return ec;
 }

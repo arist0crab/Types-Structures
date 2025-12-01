@@ -6,7 +6,6 @@
 #include "output.h"
 #include "tree_functional.h"
 #include "file_functional.h"
-#include "get_random_words.h"
 #include <time.h>
 
 status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root);
