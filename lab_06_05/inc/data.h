@@ -1,7 +1,7 @@
 #ifndef __DATA_H__
 #define __DATA_H__
 
-#define MENU_OPTIONS_QUANTITY 9
+#define MENU_OPTIONS_QUANTITY 10
 #define MAX_STRING_LENGTH 256
 
 #include <stdio.h>
@@ -28,7 +28,8 @@ typedef enum
     CLEAR_TREE,
     FIND_WORD_IN_FILE,
     FIND_WORD_IN_TREE,
-    COMPARE_FIND_TIME
+    COMPARE_FIND_TIME,
+    MEASURE_EFFICIENCY
 } menu_option_t;
 
 typedef struct tree_node

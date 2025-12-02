@@ -1,8 +1,6 @@
 #define _POSIX_C_SOURCE 199309L
 #include "../inc/process.h"
 
-#define N_TESTS 1000
-
 status_t find_in_file_general_process(tree_node_t **root, ssize_t *file_word_index);
 status_t find_in_tree_general_process(tree_node_t **root);
 status_t compare_find_times(tree_node_t **root, const char *filename);
@@ -57,6 +55,10 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
             ec = input_string(&filename, "Введите имя файла: ");
             if (ec == SUCCESS_CODE)
                 ec = compare_find_times(root, filename);
+            break;
+
+        case MEASURE_EFFICIENCY:
+            ec = compare_find_operation();
             break;
         
         default:

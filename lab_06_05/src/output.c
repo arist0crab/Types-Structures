@@ -15,6 +15,7 @@ status_t print_menu(void)
     printf("║ 6. Найти слово в файле                       ║\n");
     printf("║ 7. Найти слово в дереве                      ║\n");
     printf("║ 8. Сравнить время поиска слова дерево/файл   ║\n");
+    printf("║ 9. Сравнить эффективность                    ║\n");
     printf("╚══════════════════════════════════════════════╝\n");
     printf("%s", RESET);
 
@@ -92,4 +93,19 @@ status_t print_compare_table(double average_tree_time_ns, double average_file_ti
     printf("%s╚══════════════════════╩══════════════════════╝\n%s", BLUE_BOLD, RESET);
     
     return SUCCESS_CODE;
+}
+
+status_t print_compare_find_operation_table(double time_balanced, double time_degenerate, double time_random)
+{
+    printf("%s╔═════════════════════════════════════════════╗\n%s", BLUE_BOLD, RESET);
+    printf("%s║    C O M P A R E  F I N D  R E S U L T S    ║\n%s", BLUE_BOLD, RESET);
+    printf("%s╠══════════════════════╦══════════════════════╣\n%s", BLUE_BOLD, RESET);
+    printf("%s║     balanced tree    ║ %-20lf ║\n%s", BLUE_BOLD, time_balanced, RESET);
+    printf("%s╠══════════════════════╬══════════════════════╣\n%s", BLUE_BOLD, RESET);
+    printf("%s║    degenerate tree   ║ %-20lf ║\n%s", BLUE_BOLD, time_degenerate, RESET);
+    printf("%s╠══════════════════════╬══════════════════════╣\n%s", BLUE_BOLD, RESET);
+    printf("%s║      random tree     ║ %-20lf ║\n%s", BLUE_BOLD, time_random, RESET);
+    printf("%s╚══════════════════════╩══════════════════════╝\n%s", BLUE_BOLD, RESET);
+
+    return SUCCESS_CODE;    
 }
