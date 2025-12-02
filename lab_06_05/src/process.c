@@ -59,6 +59,8 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
 
         case MEASURE_EFFICIENCY:
             ec = compare_find_operation();
+            if (ec == SUCCESS_CODE)
+                ec = compare_sort_operation();
             break;
         
         default:

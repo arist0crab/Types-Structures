@@ -8,5 +8,6 @@
 #include <time.h>
 
 status_t compare_find_operation(void);
+status_t compare_sort_operation(void);
 
 #endif

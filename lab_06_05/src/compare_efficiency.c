@@ -4,6 +4,9 @@
 // TODO возможно, пеписать balanced_tree.txt
 
 status_t measure_one_file_for_find(const char *filename, tree_node_t **root, char ***words_arr, size_t *arr_length, double *result_average_time);
+status_t inorder_traversal_tree_from_file(const char *filename, double *result_time);
+status_t inorder_traversal(tree_node_t *root);
+
 
 status_t compare_find_operation(void)
 {
@@ -33,6 +36,32 @@ status_t compare_find_operation(void)
     return ec;
 }
 
+status_t compare_sort_operation(void)
+{
+    status_t ec = SUCCESS_CODE;
+
+    const char *tree_balanced_file = "tree_balanced.txt";
+    const char *tree_degenerate_file = "tree_degenerate.txt";
+    const char *tree_random_file = "tree_random.txt";
+
+    double tree_balanced_time = 0;
+    double tree_degenerate_time = 0;
+    double tree_random_time = 0;
+
+    ec = inorder_traversal_tree_from_file(tree_balanced_file, &tree_balanced_time);
+
+    if (ec == SUCCESS_CODE)
+        ec = inorder_traversal_tree_from_file(tree_degenerate_file, &tree_degenerate_time);
+
+    if (ec == SUCCESS_CODE)
+        ec = inorder_traversal_tree_from_file(tree_random_file, &tree_random_time);
+
+    print_compare_sort_operation_table(tree_balanced_time, tree_degenerate_time ,tree_random_time);
+
+    return ec;
+}
+
+// TODO убрать root из аргументов, убрать words_arr и arr_length
 status_t measure_one_file_for_find(const char *filename, tree_node_t **root, char ***words_arr, size_t *arr_length, double *result_average_time)
 {
     status_t ec = SUCCESS_CODE;
@@ -64,4 +93,44 @@ status_t measure_one_file_for_find(const char *filename, tree_node_t **root, cha
         *result_average_time = total_tree_time / *arr_length;
 
     return ec;
+}
+
+status_t inorder_traversal_tree_from_file(const char *filename, double *result_time)
+{
+    status_t ec = SUCCESS_CODE;
+    tree_node_t *root = NULL;
+    struct timespec start_time, end_time;
+    double total_tree_time = 0;
+
+    const size_t ntests = 1000;
+
+    if (!filename || !result_time)
+        ec = ERR_ARGS;
+
+    if (ec == SUCCESS_CODE)
+        ec = read_tree_from_file(&root, (char *)filename);
+
+    for (size_t i = 0; ec == SUCCESS_CODE && i < ntests; i++)
+    {
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
+        ec = inorder_traversal(root);
+        clock_gettime(CLOCK_MONOTONIC, &end_time);
+        total_tree_time += (end_time.tv_sec - start_time.tv_sec) * 10e9 + (end_time.tv_nsec - start_time.tv_nsec);
+    }
+
+    if (ec == SUCCESS_CODE)
+        *result_time = total_tree_time / ntests;
+
+    return ec;
+}
+
+status_t inorder_traversal(tree_node_t *root)
+{
+    if (root)
+    {
+        inorder_traversal(root->left);
+        inorder_traversal(root->right);
+    }
+    
+    return SUCCESS_CODE;
 }

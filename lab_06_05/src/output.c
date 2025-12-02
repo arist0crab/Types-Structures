@@ -109,3 +109,18 @@ status_t print_compare_find_operation_table(double time_balanced, double time_de
 
     return SUCCESS_CODE;    
 }
+
+status_t print_compare_sort_operation_table(double time_balanced, double time_degenerate, double time_random)
+{
+    printf("%s╔═════════════════════════════════════════════╗\n%s", BLUE_BOLD, RESET);
+    printf("%s║    C O M P A R E  S O R T  R E S U L T S    ║\n%s", BLUE_BOLD, RESET);
+    printf("%s╠══════════════════════╦══════════════════════╣\n%s", BLUE_BOLD, RESET);
+    printf("%s║     balanced tree    ║ %-20lf ║\n%s", BLUE_BOLD, time_balanced, RESET);
+    printf("%s╠══════════════════════╬══════════════════════╣\n%s", BLUE_BOLD, RESET);
+    printf("%s║    degenerate tree   ║ %-20lf ║\n%s", BLUE_BOLD, time_degenerate, RESET);
+    printf("%s╠══════════════════════╬══════════════════════╣\n%s", BLUE_BOLD, RESET);
+    printf("%s║      random tree     ║ %-20lf ║\n%s", BLUE_BOLD, time_random, RESET);
+    printf("%s╚══════════════════════╩══════════════════════╝\n%s", BLUE_BOLD, RESET);
+
+    return SUCCESS_CODE;    
+}
