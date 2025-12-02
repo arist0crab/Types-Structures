@@ -51,6 +51,7 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
             ec = find_in_tree_general_process(root);
             break;
 
+        // TODO сравнить по памяти файл и дерево
         case COMPARE_FIND_TIME:
             ec = input_string(&filename, "Введите имя файла: ");
             if (ec == SUCCESS_CODE)
