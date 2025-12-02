@@ -34,8 +34,10 @@ status_t measure_efficiency(void)
 
     average_arr_time = total_arr_time / EFFICIENCY_ITERATIONS_QUANTITY;
     average_list_time = total_list_time / EFFICIENCY_ITERATIONS_QUANTITY;
+
+    // считаем память для массива и среднюю для списка
     arr_memory = sizeof(arr_queue_t);
-    list_memory = sizeof(list_queue_t) * 2 + max_total_len_two_queues * sizeof(node_t);
+    list_memory = (sizeof(list_queue_t) * 2 + max_total_len_two_queues * sizeof(node_t)) / 2;
 
     print_efficiency_table(average_arr_time, arr_memory, average_list_time, list_memory);
 
@@ -110,7 +112,7 @@ status_t print_efficiency_table(double average_arr_time, size_t average_arr_memo
     printf("╔═════════════════════════════════════════╗\n");
     printf("║               EFFIENCY TABLE            ║\n");
     printf("╠════════════╦═══════════╦════════════════╣\n");
-    printf("║ queue type ║ time (ms) ║ memory (bytes) ║\n"); 
+    printf("║ queue type ║ time (ns) ║ memory (bytes) ║\n"); 
     printf("╠════════════╬═══════════╬════════════════╣\n");
     printf("║    array   ║ %-9.2lf ║ %-14lu ║\n", average_arr_time, average_arr_memory);
     printf("╠════════════╬═══════════╬════════════════╣\n");
