@@ -1,7 +1,7 @@
 #include "tree_functional.h"
 
 status_t create_tree_node(tree_node_t **new_tree_node, const char *word);
-status_t print_branch(tree_node_t *node, char* prefix, int is_tail);
+status_t print_branch(tree_node_t *node, char* prefix, int is_tail, char *color);
 
 status_t create_tree_node(tree_node_t **new_tree_node, const char *word)
 {
@@ -172,29 +172,29 @@ status_t print_pretty_tree(tree_node_t *root)
         printf("* %s (%zu)\n", root->word, root->counted);
     
     if (ec == SUCCESS_CODE && root->right)  // печатаем ребенка
-        print_branch(root->right, "", root->left == NULL);
+        print_branch(root->right, "", root->left == NULL, BLUE);
 
     if (ec == SUCCESS_CODE && root->left)  // печатаем ребенка
-        print_branch(root->left, "", 1);
+        print_branch(root->left, "", 1, GREEN);
 
     return ec;
 }
 
-status_t print_branch(tree_node_t *node, char* prefix, int is_tail) 
+status_t print_branch(tree_node_t *node, char* prefix, int is_tail, char *color) 
 {
     char new_prefix[MAX_PREFIX_SIZE];
 
     if (node)
     {
         // печатаем что есть и формируем новый префикс
-        printf("%s%s%s (%zu)\n", prefix, (is_tail ? "└── " : "├── "), node->word, node->counted);
+        printf("%s%s%s%s%s (%zu)\n", prefix, color, (is_tail ? "└── " : "├── "), RESET, node->word, node->counted);
         snprintf(new_prefix, sizeof(new_prefix), "%s%s", prefix, (is_tail ? "    " : "│   "));
 
         if (node->right)
-            print_branch(node->right, new_prefix, node->left == NULL);
+            print_branch(node->right, new_prefix, node->left == NULL, BLUE);
 
         if (node->left)
-            print_branch(node->left, new_prefix, 1);
+            print_branch(node->left, new_prefix, 1, GREEN);
     }
 
     return SUCCESS_CODE;
