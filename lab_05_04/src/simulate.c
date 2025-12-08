@@ -255,12 +255,11 @@ status_t simulate_service_unit_by_list(bool verbose_mode, size_t *max_total_len_
             log2.function_call_count++;
         }
 
+        // делаем проверку чтобы не попасть в бесконечный цикл
         if (log1.request_out_count == 0 && queue1.curr_size == CRITICAL_RECORDS_ATTITUDE)
             ec = ERR_CRITICAL_RECORDS_ATTITUDE;
 
-        // TODO
-        /* каждые 100 записей печатаем промежуточную информацию и проверяем
-        соотношение поступлений и обработок, чтобы выйти заблаговременно*/
+        // каждые 100 записей печатаем промежуточную информацию
         if (verbose_mode && log1.request_out_count % 100 == 0 && last_print_checkpoint != log1.request_out_count)
         {
             print_interim_results_table_content_list(&queue1, &log1, &queue2, &log2);
