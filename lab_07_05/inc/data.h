@@ -6,6 +6,8 @@
 // AVG - Adelson-Velsky and Landis (фамилии создателей)
 
 #define MENU_OPTIONS_QUANTITY 16  // TODO
+#define MAX_PREFIX_SIZE 256
+#define MAX_STRING_LENGTH 256
 
 typedef enum 
 {
@@ -13,7 +15,9 @@ typedef enum
     ERR_IO,
     ERR_MEM,
     ERR_ARGS,
+    ERR_FILE,
     ERR_RANGE,
+    ERR_NOT_FOUND,
     ERR_INVALID_POINTER
 } status_t;
 

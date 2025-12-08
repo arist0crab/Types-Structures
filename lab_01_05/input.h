@@ -9,6 +9,5 @@
 #include <stdbool.h>
 
 void print_instructions(void);
-void input_two_lfloats(lfloat_t *first_lfnum, lfloat_t *second_lfnum, exit_status *status);
 
 #endif

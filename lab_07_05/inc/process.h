@@ -3,7 +3,9 @@
 
 #include "data.h"
 #include "bst.h"
+#include "input.h"
 
-status_t procces_menu_choice(menu_option_t menu_option);
+// TODO добавить doxygen
+status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root);
 
 #endif

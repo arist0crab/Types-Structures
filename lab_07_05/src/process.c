@@ -1,8 +1,9 @@
 #include "../inc/process.h"  // TODO
 
-status_t procces_menu_choice(menu_option_t menu_option)
+status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root)
 {
     status_t ec = SUCCESS_CODE;
+    char *filename = NULL;
 
     switch (menu_option)
     {
@@ -10,7 +11,9 @@ status_t procces_menu_choice(menu_option_t menu_option)
             break;
 
         case CREATE_BST_FROM_FILE:
-            // TODO
+            ec = input_string(&filename, "Введите имя файла: ");
+            if (ec == SUCCESS_CODE)
+                ec = read_tree_from_file(bst_root, filename);
             break;
 
         case ADD_BST_ELEM:
@@ -54,7 +57,7 @@ status_t procces_menu_choice(menu_option_t menu_option)
             break;
 
         case PRINT_BST:
-            // TODO
+            ec = print_pretty_bst(*bst_root);
             break;
 
         case PRINT_HST:

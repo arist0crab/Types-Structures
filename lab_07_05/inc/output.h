@@ -5,6 +5,7 @@
 #include "color.h"
 #include <stdio.h>
 
+// TODO добавить doxygen
 status_t print_menu(void);
 status_t print_exit_code_result(status_t exit_code);
 status_t print_insert_menu(char *target_word);
