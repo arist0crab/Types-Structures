@@ -160,6 +160,9 @@ status_t find_word_in_bst(bst_node_t *root, bst_node_t **target_root, const char
         else root = (cmp < 0) ? root->left : root->right;
     }
 
+    if (ec == SUCCESS_CODE && *target_root == NULL)
+        ec = ERR_NOT_FOUND;
+
     return ec;
 }
 

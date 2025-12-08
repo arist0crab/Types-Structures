@@ -3,7 +3,9 @@
 status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root)
 {
     status_t ec = SUCCESS_CODE;
+    bst_node_t *temp_bst_node = NULL;
     char *filename = NULL;
+    char *word = NULL;
 
     switch (menu_option)
     {
@@ -17,19 +19,25 @@ status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root)
             break;
 
         case ADD_BST_ELEM:
-            // TODO
+            ec = input_string(&word, "Введите слово: ");
+            if (ec == SUCCESS_CODE)
+                ec = insert_bst_node(bst_root, word);
             break;
 
         case DELETE_BST_ELEM:
-            // TODO
+            ec = input_string(&word, "Введите слово: ");
+            if (ec == SUCCESS_CODE)
+                ec = delete_bst_node(bst_root, word);
             break;
 
         case CLEAR_BST:
-            // TODO
+            ec = clear_bst(bst_root);
             break;
 
         case FIND_WORD_IN_BST:
-            // TODO
+            ec = input_string(&word, "Введите слово: ");
+            if (ec == SUCCESS_CODE)
+                ec = find_word_in_bst(*bst_root, &temp_bst_node, (const char *)word);
             break;
 
         case BALANCE_BST:

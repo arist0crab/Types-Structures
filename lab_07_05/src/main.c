@@ -17,13 +17,13 @@ int main(void)
     bst_node_t *bst_root = NULL;
 
     print_menu();
-    input_cur_menu_opt((int *)&cur_menu_opt, MENU_OPTIONS_QUANTITY);
+    while (input_cur_menu_opt((int *)&cur_menu_opt, MENU_OPTIONS_QUANTITY) != SUCCESS_CODE);
     while (cur_menu_opt != 0)
     {
         menu_opt_processing_status = procces_menu_choice(cur_menu_opt, &bst_root);
         print_exit_code_result(menu_opt_processing_status);
         print_menu();
-        input_cur_menu_opt((int *)&cur_menu_opt, MENU_OPTIONS_QUANTITY);
+        while (input_cur_menu_opt((int *)&cur_menu_opt, MENU_OPTIONS_QUANTITY) != SUCCESS_CODE);
     }
 
     return SUCCESS_CODE;
