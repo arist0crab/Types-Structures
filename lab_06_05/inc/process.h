@@ -8,8 +8,8 @@
 #include "file_functional.h"
 #include "compare_efficiency.h"
 #include <time.h>
+#include <sys/stat.h>
 
 status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root);
-status_t print_compare_table(double average_tree_time_ns, double average_file_time_ns);
 
 #endif

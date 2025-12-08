@@ -28,7 +28,7 @@ typedef enum
     CLEAR_TREE,
     FIND_WORD_IN_FILE,
     FIND_WORD_IN_TREE,
-    COMPARE_FIND_TIME,
+    COMPARE_FIND_TIME_AND_MEMORY,
     MEASURE_EFFICIENCY
 } menu_option_t;
 

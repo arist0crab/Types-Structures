@@ -82,7 +82,7 @@ status_t print_insert_menu(char *target_word)
     return ec;
 }
 
-status_t print_compare_table(double average_tree_time_ns, double average_file_time_ns)
+status_t print_compare_table(double average_tree_time_ns, double average_file_time_ns, long long tree_memory, long long file_memory)
 {
     printf("%s╔═════════════════════════════════════════════╗\n%s", BLUE_BOLD, RESET);
     printf("%s║       C O M P A R E      R E S U L T S      ║\n%s", BLUE_BOLD, RESET);
@@ -90,6 +90,10 @@ status_t print_compare_table(double average_tree_time_ns, double average_file_ti
     printf("%s║    tree time (ns)    ║    file time (ns)    ║\n%s", BLUE_BOLD, RESET);
     printf("%s╠══════════════════════╬══════════════════════╣\n%s", BLUE_BOLD, RESET);
     printf("%s║  %18.2lf  ║  %18.2lf  ║\n%s", BLUE_BOLD, average_tree_time_ns, average_file_time_ns, RESET);
+    printf("%s╠══════════════════════╬══════════════════════╣\n%s", BLUE_BOLD, RESET);
+    printf("%s║   tree memory (bt)   ║   file memory (bt)   ║\n%s", BLUE_BOLD, RESET);
+    printf("%s╠══════════════════════╬══════════════════════╣\n%s", BLUE_BOLD, RESET);
+    printf("%s║  %18lld  ║  %18lld  ║\n%s", BLUE_BOLD, tree_memory, file_memory, RESET);
     printf("%s╚══════════════════════╩══════════════════════╝\n%s", BLUE_BOLD, RESET);
     
     return SUCCESS_CODE;

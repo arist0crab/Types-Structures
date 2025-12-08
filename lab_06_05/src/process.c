@@ -3,7 +3,7 @@
 
 status_t find_in_file_general_process(tree_node_t **root, ssize_t *file_word_index);
 status_t find_in_tree_general_process(tree_node_t **root);
-status_t compare_find_times(tree_node_t **root, const char *filename);
+status_t compare_find_time_and_memory(tree_node_t **root, const char *filename);
 status_t suggest_to_add_word_to_file_and_tree(tree_node_t **root, char *filename, char *target_word);
 
 status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
@@ -52,10 +52,10 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
             break;
 
         // TODO сравнить по памяти файл и дерево
-        case COMPARE_FIND_TIME:
+        case COMPARE_FIND_TIME_AND_MEMORY:
             ec = input_string(&filename, "Введите имя файла: ");
             if (ec == SUCCESS_CODE)
-                ec = compare_find_times(root, filename);
+                ec = compare_find_time_and_memory(root, filename);
             break;
 
         case MEASURE_EFFICIENCY:
@@ -74,15 +74,17 @@ status_t procces_menu_choice(menu_option_t menu_option, tree_node_t **root)
     return ec;
 }
 
-status_t compare_find_times(tree_node_t **root, const char *filename)
+status_t compare_find_time_and_memory(tree_node_t **root, const char *filename)
 {
     status_t ec = SUCCESS_CODE;
     struct timespec start_time, end_time;  // переменные для замера времени
     double total_tree_time_ns = 0, total_file_time_ns = 0;  // общее время поиска
     double average_tree_time_ns = 0, average_file_time_ns = 0;  // среднее время поиска
+    long long tree_memory = 0, file_memory = 0;  // сколько памяти занимает дерево и файл
     ssize_t word_index_in_file = -1;  // переменная для индекса слова в файле (при поиске)
     tree_node_t *target_root = NULL;  // найденный узел дерева
     char *current_word = NULL;  // текущее слово по которому мы ищем
+    struct stat file_stat;  // для замера памяти файла
 
     // массив для хранения слов из файла
     char **words_arr = NULL;
@@ -122,8 +124,17 @@ status_t compare_find_times(tree_node_t **root, const char *filename)
     {
         average_tree_time_ns = total_tree_time_ns / words_arr_length;
         average_file_time_ns = total_file_time_ns / words_arr_length;
-        print_compare_table(average_tree_time_ns, average_file_time_ns);
     }
+
+    if (ec == SUCCESS_CODE)
+    {
+        if (stat(filename, &file_stat) == 0)
+            file_memory = file_stat.st_size;
+        tree_memory = calculate_tree_memory(*root);
+    }
+
+    if (ec == SUCCESS_CODE)
+        print_compare_table(average_tree_time_ns, average_file_time_ns, tree_memory, file_memory);
 
     free_words_arr(&words_arr, words_arr_length);
     

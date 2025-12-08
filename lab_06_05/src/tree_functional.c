@@ -200,6 +200,24 @@ status_t print_branch(tree_node_t *node, char* prefix, int is_tail, char *color)
     return SUCCESS_CODE;
 }
 
+size_t calculate_tree_memory(tree_node_t *root) 
+{
+    if (root == NULL)
+        return 0;
+
+    size_t node_memory = sizeof(tree_node_t);
+    size_t word_memory = 0;
+
+    if (root->word != NULL)
+        word_memory = strlen(root->word) + 1;
+    
+    size_t left_memory = calculate_tree_memory(root->left);
+    size_t right_memory = calculate_tree_memory(root->right);
+    
+    return node_memory + word_memory + left_memory + right_memory;
+}
+
+
 char *str_dynamic_copy(const char *s) 
 {
     char *result = NULL;
