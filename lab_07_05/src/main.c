@@ -15,12 +15,13 @@ int main(void)
     menu_option_t cur_menu_opt = 0;  // выбранная опция меню
 
     bst_node_t *bst_root = NULL;
+    hash_table_t *hst = NULL;
 
     print_menu();
     while (input_cur_menu_opt((int *)&cur_menu_opt, MENU_OPTIONS_QUANTITY) != SUCCESS_CODE);
     while (cur_menu_opt != 0)
     {
-        menu_opt_processing_status = procces_menu_choice(cur_menu_opt, &bst_root);
+        menu_opt_processing_status = procces_menu_choice(cur_menu_opt, &bst_root, &hst);
         print_exit_code_result(menu_opt_processing_status);
         print_menu();
         while (input_cur_menu_opt((int *)&cur_menu_opt, MENU_OPTIONS_QUANTITY) != SUCCESS_CODE);

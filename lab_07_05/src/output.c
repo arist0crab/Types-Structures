@@ -1,5 +1,8 @@
 #include "../inc/output.h"  // TODO
 
+status_t print_branch(bst_node_t *node, char* prefix, int is_tail, char *color);
+
+
 status_t print_menu(void)
 {
     // TODO сделать таблицу более читаемой
@@ -20,24 +23,25 @@ status_t print_menu(void)
     printf("╠══════════════════════════════════════════════╣\n");
     printf("║             РАБОТА С ХЭШ-ТАБЛИЦЕЙ            ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
-    printf("║ 7. Создать хэш-таблицу                       ║\n");
+    printf("║ 7. Считать хэш-таблицу из файла              ║\n");
     printf("║ 8. Добавить элемент в хэш-таблицу            ║\n");
     printf("║ 9. Удалить элемент из хэш-таблицы            ║\n");
     printf("║ 10. Очистить хэш-таблицу                     ║\n");
+    printf("║ 11. Изменить размер таблицы                  ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
     printf("║       РАБОТА СО СБАЛАНСИРОВАННЫМ ДЕРЕВОМ     ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
-    printf("║ 11. Создать сбалансированное дерево          ║\n");
+    printf("║ 12. Создать сбалансированное дерево          ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
     printf("║           ПЕЧАТЬ ДЕЕРВЬЕВ И ТАБЛИЦ           ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
-    printf("║ 12. Вывести бинарное дерево                  ║\n");
-    printf("║ 13. Вывести хэш-таблицу                      ║\n");
-    printf("║ 14. Вывести сбалансированное дерево          ║\n");    
+    printf("║ 13. Вывести бинарное дерево                  ║\n");
+    printf("║ 14. Вывести хэш-таблицу                      ║\n");
+    printf("║ 15. Вывести сбалансированное дерево          ║\n");    
     printf("╠══════════════════════════════════════════════╣\n");
     printf("║                  ЭФФЕКТИВНОСТЬ               ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
-    printf("║ 15. Сравнить эффективность                   ║\n");
+    printf("║ 16. Сравнить эффективность                   ║\n");
     printf("╚══════════════════════════════════════════════╝\n");
     printf("%s", RESET);
 
@@ -78,8 +82,16 @@ status_t print_exit_code_result(status_t exit_code)
             printf("%sПо вашему запросу ничего не найдено :(%s\n", RED_BOLD, RESET);
             break;
 
+        case ERR_ALREADY_EXISTS:
+            printf("%sСлово, которое вы пытаетесь добавить, уже существует%s\n", RED_BOLD, RESET);
+            break;
+
         case ERR_INVALID_POINTER:
             printf("%sПроизошла ошибка при работе с указателем\n%s", RED_BOLD, RESET);
+            break;
+
+        case ERR_TABLE_DOESNT_EXIST:
+            printf("%sТаблицы пока не существует, думаю, ее придется создать%s\n", RED_BOLD, RESET);
             break;
 
         default:
@@ -102,6 +114,89 @@ status_t print_insert_menu(char *target_word)
     printf("%s1 - нет%s\n", BLUE, RESET);
 
     return ec;
+}
+
+status_t print_hash_table(const hash_table_t *table)
+{
+    status_t ec = SUCCESS_CODE;
+    hash_node_t *current = NULL;
+    bool first_in_chain = true;
+
+    if (!table || table->max_size == 0)
+        ec = ERR_ARGS;
+
+    if (ec == SUCCESS_CODE)
+    {
+        printf("%s", BLUE);
+        printf("╔══════════════════════════════════════════════════════╗\n");
+        printf("║                    HASH TABLE                        ║\n");
+        printf("╠════════════╦═══════════════════════╦═════════════════╣\n");
+        printf("║ Size: %4lu ║ Unique words: %7lu ║ Load: %6.1f%%   ║\n", table->max_size, table->uniq_words_quantity, (double)table->uniq_words_quantity / table->max_size * 100);
+        printf("╠════════════╬═══════════════════════╩═════════════════╝\n");
+
+        for (size_t i = 0; ec == SUCCESS_CODE && i < table->max_size; i++)
+        {
+            if (table->data[i])
+            {                
+                current = table->data[i];
+                first_in_chain = true;
+                
+                printf("║ %10zu ║ ", i);
+                while (current)
+                {
+                    if (!first_in_chain)
+                        printf(" -> ");
+                    
+                    printf("%s", current->word);
+                    current = current->next;
+                    first_in_chain = false;
+                }
+                printf("\n");
+            }
+        }
+        printf("╚════════════╝\n%s", RESET);
+    }
+
+    return ec;
+}
+
+status_t print_pretty_bst(bst_node_t *root) 
+{
+    status_t ec = SUCCESS_CODE;
+
+    if (!root)
+        ec = ERR_NOT_FOUND;
+    
+    if (ec == SUCCESS_CODE)  // печатаем корень
+        printf("* %s (%zu)\n", root->word, root->counted);
+    
+    if (ec == SUCCESS_CODE && root->right)  // печатаем ребенка
+        print_branch(root->right, "", root->left == NULL, BLUE);
+
+    if (ec == SUCCESS_CODE && root->left)  // печатаем ребенка
+        print_branch(root->left, "", 1, GREEN);
+
+    return ec;
+}
+
+status_t print_branch(bst_node_t *node, char* prefix, int is_tail, char *color) 
+{
+    char new_prefix[MAX_PREFIX_SIZE];
+
+    if (node)
+    {
+        // печатаем что есть и формируем новый префикс
+        printf("%s%s%s%s%s (%zu)\n", prefix, color, (is_tail ? "└── " : "├── "), RESET, node->word, node->counted);
+        snprintf(new_prefix, sizeof(new_prefix), "%s%s", prefix, (is_tail ? "    " : "│   "));
+
+        if (node->right)
+            print_branch(node->right, new_prefix, node->left == NULL, BLUE);
+
+        if (node->left)
+            print_branch(node->left, new_prefix, 1, GREEN);
+    }
+
+    return SUCCESS_CODE;
 }
 
 // TODO

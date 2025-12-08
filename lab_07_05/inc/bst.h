@@ -3,6 +3,7 @@
 
 #include "data.h"
 #include "color.h"
+#include "auxiliary.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -21,6 +22,5 @@ status_t delete_bst_node(bst_node_t **root, const char *word);
 status_t clear_bst(bst_node_t **root);
 status_t find_word_in_bst(bst_node_t *root, bst_node_t **target_root, const char *word);
 status_t insert_bst_node(bst_node_t **root, const char *word);
-status_t print_pretty_bst(bst_node_t *root);
 
 #endif

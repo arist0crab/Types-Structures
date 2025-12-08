@@ -56,3 +56,23 @@ status_t input_string(char **word, char *message)
 
     return ec;
 }
+
+status_t input_size(size_t *size)
+{
+    status_t ec = SUCCESS_CODE;
+    char extra;
+
+    if (!size) ec = ERR_ARGS;
+
+    if (ec == SUCCESS_CODE)
+    {
+        printf("%sВведите размер: %s", BLUE, RESET);
+        if (scanf("%lu", size) != 1 || size == 0)
+            ec = ERR_IO;
+    }
+
+    // чистим буфер
+    while ((extra = getchar()) != '\n' && extra != EOF);
+
+    return ec;
+}

@@ -1,6 +1,6 @@
 #include "../inc/process.h"  // TODO
 
-status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root)
+status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root, hash_table_t **hst)
 {
     status_t ec = SUCCESS_CODE;
     bst_node_t *temp_bst_node = NULL;
@@ -45,11 +45,21 @@ status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root)
             break;
 
         case CREATE_HST_FROM_FILE:
-            // TODO
+            if (*hst == NULL) 
+                ec = user_init_table(hst);
+            if (ec == SUCCESS_CODE)
+                ec = input_string(&filename, "Введите имя файла: ");
+            if (ec == SUCCESS_CODE)
+                ec = build_hash_from_file(hst, filename);
             break;
 
         case ADD_HST_ELEM:
-            // TODO
+            if (*hst == NULL) 
+                ec = user_init_table(hst);
+            if (ec == SUCCESS_CODE)
+                ec = input_string(&word, "Введите слово: ");
+            if (ec == SUCCESS_CODE)
+                ec = insert_hst_node(*hst, (const char *)word);
             break;
 
         case DELETE_HST_ELEM:
@@ -57,6 +67,10 @@ status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root)
             break;
 
         case CLEAR_HST:
+            // TODO
+            break;
+
+        case RESIZE_HST:
             // TODO
             break;
 
@@ -69,7 +83,7 @@ status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root)
             break;
 
         case PRINT_HST:
-            // TODO
+            ec = print_hash_table((const hash_table_t *)*hst);
             break;
 
         case PRINT_AVL:
