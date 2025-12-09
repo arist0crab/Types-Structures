@@ -122,6 +122,8 @@ status_t print_hash_table(const hash_table_t *table)
     hash_node_t *current = NULL;
     bool first_in_chain = true;
 
+    // TODO обработать случай, когда таблица пустая
+
     if (!table || table->max_size == 0)
         ec = ERR_ARGS;
 

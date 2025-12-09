@@ -4,6 +4,7 @@ status_t destroy_hash_table(hash_table_t **table);
 status_t create_hash_table(hash_table_t **table, size_t table_size);
 status_t hash_djb2(const char *str, size_t table_size, size_t *hash_value);
 status_t find_word_in_hash_table(const hash_table_t *table, const char *word, hash_node_t **found_node);
+status_t free_hst_node(hash_node_t *hst_node);
 
 status_t build_hash_from_file(hash_table_t **table, const char *filename)
 {
@@ -186,6 +187,60 @@ status_t find_word_in_hash_table(const hash_table_t *table, const char *word, ha
     }
 
     return ec;
+}
+
+status_t delete_hst_node(hash_table_t **table, const char *word)
+{
+    status_t ec = SUCCESS_CODE;
+    hash_node_t *temp_node = NULL, *current = NULL;
+    bool found = false;
+    size_t idx = 0;
+
+    if (!table || !*table || !word || word[0] == '\0')
+        ec = ERR_ARGS;
+
+    if (ec == SUCCESS_CODE)
+        ec = hash_djb2(word, (*table)->max_size, &idx);
+
+    if (ec == SUCCESS_CODE)
+        current = (*table)->data[idx];
+
+    // если удаляем самый первый узел ячейки
+    if (ec == SUCCESS_CODE && strcmp(current->word, word) == 0)
+    {
+        found = true;
+        (*table)->data[idx] = current->next;
+        free_hst_node(current);
+    }
+
+    // иначе ищем в остальной цепочке
+    while (ec == SUCCESS_CODE && current && !found)
+    {
+        if (current->next && strcmp(current->next->word, word) == 0)
+        {
+            found = true;
+            temp_node = current->next;
+            current->next = temp_node->next;
+            free_hst_node(temp_node);
+        }
+        current = current->next;
+    }
+
+    if (ec == SUCCESS_CODE && !found)
+        ec = ERR_NOT_FOUND;
+
+    return ec;
+}
+
+status_t free_hst_node(hash_node_t *hst_node)
+{
+    if (hst_node)
+    {
+        if (hst_node->word) free(hst_node->word);
+        free(hst_node);
+    }
+
+    return SUCCESS_CODE;
 }
 
 status_t hash_djb2(const char *str, size_t table_size, size_t *hash_value)

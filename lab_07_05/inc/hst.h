@@ -21,6 +21,7 @@ typedef struct hash_table {
 } hash_table_t;
 
 // TODO добавить doxygen
+status_t delete_hst_node(hash_table_t **table, const char *word);
 status_t user_init_table(hash_table_t **table);
 status_t print_hash_table(const hash_table_t *table);
 status_t build_hash_from_file(hash_table_t **table, const char *filename);

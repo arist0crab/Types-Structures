@@ -63,7 +63,12 @@ status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root, h
             break;
 
         case DELETE_HST_ELEM:
-            // TODO
+            if (*hst == NULL)
+                ec = ERR_TABLE_DOESNT_EXIST;
+            if (ec == SUCCESS_CODE)
+                ec = input_string(&word, "Введите слово для удаления: ");
+            if (ec == SUCCESS_CODE)
+                ec = delete_hst_node(hst, (const char *)word);
             break;
 
         case CLEAR_HST:
