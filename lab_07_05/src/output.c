@@ -201,6 +201,18 @@ status_t print_branch(bst_node_t *node, char* prefix, int is_tail, char *color)
     return SUCCESS_CODE;
 }
 
+status_t print_hst_resize_warning(void)
+{
+    printf("%s", BLUE_BOLD);
+    printf("Внимание! Все старые данные таблицы будут стерты!\n");
+    printf("Продолжим?\n");
+    printf("- 0: да\n");
+    printf("- 1: нет\n");
+    printf("%s", RESET);
+
+    return SUCCESS_CODE;
+}
+
 // TODO
 // status_t print_compare_table(double average_tree_time_ns, double average_file_time_ns)
 // {

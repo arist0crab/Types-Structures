@@ -1,6 +1,7 @@
 #include "hst.h"
 
-status_t destroy_hash_table(hash_table_t **table);
+// TODO разбить адекватно
+status_t free_hash_table(hash_table_t **table);
 status_t create_hash_table(hash_table_t **table, size_t table_size);
 status_t hash_djb2(const char *str, size_t table_size, size_t *hash_value);
 status_t find_word_in_hash_table(const hash_table_t *table, const char *word, hash_node_t **found_node);
@@ -49,7 +50,7 @@ status_t create_hash_table(hash_table_t **table, size_t table_size)
     if (!table) ec = ERR_ARGS;
 
     if (ec == SUCCESS_CODE && *table)
-        destroy_hash_table(table);
+        free_hash_table(table);
 
     if (ec == SUCCESS_CODE)
     {
@@ -72,37 +73,7 @@ status_t create_hash_table(hash_table_t **table, size_t table_size)
     }
 
     if (ec != SUCCESS_CODE)
-        ec = destroy_hash_table(table);
-
-    return ec;
-}
-
-status_t destroy_hash_table(hash_table_t **table)
-{
-    status_t ec = SUCCESS_CODE;
-    hash_node_t *current = NULL, *next = NULL;
-
-    if (!table || !(*table)) 
-        ec = ERR_ARGS;
-
-    for (size_t i = 0; ec == SUCCESS_CODE && i < (*table)->max_size; i++)
-    {
-        current = (*table)->data[i];
-        while (current)
-        {
-            next = current->next;
-            if (current->word) free(current->word);
-            free(current);
-            current = next;
-        }
-    }
-
-    if (ec == SUCCESS_CODE)
-    {
-        free((*table)->data);
-        free(*table);
-        *table = NULL;
-    }
+        ec = free_hash_table(table);
 
     return ec;
 }
@@ -228,6 +199,81 @@ status_t delete_hst_node(hash_table_t **table, const char *word)
 
     if (ec == SUCCESS_CODE && !found)
         ec = ERR_NOT_FOUND;
+
+    return ec;
+}
+
+status_t clear_hst_table(hash_table_t **table)
+{
+    status_t ec = SUCCESS_CODE;
+    hash_node_t *current = NULL, *temp = NULL;
+
+    if (!table || !*table)
+        ec = ERR_ARGS;
+
+    if (ec == SUCCESS_CODE)
+    {
+        for (size_t i = 0; i < (*table)->max_size; i++)
+        {
+            current = (*table)->data[i];
+            while (current)
+            {
+                temp = current;
+                current = current->next;
+                free_hst_node(temp);
+            }   
+        }
+    }
+
+    return ec;
+}
+
+status_t resize_hst_table(hash_table_t **table)
+{
+    status_t ec = SUCCESS_CODE;
+    size_t new_table_size = 0;
+
+    if (!table || !*table)
+        ec = ERR_ARGS;
+
+    if (ec == SUCCESS_CODE)
+        ec = input_size(&new_table_size);
+
+    if (ec == SUCCESS_CODE)
+        ec = free_hash_table(table);
+
+    if (ec == SUCCESS_CODE)
+        ec = create_hash_table(table, new_table_size);
+
+    return ec;
+}
+
+status_t free_hash_table(hash_table_t **table)
+{
+    status_t ec = SUCCESS_CODE;
+    hash_node_t *current = NULL, *next = NULL;
+
+    if (!table || !(*table)) 
+        ec = ERR_ARGS;
+
+    for (size_t i = 0; ec == SUCCESS_CODE && i < (*table)->max_size; i++)
+    {
+        current = (*table)->data[i];
+        while (current)
+        {
+            next = current->next;
+            if (current->word) free(current->word);
+            free(current);
+            current = next;
+        }
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        free((*table)->data);
+        free(*table);
+        *table = NULL;
+    }
 
     return ec;
 }

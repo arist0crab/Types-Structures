@@ -4,6 +4,7 @@ status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root, h
 {
     status_t ec = SUCCESS_CODE;
     bst_node_t *temp_bst_node = NULL;
+    int temp_menu_opt = 0;
     char *filename = NULL;
     char *word = NULL;
 
@@ -72,11 +73,14 @@ status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root, h
             break;
 
         case CLEAR_HST:
-            // TODO
+            ec = clear_hst_table(hst);
             break;
 
         case RESIZE_HST:
-            // TODO
+            print_hst_resize_warning();
+            ec = input_cur_menu_opt(&temp_menu_opt, 2);
+            if (ec == SUCCESS_CODE && temp_menu_opt == 0)
+                ec = resize_hst_table(hst);
             break;
 
         case CREATE_AVL_FROM_BST:
