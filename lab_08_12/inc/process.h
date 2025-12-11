@@ -2,8 +2,10 @@
 #define __PROCESS_H__
 
 #include "data.h"
+#include "graph.h"
+#include "input.h"
 
 // TODO добавить doxygen
-status_t procces_menu_choice(menu_option_t menu_option);
+status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph);
 
 #endif

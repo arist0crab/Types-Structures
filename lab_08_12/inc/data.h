@@ -37,4 +37,12 @@ typedef enum
     PRINT_GRAPH
 } menu_option_t;
 
+typedef enum
+{
+    BACK_TO_MENU,
+    MANUAL_ADD_CITY,
+    MANUAL_ADD_ROAD,
+    MANUAL_COMPLEX_INPUT
+} manual_menu_option_t;
+
 #endif
