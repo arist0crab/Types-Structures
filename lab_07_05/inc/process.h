@@ -4,6 +4,7 @@
 #include "data.h"
 #include "bst.h"
 #include "hst.h"
+#include "avl.h"
 #include "input.h"
 #include "output.h"
 

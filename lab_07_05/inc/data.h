@@ -5,7 +5,7 @@
 // HST - Hash Search table
 // AVG - Adelson-Velsky and Landis (фамилии создателей)
 
-#define MENU_OPTIONS_QUANTITY 17  // TODO
+#define MENU_OPTIONS_QUANTITY 16  // TODO
 #define MAX_PREFIX_SIZE 256
 #define MAX_STRING_LENGTH 256
 
@@ -41,14 +41,10 @@ typedef enum
     DELETE_HST_ELEM,
     CLEAR_HST,
     RESIZE_HST,
-
-    // работа с AVL
-    CREATE_AVL_FROM_BST,
-
+    
     // печать
     PRINT_BST,
     PRINT_HST,
-    PRINT_AVL,
 
     // эффективность
     MEASURE_SEARCH_TIME

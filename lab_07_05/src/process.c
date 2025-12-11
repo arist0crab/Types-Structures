@@ -42,7 +42,7 @@ status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root, h
             break;
 
         case BALANCE_BST:
-            // TODO
+            ec = balance_tree(bst_root);
             break;
 
         case CREATE_HST_FROM_FILE:
@@ -83,20 +83,12 @@ status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root, h
                 ec = resize_hst_table(hst);
             break;
 
-        case CREATE_AVL_FROM_BST:
-            // TODO
-            break;
-
         case PRINT_BST:
             ec = print_pretty_bst(*bst_root);
             break;
 
         case PRINT_HST:
             ec = print_hash_table((const hash_table_t *)*hst);
-            break;
-
-        case PRINT_AVL:
-            // TODO
             break;
 
         case MEASURE_SEARCH_TIME:
