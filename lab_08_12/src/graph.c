@@ -1,6 +1,80 @@
 #include "graph.h"
 
+status_t find_city_in_graph(graph_t *graph, const char *city, ssize_t *index_city);
 status_t find_start_matrix_data_ptr(size_t **matrix, size_t matrix_rows_quantity, size_t **matrix_data_start_ptr);
+
+status_t add_road_to_graph(graph_t *graph, size_t index_city_1, size_t index_city_2, size_t distance_1_to_2, size_t distance_2_to_1)
+{
+    if (!graph || graph->roads || distance_1_to_2 == 0 || distance_2_to_1 == 0)
+        return ERR_ARGS;
+    if (index_city_1 >= graph->cities_quantity || index_city_2 >= graph->cities_quantity)
+        return ERR_RANGE;
+
+    graph->roads[index_city_1][index_city_2] = distance_1_to_2;
+    graph->roads[index_city_2][index_city_1] = distance_2_to_1;
+
+    return SUCCESS_CODE;
+}
+
+status_t get_cities_indexes(graph_t *graph, const char *city_1, const char *city_2, size_t  *indx1, size_t *indx2)
+{
+    status_t ec = SUCCESS_CODE;
+    bool found1 = false, found2 = false;
+
+    if (!graph || !graph->cities_names || !graph->cities_quantity || !indx1 || !indx2)
+        return ERR_ARGS;
+
+    *indx1 = 0;
+    *indx2 = 0;
+
+    for (size_t i = 0; i < graph->cities_quantity; i++)
+    {
+        if (str_iequal(graph->cities_names[i], city_1) == 0)
+        {
+            found1 = true;
+            *indx1 = i;
+        }
+        if (strcmp(graph->cities_names[i], city_2) == 0)
+        {
+            found2 = true;
+            *indx2 = i;
+        }
+    }
+
+    // имена городов одинаковые
+    if (found1 && found2 && *indx1 == *indx2) ec = ERR_ARGS;
+    // если какой-то город не был найден
+    if (!found1 || !found2) ec = ERR_NOT_FOUND;
+
+    return ec;
+}
+
+status_t add_city_to_graph(graph_t *graph, const char *city)
+{
+    status_t ec = SUCCESS_CODE;
+    ssize_t city_index = -1;
+
+    if (!graph || !city || graph->cities_quantity >= graph->max_vertices_quantity) 
+        return ERR_ARGS;
+
+    // освобождаем стару строку, если она была
+    if (graph->cities_names[graph->cities_quantity])
+        free(graph->cities_names[graph->cities_quantity]);
+
+    ec = find_city_in_graph(graph, city, &city_index);
+    if (city_index >= 0) ec = ERR_ALREADY_EXISTS;
+
+    if (ec == SUCCESS_CODE)
+    {
+        graph->cities_names[graph->cities_quantity] = str_dynamic_copy(city);
+        if (graph->cities_names[graph->cities_quantity] == NULL) 
+            ec = ERR_MEM;
+    }
+
+    graph->cities_quantity += (ec == SUCCESS_CODE);
+
+    return ec;
+}
 
 status_t set_graph_t_distance(graph_t *graph, size_t t_distance)
 {
@@ -13,10 +87,40 @@ status_t set_graph_t_distance(graph_t *graph, size_t t_distance)
 
 status_t set_graph_capital(graph_t *graph, const char *capital)
 {
-    if (!graph || !capital || capital[0] == '\0') return ERR_ARGS;
+    status_t ec = SUCCESS_CODE;
+    ssize_t city_index = -1;
+    
+    if (!graph || !capital || capital[0] == '\0') 
+        ec = ERR_ARGS;
 
-    if (graph->capital) free(graph->capital);
-    graph->capital = str_dynamic_copy(capital);
+    // если такого города нет добавляем
+    if (ec == SUCCESS_CODE)
+    {
+        ec = find_city_in_graph(graph, capital, &city_index);
+        if (ec == SUCCESS_CODE && city_index < 0)
+            ec = add_city_to_graph(graph, capital);
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        if (graph->capital) free(graph->capital);
+        graph->capital = str_dynamic_copy(capital);
+        if (graph->capital == NULL) 
+            ec = ERR_MEM;
+    }
+
+    return ec;
+}
+
+status_t find_city_in_graph(graph_t *graph, const char *city, ssize_t *index_city)
+{
+    if (!graph || !graph->cities_names || !city || city[0] == '\0' || !index_city)
+        return ERR_ARGS;
+
+    *index_city = -1;
+    for (size_t i = 0; *index_city < 0 && i < graph->cities_quantity; i++)
+        if (str_iequal(graph->cities_names[i], city) == 0)
+            *index_city = i;
 
     return SUCCESS_CODE;
 }

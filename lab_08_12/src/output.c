@@ -12,7 +12,7 @@ status_t print_menu(void)
     printf("║                РАБОТА С ГРАФОМ               ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
     printf("║ 1. Сбросить граф                             ║\n");
-    printf("║ 2. Ввести граф вручную                       ║\n");
+    printf("║ 2. Настроить граф вручную                    ║\n");
     printf("║ 3. Считать граф из файла                     ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
     printf("║                ВВОД ПАРАМЕТРОВ               ║\n");
@@ -29,7 +29,7 @@ status_t print_menu(void)
     printf("╠══════════════════════════════════════════════╣\n");
     printf("║                ФУНКЦИИ ВЫВОДА                ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
-    printf("║ 10. Вывести граф                              ║\n");
+    printf("║ 10. Вывести граф                             ║\n");
     printf("╚══════════════════════════════════════════════╝\n");
     printf("%s", RESET);
 
@@ -40,7 +40,7 @@ status_t print_manual_input_menu(void)
 {
     printf("%s", BLUE);
     printf("╔══════════════════════════════════════════════╗\n");
-    printf("║                   M E N U                    ║\n");
+    printf("║               MANUAL INPUT MENU              ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
     printf("║ 0. Назад                                     ║\n");
     printf("║ 1. Добавить город                            ║\n");
@@ -80,6 +80,14 @@ status_t print_exit_code_result(status_t exit_code)
 
         case ERR_INVALID_POINTER:
             printf("%sПроизошла ошибка при работе с указателем\n%s", RED_BOLD, RESET);
+            break;
+
+        case ERR_NOT_FOUND:
+            printf("%sПроизошла ошибка: начего не найдено\n%s", RED_BOLD, RESET);
+            break;
+
+        case ERR_ALREADY_EXISTS:
+            printf("%sПроизошла ошибка: элемент уже существует\n%s", RED_BOLD, RESET);
             break;
 
         default:

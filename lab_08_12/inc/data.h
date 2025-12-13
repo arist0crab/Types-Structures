@@ -11,6 +11,8 @@ typedef enum
     ERR_RANGE,
     ERR_MEM,
     ERR_ARGS,
+    ERR_NOT_FOUND,
+    ERR_ALREADY_EXISTS,
     ERR_INVALID_POINTER
 } status_t;
 
@@ -21,7 +23,7 @@ typedef enum
     
     // работа с графом
     CLEAR_GRAPH,
-    MANUALLY_DATA_INPUT,
+    MANUALLY_GRAPH_SETTINGS,
     FILE_DATA_INPUT,
 
     // ввод параметров
@@ -43,7 +45,9 @@ typedef enum
     BACK_TO_MENU,
     MANUAL_ADD_CITY,
     MANUAL_ADD_ROAD,
-    MANUAL_COMPLEX_INPUT
+    MANUAL_COMPLEX_INPUT,
+    MANUAL_REMOVE_CITY,
+    MANUAL_REMOVE_ROAD
 } manual_menu_option_t;
 
 #endif

@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
+#include <unistd.h>
 
 typedef struct
 {
@@ -22,5 +24,8 @@ status_t free_graph(graph_t *graph);
 status_t clear_graph(graph_t *graph);
 status_t set_graph_capital(graph_t *graph, const char *capital);
 status_t set_graph_t_distance(graph_t *graph, size_t t_distance);
+status_t add_city_to_graph(graph_t *graph, const char *city);
+status_t get_cities_indexes(graph_t *graph, const char *city_1, const char *city_2, size_t  *indx1, size_t *indx2);
+status_t add_road_to_graph(graph_t *graph, size_t index_city_1, size_t index_city_2, size_t distance_1_to_2, size_t distance_2_to_1);
 
 #endif
