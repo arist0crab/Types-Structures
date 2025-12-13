@@ -3,6 +3,35 @@
 status_t find_city_in_graph(graph_t *graph, const char *city, ssize_t *index_city);
 status_t find_start_matrix_data_ptr(size_t **matrix, size_t matrix_rows_quantity, size_t **matrix_data_start_ptr);
 
+status_t export_graph_to_dot_file(graph_t *graph, const char *filename)
+{
+    status_t ec = SUCCESS_CODE;
+    FILE *filestream = NULL;
+
+    if (!graph || !graph->cities_names || !graph->roads || !filename || filename[0] == '\0')
+        return ERR_ARGS;
+
+    filestream = fopen(filename, "w");
+    if (!filestream) ec = ERR_FILE;
+
+    if (ec == SUCCESS_CODE)
+    {
+        fprintf(filestream, "digraph G {\n");
+        fprintf(filestream, "   node [shape=\"circle\", style=\"filled\", fillcolor=\"blue\", fontcolor=\"#FFFFFF\"];\n");
+        fprintf(filestream, "   rankdir=\"LR\";\n");
+
+        for (size_t i = 0; i < graph->cities_quantity; i++)
+            for (size_t j = 0; j < graph->cities_quantity; j++)
+                if (graph->roads[i][j] > 0)
+                    fprintf(filestream, "   \"%s\"->\"%s\" [label=\"%zu\", fontsize=12];\n", graph->cities_names[i], graph->cities_names[j], graph->roads[i][j]);
+        fprintf(filestream, "}\n");
+    }
+
+    if (filestream) fclose(filestream);
+
+    return ec;
+}
+
 status_t remove_road_from_graph(graph_t *graph, size_t index_city_1, size_t index_city_2)
 {
     if (!graph || graph->roads)

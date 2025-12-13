@@ -30,5 +30,7 @@ status_t get_cities_indexes(graph_t *graph, const char *city_1, const char *city
 status_t add_road_to_graph(graph_t *graph, size_t index_city_1, size_t index_city_2, size_t distance_1_to_2, size_t distance_2_to_1);
 status_t remove_road_from_graph(graph_t *graph, size_t index_city_1, size_t index_city_2);
 status_t remove_city_from_graph(graph_t *graph, const char *city);
+status_t export_graph_to_dot_file(graph_t *graph, const char *filename);
+status_t init_graph(graph_t *graph, size_t cities_quantity);
 
 #endif

@@ -40,4 +40,3 @@ int str_iequal(const char *s1, const char *s2)
     
     return (*s1 == '\0') - (*s2 == '\0');
 }
-

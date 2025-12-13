@@ -6,7 +6,8 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
 {
     status_t ec = SUCCESS_CODE;
     size_t t_distance = 0;
-    char *word = NULL;
+    size_t graph_capacity = 0;
+    char *word = NULL, *filename = NULL;
 
     if (!graph) ec = ERR_ARGS;
 
@@ -17,8 +18,14 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
             case EXIT_PROGRAM:
                 break;
 
-            case CLEAR_GRAPH:
-                ec = clear_graph(graph);
+            case CREATE_GRAPH:
+                ec = input_size(&graph_capacity, "Введите вместимость графа (вершины): ");
+                if (ec == SUCCESS_CODE)
+                    ec = init_graph(graph, graph_capacity);
+                break;
+
+            case DESTROY_GRAPH:
+                ec = free_graph(graph);
                 break;
 
             case MANUALLY_GRAPH_SETTINGS:
@@ -58,7 +65,9 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
                 break;
 
             case PRINT_GRAPH:
-                // TODO
+                ec = input_string(&filename, "Введите имя файла: ");
+                if (ec == SUCCESS_CODE)
+                    ec = export_graph_to_dot_file(graph, filename);
                 break;
             
             default:

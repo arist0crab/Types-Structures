@@ -2,7 +2,7 @@
 #define __DATA_H__
 
 #define MAX_STRING_LENGTH 256
-#define MENU_OPTIONS_QUANTITY 11
+#define MENU_OPTIONS_QUANTITY 12
 
 typedef enum 
 {
@@ -11,6 +11,7 @@ typedef enum
     ERR_RANGE,
     ERR_MEM,
     ERR_ARGS,
+    ERR_FILE,
     ERR_NOT_FOUND,
     ERR_ALREADY_EXISTS,
     ERR_INVALID_POINTER
@@ -22,7 +23,8 @@ typedef enum
     EXIT_PROGRAM,
     
     // работа с графом
-    CLEAR_GRAPH,
+    CREATE_GRAPH,   
+    DESTROY_GRAPH,
     MANUALLY_GRAPH_SETTINGS,
     FILE_DATA_INPUT,
 
