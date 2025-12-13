@@ -76,3 +76,28 @@ status_t input_size(size_t *size, const char *message)
 
     return ec;
 }
+
+status_t get_two_cities_and_distances(char **city_name_1, char **city_name_2, size_t *distance_1_to_2, size_t *distance_2_to_1)
+{
+    status_t ec = SUCCESS_CODE;
+    char message[MAX_STRING_LENGTH];
+
+    // получаем названия городов
+    ec = input_string(city_name_1, "Введите город №1: ");
+    if (ec == SUCCESS_CODE)
+        ec = input_string(city_name_2, "Введите город №2: ");
+
+    // получаем дистанции
+    if (ec == SUCCESS_CODE)
+    {
+        snprintf(message, MAX_STRING_LENGTH, "Введите длину дороги из %s в %s: ", *city_name_1, *city_name_2);
+        ec = input_size(distance_1_to_2, message);
+    }
+    if (ec == SUCCESS_CODE)
+    {
+        snprintf(message, MAX_STRING_LENGTH, "Введите длину дороги из %s в %s: ", *city_name_2, *city_name_1);
+        ec = input_size(distance_2_to_1, message);
+    }
+
+    return ec;
+}

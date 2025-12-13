@@ -2,6 +2,7 @@
 #define __GRAPH_T__
 
 #include "../inc/data.h"  // TODO
+#include "input.h"
 #include "auxilary.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,5 +28,7 @@ status_t set_graph_t_distance(graph_t *graph, size_t t_distance);
 status_t add_city_to_graph(graph_t *graph, const char *city);
 status_t get_cities_indexes(graph_t *graph, const char *city_1, const char *city_2, size_t  *indx1, size_t *indx2);
 status_t add_road_to_graph(graph_t *graph, size_t index_city_1, size_t index_city_2, size_t distance_1_to_2, size_t distance_2_to_1);
+status_t remove_road_from_graph(graph_t *graph, size_t index_city_1, size_t index_city_2);
+status_t remove_city_from_graph(graph_t *graph, const char *city);
 
 #endif

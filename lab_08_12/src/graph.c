@@ -3,11 +3,24 @@
 status_t find_city_in_graph(graph_t *graph, const char *city, ssize_t *index_city);
 status_t find_start_matrix_data_ptr(size_t **matrix, size_t matrix_rows_quantity, size_t **matrix_data_start_ptr);
 
+status_t remove_road_from_graph(graph_t *graph, size_t index_city_1, size_t index_city_2)
+{
+    if (!graph || graph->roads)
+        return ERR_ARGS;
+    if (index_city_1 >= graph->cities_quantity || index_city_2 >= graph->cities_quantity || index_city_1 == index_city_2)
+        return ERR_RANGE;
+
+    graph->roads[index_city_1][index_city_2] = 0;
+    graph->roads[index_city_2][index_city_1] = 0;
+
+    return SUCCESS_CODE;
+}
+
 status_t add_road_to_graph(graph_t *graph, size_t index_city_1, size_t index_city_2, size_t distance_1_to_2, size_t distance_2_to_1)
 {
     if (!graph || graph->roads || distance_1_to_2 == 0 || distance_2_to_1 == 0)
         return ERR_ARGS;
-    if (index_city_1 >= graph->cities_quantity || index_city_2 >= graph->cities_quantity)
+    if (index_city_1 >= graph->cities_quantity || index_city_2 >= graph->cities_quantity || index_city_1 == index_city_2)
         return ERR_RANGE;
 
     graph->roads[index_city_1][index_city_2] = distance_1_to_2;
@@ -45,6 +58,45 @@ status_t get_cities_indexes(graph_t *graph, const char *city_1, const char *city
     if (found1 && found2 && *indx1 == *indx2) ec = ERR_ARGS;
     // если какой-то город не был найден
     if (!found1 || !found2) ec = ERR_NOT_FOUND;
+
+    return ec;
+}
+
+status_t remove_city_from_graph(graph_t *graph, const char *city)
+{
+    status_t ec = SUCCESS_CODE;
+    ssize_t city_index = -1;
+    ssize_t last_city = 0;
+
+    if (!graph || !graph->cities_names || !graph->roads)
+        return ERR_ARGS;
+
+    ec = find_city_in_graph(graph, city, &city_index);
+    if (ec == SUCCESS_CODE && city_index < 0)
+        ec = ERR_NOT_FOUND;
+    else if (ec == SUCCESS_CODE && city_index >= 0)
+    {
+        if (graph->cities_names[city_index])
+            free(graph->cities_names[city_index]);
+        graph->cities_names[city_index] = NULL;
+        
+        last_city = graph->cities_quantity - 1;
+        if (city_index != last_city)
+        {
+            // копируем название последнего города
+            graph->cities_names[city_index] = graph->cities_names[last_city];
+            graph->cities_names[last_city] = NULL;
+            
+            // копируем всю строку матрицы дорог последнего города
+            memcpy(graph->roads[city_index], graph->roads[last_city], graph->max_vertices_quantity * sizeof(size_t));
+            
+            // обновляем столбец последнего города (все строки)
+            for (size_t i = 0; i < graph->cities_quantity; i++)
+                graph->roads[i][city_index] = graph->roads[i][last_city];
+        }
+        graph->roads[last_city][last_city] = 0;  // диагональ = 0
+        graph->cities_quantity--;
+    }
 
     return ec;
 }

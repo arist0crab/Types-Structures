@@ -77,7 +77,6 @@ status_t process_manual_input(graph_t *graph)
     char *city_name_1 = NULL, *city_name_2 = NULL;
     size_t distance_1_to_2 = 0, distance_2_to_1 = 0;
     size_t city1_index = 0, city2_index = 0;
-    char message[MAX_STRING_LENGTH];
     char *word = NULL;
 
     if (!graph) ec = ERR_ARGS;
@@ -85,7 +84,7 @@ status_t process_manual_input(graph_t *graph)
     if (ec == SUCCESS_CODE)
     {
         print_manual_input_menu();
-        ec = input_cur_menu_opt((int *)&manual_menu_option, 6);
+        ec = input_cur_menu_opt((int *)&manual_menu_option, 5);
     }
 
     if (ec == SUCCESS_CODE)
@@ -95,8 +94,6 @@ status_t process_manual_input(graph_t *graph)
             case BACK_TO_MENU:
                 break;
 
-            // TODO кажется надо добаить функию удаления городов и дорог)))))))))
-
             case MANUAL_ADD_CITY:
                 ec = input_string(&word, "Введите название нового города: ");
                 if (ec == SUCCESS_CODE)
@@ -104,42 +101,35 @@ status_t process_manual_input(graph_t *graph)
                 break;
             
             case MANUAL_ADD_ROAD:
-                // получаем названия городов
-                ec = input_string(&city_name_1, "Введите город №1: ");
-                if (ec == SUCCESS_CODE)
-                    ec = input_string(&city_name_2, "Введите город №2: ");
+                // вводим города и дистанции
+                ec = get_two_cities_and_distances(&city_name_1, &city_name_2, &distance_1_to_2, &distance_2_to_1);
 
-                // проверяем их корректность и получаем индексы в матрице
+                // проверяем корректность данных и получаем индексы городов в матрице
                 if (ec == SUCCESS_CODE)
                     ec = get_cities_indexes(graph, (const char *)city_name_1, (const char *)city_name_2, &city1_index, &city2_index);
-                
-                // получаем дистанции
-                if (ec == SUCCESS_CODE)
-                {
-                    snprintf(message, MAX_STRING_LENGTH, "Введите длину дороги из %s в %s: ", city_name_1, city_name_2);
-                    ec = input_size(&distance_1_to_2, message);
-                }
-                if (ec == SUCCESS_CODE)
-                {
-                    snprintf(message, MAX_STRING_LENGTH, "Введите длину дороги из %s в %s: ", city_name_2, city_name_1);
-                    ec = input_size(&distance_2_to_1, message);
-                }
-
+                    
                 // добавляем дорогу
                 if (ec == SUCCESS_CODE)
                     ec = add_road_to_graph(graph, city1_index, city2_index, distance_1_to_2, distance_2_to_1);
                 break;
-            
-            case MANUAL_COMPLEX_INPUT:
-                // TODO
-                break;
 
             case MANUAL_REMOVE_CITY:
-                // TODO
+                ec = input_string(&word, "Введите название удаляемого города: ");
+                if (ec == SUCCESS_CODE)
+                    ec = remove_city_from_graph(graph, (const char *)word);
                 break;
 
             case MANUAL_REMOVE_ROAD:
-                // TODO
+                // вводим города и дистанции
+                ec = get_two_cities_and_distances(&city_name_1, &city_name_2, &distance_1_to_2, &distance_2_to_1);
+
+                // проверяем корректность данных и получаем индексы городов в матрице
+                if (ec == SUCCESS_CODE)
+                    ec = get_cities_indexes(graph, (const char *)city_name_1, (const char *)city_name_2, &city1_index, &city2_index);
+                    
+                // добавляем дорогу
+                if (ec == SUCCESS_CODE)
+                    ec = remove_road_from_graph(graph, city1_index, city2_index);
                 break;
             
             default:

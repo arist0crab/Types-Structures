@@ -45,7 +45,6 @@ typedef enum
     BACK_TO_MENU,
     MANUAL_ADD_CITY,
     MANUAL_ADD_ROAD,
-    MANUAL_COMPLEX_INPUT,
     MANUAL_REMOVE_CITY,
     MANUAL_REMOVE_ROAD
 } manual_menu_option_t;
