@@ -5,6 +5,8 @@ status_t process_manual_input(graph_t *graph);
 status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
 {
     status_t ec = SUCCESS_CODE;
+    size_t t_distance = 0;
+    char *word = NULL;
 
     if (!graph) ec = ERR_ARGS;
 
@@ -13,6 +15,10 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
         switch (menu_option)
         {
             case EXIT_PROGRAM:
+                break;
+
+            case CLEAR_GRAPH:
+                ec = clear_graph(graph);
                 break;
 
             case MANUALLY_DATA_INPUT:
@@ -24,11 +30,15 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
                 break;
 
             case SET_CAPITAL:
-                // TODO
+                ec = input_string(&word, "Введите новую столицу: ");
+                if (ec == SUCCESS_CODE)
+                    ec = set_graph_capital(graph, (const char *)word);
                 break;
 
             case SET_T_DISTANCE:
-                // TODO
+                ec = input_size(&t_distance, "Введите расстояние Т: ");
+                if (ec == SUCCESS_CODE)
+                    ec = set_graph_t_distance(graph, t_distance);
                 break;
 
             case FIND_SHORTEST_ROUTE_BETWEEN_TWO_CITIES:

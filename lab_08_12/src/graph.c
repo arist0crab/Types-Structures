@@ -2,6 +2,45 @@
 
 status_t find_start_matrix_data_ptr(size_t **matrix, size_t matrix_rows_quantity, size_t **matrix_data_start_ptr);
 
+status_t set_graph_t_distance(graph_t *graph, size_t t_distance)
+{
+    if (!graph) return ERR_ARGS;
+
+    graph->t_distance = t_distance;
+
+    return SUCCESS_CODE;
+}
+
+status_t set_graph_capital(graph_t *graph, const char *capital)
+{
+    if (!graph || !capital || capital[0] == '\0') return ERR_ARGS;
+
+    if (graph->capital) free(graph->capital);
+    graph->capital = str_dynamic_copy(capital);
+
+    return SUCCESS_CODE;
+}
+
+status_t clear_graph(graph_t *graph)
+{
+    size_t *matrix_elems_block_start = NULL;
+
+    if (!graph) return ERR_ARGS;
+
+    if (graph->cities_names)
+        for (size_t i = 0; i < graph->max_vertices_quantity; i++)
+            if (graph->cities_names[i]) free(graph->cities_names[i]);
+
+    find_start_matrix_data_ptr(graph->roads, graph->cities_quantity, &matrix_elems_block_start);
+    if (graph->roads) memset(matrix_elems_block_start, 0, graph->max_vertices_quantity * graph->max_vertices_quantity);
+
+    if (graph->capital) free(graph->capital);
+    graph->cities_quantity = 0;
+    graph->t_distance = 0;
+
+    return SUCCESS_CODE;
+}
+
 status_t init_graph(graph_t *graph, size_t cities_quantity)
 {
     status_t ec = SUCCESS_CODE;
@@ -11,7 +50,7 @@ status_t init_graph(graph_t *graph, size_t cities_quantity)
 
     graph->max_vertices_quantity = cities_quantity * 2;
     graph->cities_quantity = cities_quantity;
-    graph->target_distance = 0;
+    graph->t_distance = 0;
     graph->cities_names = NULL;
     graph->capital = NULL;
     graph->roads = NULL;

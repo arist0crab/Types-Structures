@@ -24,3 +24,55 @@ status_t input_cur_menu_opt(int *cur_menu_opt, int const menu_points_quantity)
 
     return ec;
 }
+
+status_t input_string(char **word, const char *message)
+{
+    status_t ec = SUCCESS_CODE;
+    char buffer[MAX_STRING_LENGTH];
+    char extra;
+
+    if (!word)
+        ec = ERR_ARGS;
+
+    if (ec == SUCCESS_CODE)
+    {
+        printf("%s%s%s", BLUE, message, RESET);
+        if (scanf("%s", buffer) != 1)
+            ec = ERR_IO;
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        *word = malloc(strlen(buffer) + 1);
+        if (!(*word))
+            ec = ERR_MEM;
+    }
+
+    if (ec == SUCCESS_CODE)
+        strcpy(*word, buffer);
+
+    // чистим буфер
+    while ((extra = getchar()) != '\n' && extra != EOF);
+
+    return ec;
+}
+
+status_t input_size(size_t *size, const char *message)
+{
+    status_t ec = SUCCESS_CODE;
+    char extra;
+
+    if (!size) ec = ERR_ARGS;
+
+    if (ec == SUCCESS_CODE)
+    {
+        printf("%s%s%s", BLUE, message, RESET);
+        if (scanf("%lu", size) != 1 || size == 0)
+            ec = ERR_IO;
+    }
+
+    // чистим буфер
+    while ((extra = getchar()) != '\n' && extra != EOF);
+
+    return ec;
+}

@@ -2,7 +2,7 @@
 #define __DATA_H__
 
 #define MAX_STRING_LENGTH 256
-#define MENU_OPTIONS_QUANTITY 10
+#define MENU_OPTIONS_QUANTITY 11
 
 typedef enum 
 {
@@ -19,7 +19,8 @@ typedef enum
     // выход из программы
     EXIT_PROGRAM,
     
-    // ввод графа
+    // работа с графом
+    CLEAR_GRAPH,
     MANUALLY_DATA_INPUT,
     FILE_DATA_INPUT,
 

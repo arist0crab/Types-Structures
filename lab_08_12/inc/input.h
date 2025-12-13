@@ -9,5 +9,7 @@
 
 // TODO добавить doxygen
 status_t input_cur_menu_opt(int *cur_menu_opt, int const menu_points_quantity);
+status_t input_string(char **word, const char *message);
+status_t input_size(size_t *size, const char *message);
 
 #endif
