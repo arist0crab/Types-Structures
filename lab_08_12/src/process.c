@@ -6,8 +6,10 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
 {
     status_t ec = SUCCESS_CODE;
     size_t t_distance = 0;
-    size_t graph_capacity = 0;
+    size_t graph_cities = 0;
     char *word = NULL, *filename = NULL;
+    char cmd[MAX_STRING_LENGTH];
+    FILE *filestream = NULL;
 
     if (!graph) ec = ERR_ARGS;
 
@@ -19,9 +21,9 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
                 break;
 
             case CREATE_GRAPH:
-                ec = input_size(&graph_capacity, "Введите вместимость графа (вершины): ");
+                ec = input_size(&graph_cities, "Введите кол-во городов нового графа: ");
                 if (ec == SUCCESS_CODE)
-                    ec = init_graph(graph, graph_capacity);
+                    ec = init_graph(graph, graph_cities);
                 break;
 
             case DESTROY_GRAPH:
@@ -33,7 +35,21 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
                 break;
 
             case FILE_DATA_INPUT:
-                // TODO
+                if (graph->cities_names || graph->roads) free_graph(graph);  // освобождаем старый граф
+
+                if (ec == SUCCESS_CODE)
+                    ec = input_string(&filename, "Введите имя файла с графом: ");
+                if (ec == SUCCESS_CODE)
+                {
+                    filestream = fopen(filename, "r");
+                    if (!filestream) ec = ERR_FILE;
+                }
+
+                if (ec == SUCCESS_CODE)
+                    ec = input_graph_from_file(graph, filestream);
+
+                if (filestream) fclose(filestream);
+
                 break;
 
             case SET_CAPITAL:
@@ -65,9 +81,17 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
                 break;
 
             case PRINT_GRAPH:
-                ec = input_string(&filename, "Введите имя файла: ");
+                if (!graph || !graph->cities_names  || !graph->roads)
+                    ec = ERR_GRAPH_DOESNT_EXIST;
                 if (ec == SUCCESS_CODE)
-                    ec = export_graph_to_dot_file(graph, filename);
+                    ec = input_string(&filename, "Введите имя файла (картинка графа): ");
+                if (ec == SUCCESS_CODE)
+                    ec = export_graph_to_dot_file(graph, "file.dot");
+                if (ec == SUCCESS_CODE)
+                {
+                    snprintf(cmd, sizeof(cmd), "dot -Tpng \"%s\" -o \"%s\"", "file.dot", filename);
+                    ec = system(cmd);
+                }
                 break;
             
             default:
@@ -104,14 +128,21 @@ status_t process_manual_input(graph_t *graph)
                 break;
 
             case MANUAL_ADD_CITY:
-                ec = input_string(&word, "Введите название нового города: ");
+                if (!graph || !graph->cities_names  || !graph->roads)
+                    ec = ERR_GRAPH_DOESNT_EXIST;
+                if (ec == SUCCESS_CODE)
+                    ec = input_string(&word, "Введите название нового города: ");
                 if (ec == SUCCESS_CODE)
                     ec = add_city_to_graph(graph, (const char *)word);
                 break;
             
             case MANUAL_ADD_ROAD:
+                if (!graph || !graph->cities_names  || !graph->roads)
+                    ec = ERR_GRAPH_DOESNT_EXIST;
+
                 // вводим города и дистанции
-                ec = get_two_cities_and_distances(&city_name_1, &city_name_2, &distance_1_to_2, &distance_2_to_1);
+                if (ec == SUCCESS_CODE)
+                    ec = get_two_cities_and_distances(&city_name_1, &city_name_2, &distance_1_to_2, &distance_2_to_1);
 
                 // проверяем корректность данных и получаем индексы городов в матрице
                 if (ec == SUCCESS_CODE)

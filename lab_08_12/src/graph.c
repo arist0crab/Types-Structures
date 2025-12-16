@@ -3,6 +3,77 @@
 status_t find_city_in_graph(graph_t *graph, const char *city, ssize_t *index_city);
 status_t find_start_matrix_data_ptr(size_t **matrix, size_t matrix_rows_quantity, size_t **matrix_data_start_ptr);
 
+status_t check_graph_exists(graph_t *graph)
+{
+    if (!graph || !graph->cities_names || !graph->roads)
+        return ERR_GRAPH_DOESNT_EXIST;
+
+    if (!graph->capital || graph->cities_quantity == 0 || graph->t_distance == 0)
+        return ERR_INVALID_GRAPH_DATA;
+
+    return SUCCESS_CODE;
+}
+
+status_t input_graph_from_file(graph_t *graph, FILE *filestream)
+{
+    status_t ec = SUCCESS_CODE;
+    size_t t_distance = 0, cities_quantity = 0;
+    char city1[MAX_STRING_LENGTH], city2[MAX_STRING_LENGTH];
+    size_t indx1 = -1, indx2 = -1;
+    size_t distance_1_to_2 = 0, distance_2_to_1 = 0;
+    char buf[MAX_STRING_LENGTH];
+    int rc;
+
+    if (graph->cities_names || graph->roads) free_graph(graph);
+
+    rewind(filestream);
+    ec = read_size_from_file(filestream, &t_distance);
+    if (ec == SUCCESS_CODE)
+        ec = read_size_from_file(filestream, &cities_quantity);
+
+    if (ec == SUCCESS_CODE && cities_quantity == 0)
+        ec = ERR_RANGE;
+
+    if (ec == SUCCESS_CODE)
+        ec = init_graph(graph, cities_quantity);
+
+    if (ec == SUCCESS_CODE)
+        graph->t_distance = t_distance;
+
+    for (size_t i = 0; ec == SUCCESS_CODE && i < cities_quantity; i++)
+    {
+        if (fscanf(filestream, "%s", buf) != 1)
+            ec = ERR_FILE;
+        if (ec == SUCCESS_CODE)
+            ec = add_city_to_graph(graph, (const char *)buf);
+    }
+
+    if (ec == SUCCESS_CODE)
+    {
+        if (fscanf(filestream, "%s", buf) != 1)
+            ec = ERR_FILE;
+        else
+            ec = set_graph_capital(graph, (const char *)buf);
+    }
+    
+    if (ec == SUCCESS_CODE)
+        rc = fscanf(filestream, "%s %s %lu %lu", city1, city2, &distance_1_to_2, &distance_2_to_1);
+    while (rc == 4 && ec == SUCCESS_CODE)
+    {
+        ec = get_cities_indexes(graph, city1, city2, &indx1, &indx2);
+        if (ec == SUCCESS_CODE)
+        {
+            ec = add_road_to_graph(graph, indx1, indx2, distance_1_to_2, distance_2_to_1);
+            rc = fscanf(filestream, "%s %s %lu %lu", city1, city2, &distance_1_to_2, &distance_2_to_1);
+        }
+    }
+
+    // если что-то пошло не так, уничтожаем все
+    if (ec != SUCCESS_CODE) free_graph(graph);
+    
+    return ec;
+}
+
 status_t export_graph_to_dot_file(graph_t *graph, const char *filename)
 {
     status_t ec = SUCCESS_CODE;
@@ -17,8 +88,12 @@ status_t export_graph_to_dot_file(graph_t *graph, const char *filename)
     if (ec == SUCCESS_CODE)
     {
         fprintf(filestream, "digraph G {\n");
-        fprintf(filestream, "   node [shape=\"circle\", style=\"filled\", fillcolor=\"blue\", fontcolor=\"#FFFFFF\"];\n");
+        fprintf(filestream, "   node [shape=\"circle\", style=\"filled\", fillcolor=\"#8cafdd\", fontcolor=\"#102034\"];\n");
         fprintf(filestream, "   rankdir=\"LR\";\n");
+
+        for (size_t i = 0; i < graph->cities_quantity; i++)
+            if (graph->cities_names[i])
+                fprintf(filestream, "   \"%s\";\n", graph->cities_names[i]);
 
         for (size_t i = 0; i < graph->cities_quantity; i++)
             for (size_t j = 0; j < graph->cities_quantity; j++)
@@ -47,7 +122,7 @@ status_t remove_road_from_graph(graph_t *graph, size_t index_city_1, size_t inde
 
 status_t add_road_to_graph(graph_t *graph, size_t index_city_1, size_t index_city_2, size_t distance_1_to_2, size_t distance_2_to_1)
 {
-    if (!graph || graph->roads || distance_1_to_2 == 0 || distance_2_to_1 == 0)
+    if (!graph || !graph->roads || distance_1_to_2 == 0 || distance_2_to_1 == 0)
         return ERR_ARGS;
     if (index_city_1 >= graph->cities_quantity || index_city_2 >= graph->cities_quantity || index_city_1 == index_city_2)
         return ERR_RANGE;
@@ -76,7 +151,7 @@ status_t get_cities_indexes(graph_t *graph, const char *city_1, const char *city
             found1 = true;
             *indx1 = i;
         }
-        if (strcmp(graph->cities_names[i], city_2) == 0)
+        if (str_iequal(graph->cities_names[i], city_2) == 0)
         {
             found2 = true;
             *indx2 = i;
@@ -135,7 +210,10 @@ status_t add_city_to_graph(graph_t *graph, const char *city)
     status_t ec = SUCCESS_CODE;
     ssize_t city_index = -1;
 
-    if (!graph || !city || graph->cities_quantity >= graph->max_vertices_quantity) 
+    if (!graph || !graph->cities_names  || !graph->roads)
+        return ERR_GRAPH_DOESNT_EXIST;
+
+    if (!city || graph->cities_quantity >= graph->max_vertices_quantity) 
         return ERR_ARGS;
 
     // освобождаем стару строку, если она была
@@ -234,7 +312,7 @@ status_t init_graph(graph_t *graph, size_t cities_quantity)
     if (!graph || cities_quantity == 0) return ERR_ARGS;
 
     graph->max_vertices_quantity = cities_quantity * 2;
-    graph->cities_quantity = cities_quantity;
+    graph->cities_quantity = 0;
     graph->t_distance = 0;
     graph->cities_names = NULL;
     graph->capital = NULL;
@@ -287,9 +365,14 @@ status_t free_graph(graph_t *graph)
 
     if (graph->capital) free(graph->capital);
 
-    find_start_matrix_data_ptr(graph->roads, graph->max_vertices_quantity, &matrix_elems_block_start);
+    if (graph->roads)
+        find_start_matrix_data_ptr(graph->roads, graph->max_vertices_quantity, &matrix_elems_block_start);
     if (matrix_elems_block_start) free(matrix_elems_block_start);
     if (graph->roads) free(graph->roads);
+
+    graph->cities_names = NULL;
+    graph->capital = NULL;
+    graph->roads = NULL;
 
     return SUCCESS_CODE;
 }

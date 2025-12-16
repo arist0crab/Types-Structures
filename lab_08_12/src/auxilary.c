@@ -40,3 +40,19 @@ int str_iequal(const char *s1, const char *s2)
     
     return (*s1 == '\0') - (*s2 == '\0');
 }
+
+status_t read_size_from_file(FILE *filestream, size_t *size)
+{
+    status_t ec = SUCCESS_CODE;
+    size_t temp_size;
+
+    if (!filestream || !size) return ERR_ARGS;
+
+    if (fscanf(filestream, "%lu", &temp_size) != 1)
+        ec = ERR_FILE;
+
+    if (ec == SUCCESS_CODE)
+        *size = temp_size;
+
+    return ec;
+}

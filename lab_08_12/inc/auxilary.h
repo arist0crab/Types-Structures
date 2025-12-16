@@ -10,5 +10,6 @@
 // TODO добавить doxygen
 char *str_dynamic_copy(const char *s);
 int str_iequal(const char *s1, const char *s2);
+status_t read_size_from_file(FILE *filestream, size_t *size);
 
 #endif

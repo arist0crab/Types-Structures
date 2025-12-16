@@ -1,0 +1,9 @@
+10
+5
+Moscow Drezden Florida NewYork Saratov
+Moscow
+Moscow Drezden 10 15
+Drezden Florida 6 17
+Florida NewYork 5 5
+Saratov Drezden 17 71
+Moscow Saratov 52 52

@@ -32,5 +32,8 @@ status_t remove_road_from_graph(graph_t *graph, size_t index_city_1, size_t inde
 status_t remove_city_from_graph(graph_t *graph, const char *city);
 status_t export_graph_to_dot_file(graph_t *graph, const char *filename);
 status_t init_graph(graph_t *graph, size_t cities_quantity);
+status_t input_graph_from_file(graph_t *graph, FILE *filestream);
+status_t check_graph_exists(graph_t *graph);
+status_t check_graph_exists(graph_t *graph);
 
 #endif

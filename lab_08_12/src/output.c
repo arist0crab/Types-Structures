@@ -96,6 +96,14 @@ status_t print_exit_code_result(status_t exit_code)
             printf("%sПроизошла ошибка: элемент уже существует\n%s", RED_BOLD, RESET);
             break;
 
+        case ERR_GRAPH_DOESNT_EXIST:
+            printf("%sГраф не существует. Попробуйте инициализировать граф (пункт меню №1)\n%s", RED_BOLD, RESET);
+            break;
+
+        case ERR_INVALID_GRAPH_DATA:
+            printf("%sНевалидные данные графа. Проверьте поля 'столица', 'вершины', 'кол-во городов'\n%s", RED_BOLD, RESET);
+            break;
+
         default:
             ec = ERR_RANGE;
             break;
