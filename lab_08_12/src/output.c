@@ -80,6 +80,10 @@ status_t print_exit_code_result(status_t exit_code)
             printf("%sПроизошла ошибка при работе с файлом%s\n", RED_BOLD, RESET);
             break;
 
+        case ERR_NO_PATH:
+            printf("%sМежду указанными вершинами пути нет%s\n", RED_BOLD, RESET);
+            break;
+
         case ERR_RANGE:
             printf("%sПроизошла ошибка обработки массива или обработки количества чего-либо :(\n%s", RED_BOLD, RESET);
             break; 

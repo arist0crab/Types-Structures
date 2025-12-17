@@ -12,6 +12,7 @@ typedef enum
     ERR_MEM,
     ERR_ARGS,
     ERR_FILE,
+    ERR_NO_PATH,
     ERR_NOT_FOUND,
     ERR_GRAPH_DOESNT_EXIST,
     ERR_INVALID_GRAPH_DATA,

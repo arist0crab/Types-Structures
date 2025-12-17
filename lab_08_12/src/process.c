@@ -5,8 +5,10 @@ status_t process_manual_input(graph_t *graph);
 status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
 {
     status_t ec = SUCCESS_CODE;
-    size_t t_distance = 0;
-    size_t graph_cities = 0;
+    // TODO упорядочить
+    size_t t_distance = 0, graph_cities = 0;
+    char *city1 = NULL, *city2 = NULL; 
+    size_t indx1 = 0, indx2 = 0;
     char *word = NULL, *filename = NULL;
     char cmd[MAX_STRING_LENGTH];
     FILE *filestream = NULL;
@@ -53,18 +55,32 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
                 break;
 
             case SET_CAPITAL:
-                ec = input_string(&word, "Введите новую столицу: ");
+                if (!graph || !graph->cities_names  || !graph->roads)
+                    ec = ERR_GRAPH_DOESNT_EXIST;
+                if (ec == SUCCESS_CODE)
+                    ec = input_string(&word, "Введите новую столицу: ");
                 if (ec == SUCCESS_CODE)
                     ec = set_graph_capital(graph, (const char *)word);
                 break;
 
             case SET_T_DISTANCE:
-                ec = input_size(&t_distance, "Введите расстояние Т: ");
+                if (!graph || !graph->cities_names  || !graph->roads)
+                    ec = ERR_GRAPH_DOESNT_EXIST;
+                if (ec == SUCCESS_CODE)
+                    ec = input_size(&t_distance, "Введите расстояние Т: ");
                 if (ec == SUCCESS_CODE)
                     ec = set_graph_t_distance(graph, t_distance);
                 break;
 
             case FIND_SHORTEST_ROUTE_BETWEEN_TWO_CITIES:
+                if (!graph || !graph->cities_names  || !graph->roads)
+                    ec = ERR_GRAPH_DOESNT_EXIST;
+                if (ec == SUCCESS_CODE)
+                    ec = input_string(&city1, "Введите город отправления: ");
+                if (ec == SUCCESS_CODE)
+                    ec = input_string(&city2, "Введите город назначения: ");
+                if (ec == SUCCESS_CODE)
+                    ec = get_cities_indexes(graph, (const char *)city1, (const char *)city2, &indx1, &indx2);
                 // TODO
                 break;
 
@@ -154,14 +170,21 @@ status_t process_manual_input(graph_t *graph)
                 break;
 
             case MANUAL_REMOVE_CITY:
-                ec = input_string(&word, "Введите название удаляемого города: ");
+                if (!graph || !graph->cities_names  || !graph->roads)
+                    ec = ERR_GRAPH_DOESNT_EXIST;
+                if (ec == SUCCESS_CODE)
+                    ec = input_string(&word, "Введите название удаляемого города: ");
                 if (ec == SUCCESS_CODE)
                     ec = remove_city_from_graph(graph, (const char *)word);
                 break;
 
             case MANUAL_REMOVE_ROAD:
+                if (!graph || !graph->cities_names  || !graph->roads)
+                    ec = ERR_GRAPH_DOESNT_EXIST;
+
                 // вводим города и дистанции
-                ec = get_two_cities_and_distances(&city_name_1, &city_name_2, &distance_1_to_2, &distance_2_to_1);
+                if (ec == SUCCESS_CODE)
+                    ec = get_two_cities_and_distances(&city_name_1, &city_name_2, &distance_1_to_2, &distance_2_to_1);
 
                 // проверяем корректность данных и получаем индексы городов в матрице
                 if (ec == SUCCESS_CODE)

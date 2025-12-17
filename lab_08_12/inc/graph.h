@@ -9,6 +9,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <unistd.h>
+#include <stdint.h>
 
 typedef struct
 {
@@ -17,7 +18,7 @@ typedef struct
     size_t **roads;  // длины дорог
     size_t cities_quantity;  // количество городов
     size_t max_vertices_quantity;  // максимальное кол-во вершин графа
-    size_t t_distance;  // TODO
+    size_t t_distance;  // заданное расстояние Т
 } graph_t;
 
 // TODO написать doxygen
