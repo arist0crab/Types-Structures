@@ -41,6 +41,21 @@ int str_iequal(const char *s1, const char *s2)
     return (*s1 == '\0') - (*s2 == '\0');
 }
 
+status_t find_start_matrix_data_ptr(size_t **matrix, size_t matrix_rows_quantity, size_t **matrix_data_start_ptr)
+{
+    status_t ec = SUCCESS_CODE;
+    
+    if (!matrix || !matrix_data_start_ptr || matrix_rows_quantity == 0) 
+        return ERR_ARGS;
+
+    *matrix_data_start_ptr = matrix[0];
+    for (size_t i = 1; ec == SUCCESS_CODE && i < matrix_rows_quantity; i++)
+        if (matrix[i] < *matrix_data_start_ptr)
+            *matrix_data_start_ptr = matrix[i];
+    
+    return ec;
+}
+
 status_t read_size_from_file(FILE *filestream, size_t *size)
 {
     status_t ec = SUCCESS_CODE;

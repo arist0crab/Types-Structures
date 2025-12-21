@@ -37,7 +37,7 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
                 break;
 
             case FILE_DATA_INPUT:
-                if (graph->cities_names || graph->roads) free_graph(graph);  // освобождаем старый граф
+                if (graph && (graph->cities_names || graph->roads)) free_graph(graph);  // освобождаем старый граф
 
                 if (ec == SUCCESS_CODE)
                     ec = input_string(&filename, "Введите имя файла с графом: ");

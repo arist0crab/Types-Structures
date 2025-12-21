@@ -23,7 +23,6 @@ typedef struct
 
 // TODO написать doxygen
 status_t free_graph(graph_t *graph);
-status_t clear_graph(graph_t *graph);
 status_t set_graph_capital(graph_t *graph, const char *capital);
 status_t set_graph_t_distance(graph_t *graph, size_t t_distance);
 status_t add_city_to_graph(graph_t *graph, const char *city);
@@ -34,7 +33,5 @@ status_t remove_city_from_graph(graph_t *graph, const char *city);
 status_t export_graph_to_dot_file(graph_t *graph, const char *filename);
 status_t init_graph(graph_t *graph, size_t cities_quantity);
 status_t input_graph_from_file(graph_t *graph, FILE *filestream);
-status_t check_graph_exists(graph_t *graph);
-status_t check_graph_exists(graph_t *graph);
 
 #endif

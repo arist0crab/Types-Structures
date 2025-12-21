@@ -1,18 +1,6 @@
 #include "graph.h"
 
 status_t find_city_in_graph(graph_t *graph, const char *city, ssize_t *index_city);
-status_t find_start_matrix_data_ptr(size_t **matrix, size_t matrix_rows_quantity, size_t **matrix_data_start_ptr);
-
-status_t check_graph_exists(graph_t *graph)
-{
-    if (!graph || !graph->cities_names || !graph->roads)
-        return ERR_GRAPH_DOESNT_EXIST;
-
-    if (!graph->capital || graph->cities_quantity == 0 || graph->t_distance == 0)
-        return ERR_INVALID_GRAPH_DATA;
-
-    return SUCCESS_CODE;
-}
 
 status_t input_graph_from_file(graph_t *graph, FILE *filestream)
 {
@@ -133,39 +121,6 @@ status_t add_road_to_graph(graph_t *graph, size_t index_city_1, size_t index_cit
     return SUCCESS_CODE;
 }
 
-status_t get_cities_indexes(graph_t *graph, const char *city_1, const char *city_2, size_t  *indx1, size_t *indx2)
-{
-    status_t ec = SUCCESS_CODE;
-    bool found1 = false, found2 = false;
-
-    if (!graph || !graph->cities_names || !graph->cities_quantity || !indx1 || !indx2)
-        return ERR_ARGS;
-
-    *indx1 = 0;
-    *indx2 = 0;
-
-    for (size_t i = 0; i < graph->cities_quantity; i++)
-    {
-        if (str_iequal(graph->cities_names[i], city_1) == 0)
-        {
-            found1 = true;
-            *indx1 = i;
-        }
-        if (str_iequal(graph->cities_names[i], city_2) == 0)
-        {
-            found2 = true;
-            *indx2 = i;
-        }
-    }
-
-    // имена городов одинаковые
-    if (found1 && found2 && *indx1 == *indx2) ec = ERR_ARGS;
-    // если какой-то город не был найден
-    if (!found1 || !found2) ec = ERR_NOT_FOUND;
-
-    return ec;
-}
-
 status_t remove_city_from_graph(graph_t *graph, const char *city)
 {
     status_t ec = SUCCESS_CODE;
@@ -284,24 +239,37 @@ status_t find_city_in_graph(graph_t *graph, const char *city, ssize_t *index_cit
     return SUCCESS_CODE;
 }
 
-status_t clear_graph(graph_t *graph)
+status_t get_cities_indexes(graph_t *graph, const char *city_1, const char *city_2, size_t  *indx1, size_t *indx2)
 {
-    size_t *matrix_elems_block_start = NULL;
+    status_t ec = SUCCESS_CODE;
+    bool found1 = false, found2 = false;
 
-    if (!graph) return ERR_ARGS;
+    if (!graph || !graph->cities_names || !graph->cities_quantity || !indx1 || !indx2)
+        return ERR_ARGS;
 
-    if (graph->cities_names)
-        for (size_t i = 0; i < graph->max_vertices_quantity; i++)
-            if (graph->cities_names[i]) free(graph->cities_names[i]);
+    *indx1 = 0;
+    *indx2 = 0;
 
-    find_start_matrix_data_ptr(graph->roads, graph->cities_quantity, &matrix_elems_block_start);
-    if (graph->roads) memset(matrix_elems_block_start, 0, graph->max_vertices_quantity * graph->max_vertices_quantity);
+    for (size_t i = 0; i < graph->cities_quantity; i++)
+    {
+        if (str_iequal(graph->cities_names[i], city_1) == 0)
+        {
+            found1 = true;
+            *indx1 = i;
+        }
+        if (str_iequal(graph->cities_names[i], city_2) == 0)
+        {
+            found2 = true;
+            *indx2 = i;
+        }
+    }
 
-    if (graph->capital) free(graph->capital);
-    graph->cities_quantity = 0;
-    graph->t_distance = 0;
+    // имена городов одинаковые
+    if (found1 && found2 && *indx1 == *indx2) ec = ERR_ARGS;
+    // если какой-то город не был найден
+    if (!found1 || !found2) ec = ERR_NOT_FOUND;
 
-    return SUCCESS_CODE;
+    return ec;
 }
 
 status_t init_graph(graph_t *graph, size_t cities_quantity)
@@ -375,19 +343,4 @@ status_t free_graph(graph_t *graph)
     graph->roads = NULL;
 
     return SUCCESS_CODE;
-}
-
-status_t find_start_matrix_data_ptr(size_t **matrix, size_t matrix_rows_quantity, size_t **matrix_data_start_ptr)
-{
-    status_t ec = SUCCESS_CODE;
-    
-    if (!matrix || !matrix_data_start_ptr || matrix_rows_quantity == 0) 
-        return ERR_ARGS;
-
-    *matrix_data_start_ptr = matrix[0];
-    for (size_t i = 1; ec == SUCCESS_CODE && i < matrix_rows_quantity; i++)
-        if (matrix[i] < *matrix_data_start_ptr)
-            *matrix_data_start_ptr = matrix[i];
-    
-    return ec;
 }
