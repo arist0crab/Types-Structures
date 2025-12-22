@@ -1,24 +1,27 @@
-#include "../inc/process.h"  // TODO
+#include "process.h"
 
 status_t process_manual_input(graph_t *graph);
 
 status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
 {
     status_t ec = SUCCESS_CODE;
-    // TODO упорядочить
+    // кол-во городов графа
     size_t graph_cities = 0;
+    // имена городов и их инддексы
     char *city1 = NULL, *city2 = NULL; 
     size_t indx1 = 0, indx2 = 0;
+    // переменные для слов (город, имя файла, команда)
     char *word = NULL, *filename = NULL;
     char cmd[MAX_STRING_LENGTH];
+    // файловый поток
     FILE *filestream = NULL;
-
+    // массив дистанций между городами и дистанция Т
     size_t *distances = NULL;
-
     size_t distance_t = 0;
+    // массив индексов городов, которые находятся дальше чем distance_t
     size_t *farther_t_distance_cities = NULL;
     size_t farther_t_distance_cities_quantity = 0;
-
+    // переменная, указывающая на связность графа
     bool if_graph_connected = false;
 
     if (!graph) ec = ERR_ARGS;

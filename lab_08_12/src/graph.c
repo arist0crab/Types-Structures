@@ -31,7 +31,18 @@ status_t is_graph_connected(const graph_t *graph, bool *is_connected)
     return ec;
 }
 
-// TODO написать что это за функция
+/**
+ * @brief Рекурсивный обход графа в глубину (DFS) для проверки достижимости вершин.
+ * 
+ * Помечает текущую вершину как посещенную и рекурсивно обходит всех непосещенных
+ * соседей. При обнаружении ошибки немедленно возвращает статус вверх по стеку вызовов.
+ * 
+ * @param[in] current Индекс текущей вершины (город) для обхода.
+ * @param[in,out] visited Массив флагов посещенных вершин.
+ * @param[in] graph Указатель на структуру графа.
+ * 
+ * @return Статус выполнения.
+ */
 status_t dfs(size_t current, bool *visited, const graph_t *graph) 
 {
     status_t ec = SUCCESS_CODE;
@@ -107,7 +118,6 @@ status_t find_min_distance(size_t dist[], bool included[], size_t cities_quantit
     return found ? SUCCESS_CODE : ERR_NO_PATH;
 }
 
-// TODO можно улучшить и добавить отображение пути
 status_t dijkstra_graph(graph_t *graph, size_t src, size_t **dist_out)
 {
     status_t ec = SUCCESS_CODE;

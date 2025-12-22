@@ -7,7 +7,11 @@
 #include "output.h"
 #include "auxilary.h"
 
-// TODO добавить doxygen
+/** @brief Функция для обработки выбранного пункта меню.
+ * @param[in] menu_option Выбранная опция меню.
+ * @param[in] graph Указатель на исходный граф.
+ * @return Статус выполнения.
+*/
 status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph);
 
 #endif

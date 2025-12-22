@@ -1,4 +1,4 @@
-#include "../inc/data.h"  // TODO
+#include "data.h"
 #include "graph.h"
 #include "output.h"
 #include "../inc/input.h"

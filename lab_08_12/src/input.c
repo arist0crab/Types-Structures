@@ -1,4 +1,4 @@
-#include "../inc/input.h"  // TODO
+#include "input.h"
 
 status_t input_cur_menu_opt(int *cur_menu_opt, int const menu_points_quantity)
 {
