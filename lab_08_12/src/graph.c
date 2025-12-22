@@ -2,6 +2,80 @@
 
 status_t find_city_in_graph(graph_t *graph, const char *city, ssize_t *index_city);
 
+/** @brief Выбирает следующую вершину для обработки в алгоритме Дейкстры 
+ * (жадный алгоритм).
+ * Относительно начальной точки (т.е. относительно одного из городов, между
+ * которыми мы ищем кратчайшее растояние) ищет ближайший непосещенный город.
+ * @param[in] dist Массив расстояний между городами
+ * @param[in] included Массив статусов городов: посещен / не посещен.
+ * @param[in] cities_quantity Количество городов.
+ * @param[out] min_index Указатель на индекс до ближайшего непосещенного города.
+ * @return Статус выполнения.
+ */
+status_t find_min_distance(size_t dist[], bool included[], size_t cities_quantity, size_t *min_index)
+{
+    bool found = false;
+    size_t min = SIZE_MAX;
+    *min_index = SIZE_MAX;
+    
+    for (size_t v = 0; v < cities_quantity; v++) 
+    {
+        if (!included[v] && dist[v] < min) 
+        { 
+            min = dist[v];
+            *min_index = v;
+            found = true;
+        }
+    }
+    
+    return found ? SUCCESS_CODE : ERR_NO_PATH;
+}
+
+// TODO можно улучшить и добавить отображение пути
+status_t dijkstra_graph(graph_t *graph, size_t src, size_t **dist_out)
+{
+    status_t ec = SUCCESS_CODE;
+    bool *included = NULL;
+    size_t u;
+
+    if (!graph || src >= graph->cities_quantity || !dist_out)
+        return ERR_ARGS;
+        
+    *dist_out = calloc(graph->cities_quantity, sizeof(size_t));
+    included = calloc(graph->cities_quantity, sizeof(bool));
+    
+    if (!*dist_out || !included) 
+    {
+        if (*dist_out) free(*dist_out); 
+        if (included) free(included);
+        ec = ERR_MEM;
+    }
+    
+    // инициализация массива расстояний
+    if (ec == SUCCESS_CODE)
+    {
+        for (size_t i = 0; i < graph->cities_quantity; i++) 
+            (*dist_out)[i] = SIZE_MAX;
+        (*dist_out)[src] = 0;
+    }
+    
+    for (size_t count = 0; ec == SUCCESS_CODE && count < graph->cities_quantity - 1; count++) 
+    {
+        ec = find_min_distance(*dist_out, included, graph->cities_quantity, &u);
+        if (ec == SUCCESS_CODE) included[u] = true;
+        
+        // обновляем соседей
+        for (size_t v = 0; ec == SUCCESS_CODE && v < graph->cities_quantity; v++)
+            if (!included[v] && graph->roads[u][v] != SIZE_MAX && graph->roads[u][v] > 0 && (*dist_out)[u] != SIZE_MAX && (*dist_out)[u] + graph->roads[u][v] < (*dist_out)[v])
+                (*dist_out)[v] = (*dist_out)[u] + graph->roads[u][v];
+    }
+    
+    if (included) free(included);
+
+    return ec;
+}
+
+
 status_t input_graph_from_file(graph_t *graph, FILE *filestream)
 {
     status_t ec = SUCCESS_CODE;

@@ -13,6 +13,8 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
     char cmd[MAX_STRING_LENGTH];
     FILE *filestream = NULL;
 
+    size_t *distances = NULL;
+
     if (!graph) ec = ERR_ARGS;
 
     if (ec == SUCCESS_CODE)
@@ -81,7 +83,12 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
                     ec = input_string(&city2, "Введите город назначения: ");
                 if (ec == SUCCESS_CODE)
                     ec = get_cities_indexes(graph, (const char *)city1, (const char *)city2, &indx1, &indx2);
-                // TODO
+                if (ec == SUCCESS_CODE)
+                    // т.к. граф направленный, берем обязательно город №1
+                    ec = dijkstra_graph(graph, indx1, &distances);
+                if (ec == SUCCESS_CODE)
+                    print_dijkstra_result(graph, distances, indx1, indx2);
+                if (distances) free(distances);
                 break;
 
             case FIND_FURTHER_THAN_T_CITIES:

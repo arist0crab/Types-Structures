@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <limits.h>
 
 typedef struct
 {
@@ -33,5 +34,6 @@ status_t remove_city_from_graph(graph_t *graph, const char *city);
 status_t export_graph_to_dot_file(graph_t *graph, const char *filename);
 status_t init_graph(graph_t *graph, size_t cities_quantity);
 status_t input_graph_from_file(graph_t *graph, FILE *filestream);
+status_t dijkstra_graph(graph_t *graph, size_t src, size_t **dist);
 
 #endif

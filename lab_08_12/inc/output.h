@@ -3,11 +3,13 @@
 
 #include "data.h"
 #include "color.h"
+#include "graph.h"
 #include <stdio.h>
 
 // TODO добавить doxygen
 status_t print_menu(void);
 status_t print_exit_code_result(status_t exit_code);
 status_t print_manual_input_menu(void);
+status_t print_dijkstra_result(graph_t *graph, const size_t *distances, size_t index_start_city, size_t index_end_sity);
 
 #endif

@@ -54,6 +54,21 @@ status_t print_manual_input_menu(void)
     return SUCCESS_CODE;
 }
 
+status_t print_dijkstra_result(graph_t *graph, const size_t *distances, size_t index_start_city, size_t index_end_sity)
+{
+    if (!graph || index_start_city >= graph->cities_quantity || index_end_sity >= graph->cities_quantity || !distances)
+        return ERR_ARGS;
+
+    printf("%s", BLUE);
+    printf("╔══════════════════════════════════════════════╗\n");
+    printf("║              SHORTEST DISTANCE               ║\n");
+    printf("╚══════════════════════════════════════════════╝\n");
+    printf("%s -> %s: %lu\n", graph->cities_names[index_start_city], graph->cities_names[index_end_sity], distances[index_end_sity]);
+    printf("%s", BLUE);
+
+    return SUCCESS_CODE;
+}
+
 status_t print_exit_code_result(status_t exit_code)
 {
     status_t ec = SUCCESS_CODE;
