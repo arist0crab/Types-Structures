@@ -25,11 +25,10 @@ status_t print_menu(void)
     printf("║ 6. Найти кратчайшее между двумя городами     ║\n");
     printf("║ 7. Найти дальние города                      ║\n");
     printf("║ 8. Проверить связность графа                 ║\n");
-    printf("║ 9. Найти минимальный остов                   ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
     printf("║                ФУНКЦИИ ВЫВОДА                ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
-    printf("║ 10. Вывести граф                             ║\n");
+    printf("║ 9. Вывести граф                              ║\n");
     printf("╚══════════════════════════════════════════════╝\n");
     printf("%s", RESET);
 
@@ -75,6 +74,8 @@ status_t print_graph_connectivity_status(bool if_graph_connected)
     printf("║             ТЕКУЩИЙ ГРАФ %-9s           ║\n", if_graph_connected ? "СВЯЗНЫЙ" : "НЕСВЯЗНЫЙ");
     printf("╚══════════════════════════════════════════════╝\n");
     printf("%s", RESET);
+
+    return SUCCESS_CODE;
 }
 
 status_t print_farther_than_t_distance_cities(graph_t *graph, size_t *farther_t_distance_cities, size_t farther_t_distance_cities_quantity)

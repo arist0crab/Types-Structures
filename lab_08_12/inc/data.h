@@ -2,7 +2,7 @@
 #define __DATA_H__
 
 #define MAX_STRING_LENGTH 256
-#define MENU_OPTIONS_QUANTITY 11
+#define MENU_OPTIONS_QUANTITY 10
 
 typedef enum 
 {
@@ -38,7 +38,6 @@ typedef enum
     FIND_SHORTEST_ROUTE_BETWEEN_TWO_CITIES,
     FIND_FURTHER_THAN_T_CITIES,
     CONNECTIVITY_CHECK,
-    BUILD_MINIMAL_SKELETON,
 
     // функции вывода
     PRINT_GRAPH

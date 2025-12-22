@@ -109,10 +109,6 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
                     print_graph_connectivity_status(if_graph_connected);
                 break;
 
-            case BUILD_MINIMAL_SKELETON:
-                // TODO
-                break;
-
             case PRINT_GRAPH:
                 if (!graph || !graph->cities_names  || !graph->roads)
                     ec = ERR_GRAPH_DOESNT_EXIST;
