@@ -256,7 +256,7 @@ status_t export_graph_to_dot_file(graph_t *graph, const char *filename)
 
 status_t remove_road_from_graph(graph_t *graph, size_t index_city_1, size_t index_city_2)
 {
-    if (!graph || graph->roads)
+    if (!graph || !graph->roads)
         return ERR_ARGS;
     if (index_city_1 >= graph->cities_quantity || index_city_2 >= graph->cities_quantity || index_city_1 == index_city_2)
         return ERR_RANGE;

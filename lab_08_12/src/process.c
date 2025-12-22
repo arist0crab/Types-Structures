@@ -198,14 +198,18 @@ status_t process_manual_input(graph_t *graph)
                 if (!graph || !graph->cities_names  || !graph->roads)
                     ec = ERR_GRAPH_DOESNT_EXIST;
 
-                // вводим города и дистанции
+                // вводим города
                 if (ec == SUCCESS_CODE)
-                    ec = get_two_cities_and_distances(&city_name_1, &city_name_2, &distance_1_to_2, &distance_2_to_1);
+                {
+                    ec = input_string(&city_name_1, "Введите город №1: ");
+                    if (ec == SUCCESS_CODE)
+                        ec = input_string(&city_name_2, "Введите город №2: ");
+                }
 
                 // проверяем корректность данных и получаем индексы городов в матрице
                 if (ec == SUCCESS_CODE)
                     ec = get_cities_indexes(graph, (const char *)city_name_1, (const char *)city_name_2, &city1_index, &city2_index);
-                    
+
                 // добавляем дорогу
                 if (ec == SUCCESS_CODE)
                     ec = remove_road_from_graph(graph, city1_index, city2_index);
