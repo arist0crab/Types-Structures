@@ -6,7 +6,7 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
 {
     status_t ec = SUCCESS_CODE;
     // TODO упорядочить
-    size_t t_distance = 0, graph_cities = 0;
+    size_t graph_cities = 0;
     char *city1 = NULL, *city2 = NULL; 
     size_t indx1 = 0, indx2 = 0;
     char *word = NULL, *filename = NULL;
@@ -63,15 +63,6 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
                     ec = input_string(&word, "Введите новую столицу: ");
                 if (ec == SUCCESS_CODE)
                     ec = set_graph_capital(graph, (const char *)word);
-                break;
-
-            case SET_T_DISTANCE:
-                if (!graph || !graph->cities_names  || !graph->roads)
-                    ec = ERR_GRAPH_DOESNT_EXIST;
-                if (ec == SUCCESS_CODE)
-                    ec = input_size(&t_distance, "Введите расстояние Т: ");
-                if (ec == SUCCESS_CODE)
-                    ec = set_graph_t_distance(graph, t_distance);
                 break;
 
             case FIND_SHORTEST_ROUTE_BETWEEN_TWO_CITIES:

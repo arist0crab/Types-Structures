@@ -99,9 +99,6 @@ status_t input_graph_from_file(graph_t *graph, FILE *filestream)
     if (ec == SUCCESS_CODE)
         ec = init_graph(graph, cities_quantity);
 
-    if (ec == SUCCESS_CODE)
-        graph->t_distance = t_distance;
-
     for (size_t i = 0; ec == SUCCESS_CODE && i < cities_quantity; i++)
     {
         if (fscanf(filestream, "%s", buf) != 1)
@@ -264,15 +261,6 @@ status_t add_city_to_graph(graph_t *graph, const char *city)
     return ec;
 }
 
-status_t set_graph_t_distance(graph_t *graph, size_t t_distance)
-{
-    if (!graph) return ERR_ARGS;
-
-    graph->t_distance = t_distance;
-
-    return SUCCESS_CODE;
-}
-
 status_t set_graph_capital(graph_t *graph, const char *capital)
 {
     status_t ec = SUCCESS_CODE;
@@ -355,7 +343,6 @@ status_t init_graph(graph_t *graph, size_t cities_quantity)
 
     graph->max_vertices_quantity = cities_quantity * 2;
     graph->cities_quantity = 0;
-    graph->t_distance = 0;
     graph->cities_names = NULL;
     graph->capital = NULL;
     graph->roads = NULL;

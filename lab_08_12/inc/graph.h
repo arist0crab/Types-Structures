@@ -19,13 +19,11 @@ typedef struct
     size_t **roads;  // длины дорог
     size_t cities_quantity;  // количество городов
     size_t max_vertices_quantity;  // максимальное кол-во вершин графа
-    size_t t_distance;  // заданное расстояние Т
 } graph_t;
 
 // TODO написать doxygen
 status_t free_graph(graph_t *graph);
 status_t set_graph_capital(graph_t *graph, const char *capital);
-status_t set_graph_t_distance(graph_t *graph, size_t t_distance);
 status_t add_city_to_graph(graph_t *graph, const char *city);
 status_t get_cities_indexes(graph_t *graph, const char *city_1, const char *city_2, size_t  *indx1, size_t *indx2);
 status_t add_road_to_graph(graph_t *graph, size_t index_city_1, size_t index_city_2, size_t distance_1_to_2, size_t distance_2_to_1);

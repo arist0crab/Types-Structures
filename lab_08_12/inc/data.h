@@ -2,7 +2,7 @@
 #define __DATA_H__
 
 #define MAX_STRING_LENGTH 256
-#define MENU_OPTIONS_QUANTITY 12
+#define MENU_OPTIONS_QUANTITY 11
 
 typedef enum 
 {
@@ -33,7 +33,6 @@ typedef enum
 
     // ввод параметров
     SET_CAPITAL,
-    SET_T_DISTANCE,
 
     // алгоритмы обработки графовых структур
     FIND_SHORTEST_ROUTE_BETWEEN_TWO_CITIES,
