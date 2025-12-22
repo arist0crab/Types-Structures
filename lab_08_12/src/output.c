@@ -25,7 +25,7 @@ status_t print_menu(void)
     printf("║ 6. Найти кратчайшее между двумя городами     ║\n");
     printf("║ 7. Найти дальние города                      ║\n");
     printf("║ 8. Проверить связность графа                 ║\n");
-    printf("║ 9. Найти минимальный остов                  ║\n");
+    printf("║ 9. Найти минимальный остов                   ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
     printf("║                ФУНКЦИИ ВЫВОДА                ║\n");
     printf("╠══════════════════════════════════════════════╣\n");
@@ -63,9 +63,18 @@ status_t print_dijkstra_result(graph_t *graph, const size_t *distances, size_t i
     printf("║              SHORTEST DISTANCE               ║\n");
     printf("╚══════════════════════════════════════════════╝\n");
     printf("%s -> %s: %lu\n", graph->cities_names[index_start_city], graph->cities_names[index_end_sity], distances[index_end_sity]);
-    printf("%s", BLUE);
+    printf("%s", RESET);
 
     return SUCCESS_CODE;
+}
+
+status_t print_graph_connectivity_status(bool if_graph_connected)
+{
+    printf("%s", BLUE);
+    printf("╔══════════════════════════════════════════════╗\n");
+    printf("║             ТЕКУЩИЙ ГРАФ %-9s           ║\n", if_graph_connected ? "СВЯЗНЫЙ" : "НЕСВЯЗНЫЙ");
+    printf("╚══════════════════════════════════════════════╝\n");
+    printf("%s", RESET);
 }
 
 status_t print_farther_than_t_distance_cities(graph_t *graph, size_t *farther_t_distance_cities, size_t farther_t_distance_cities_quantity)

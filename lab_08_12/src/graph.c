@@ -1,6 +1,49 @@
 #include "graph.h"
 
 status_t find_city_in_graph(graph_t *graph, const char *city, ssize_t *index_city);
+status_t dfs(size_t current, bool *visited, const graph_t *graph);
+
+status_t is_graph_connected(const graph_t *graph, bool *is_connected) 
+{
+    status_t ec = SUCCESS_CODE;
+    *is_connected = false;
+    bool *visited = NULL;
+
+    if (!graph || !graph->cities_names || !graph->roads || !graph->capital || !is_connected)
+        return ERR_ARGS;
+
+    visited = calloc(graph->cities_quantity, sizeof(bool));
+    if (!visited) ec = ERR_MEM;
+    
+    if (ec == SUCCESS_CODE)
+        ec = dfs(0, visited, graph);
+    
+    if (ec == SUCCESS_CODE)
+    {
+        *is_connected = true;
+        for (size_t i = 0; *is_connected && i < graph->cities_quantity; i++)
+            if (!visited[i])
+                *is_connected = false;
+    }
+    
+    if (visited) free(visited);
+
+    return ec;
+}
+
+// TODO написать что это за функция
+status_t dfs(size_t current, bool *visited, const graph_t *graph) 
+{
+    status_t ec = SUCCESS_CODE;
+    size_t n = graph->cities_quantity;
+    visited[current] = true;
+    
+    for (size_t neighbor = 0; ec == SUCCESS_CODE && neighbor < n; neighbor++) 
+        if (neighbor != current && graph->roads[current] && graph->roads[current][neighbor] > 0 && !visited[neighbor])
+            ec = dfs(neighbor, visited, graph);
+    
+    return ec;
+}
 
 status_t find_cities_farther_than_t_distance(graph_t *graph, size_t distance_t, size_t **far_cities, size_t *count)
 {

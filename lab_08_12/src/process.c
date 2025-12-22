@@ -19,6 +19,8 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
     size_t *farther_t_distance_cities = NULL;
     size_t farther_t_distance_cities_quantity = 0;
 
+    bool if_graph_connected = false;
+
     if (!graph) ec = ERR_ARGS;
 
     if (ec == SUCCESS_CODE)
@@ -99,7 +101,12 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
                 break;
 
             case CONNECTIVITY_CHECK:
-                // TODO
+                if (!graph || !graph->cities_names  || !graph->roads || !graph->capital)
+                    ec = ERR_GRAPH_DOESNT_EXIST;
+                if (ec == SUCCESS_CODE)
+                    ec = is_graph_connected(graph, &if_graph_connected);
+                if (ec == SUCCESS_CODE)
+                    print_graph_connectivity_status(if_graph_connected);
                 break;
 
             case BUILD_MINIMAL_SKELETON:
