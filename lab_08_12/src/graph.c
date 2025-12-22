@@ -2,6 +2,39 @@
 
 status_t find_city_in_graph(graph_t *graph, const char *city, ssize_t *index_city);
 
+status_t find_cities_farther_than_t_distance(graph_t *graph, size_t distance_t, size_t **far_cities, size_t *count)
+{
+    status_t ec = SUCCESS_CODE;
+    ssize_t capital_index = -1;
+    size_t *distances = NULL;
+
+    if (!graph || !far_cities || !count || !graph->capital)
+        return ERR_ARGS;
+    
+    // ищем индекс столицы
+    ec = find_city_in_graph(graph, graph->capital, &capital_index);
+    if (ec == SUCCESS_CODE && capital_index == -1) ec = ERR_NO_PATH;
+    
+    // запускаем Дейкстру от столицы
+    if (ec == SUCCESS_CODE)
+        ec = dijkstra_graph(graph, capital_index, &distances);
+    
+    if (ec == SUCCESS_CODE)
+    {
+        *far_cities = malloc(graph->cities_quantity * sizeof(size_t));
+        if (!*far_cities) ec = ERR_MEM;
+    }
+    
+    *count = 0;
+    for (size_t i = 0; ec == SUCCESS_CODE && i < graph->cities_quantity; i++)
+        if (distances[i] > distance_t && distances[i] != SIZE_MAX)
+            (*far_cities)[(*count)++] = i;
+
+    if (distances) free(distances);
+
+    return ec;
+}
+
 /** @brief Выбирает следующую вершину для обработки в алгоритме Дейкстры 
  * (жадный алгоритм).
  * Относительно начальной точки (т.е. относительно одного из городов, между
@@ -74,7 +107,6 @@ status_t dijkstra_graph(graph_t *graph, size_t src, size_t **dist_out)
 
     return ec;
 }
-
 
 status_t input_graph_from_file(graph_t *graph, FILE *filestream)
 {
@@ -153,6 +185,9 @@ status_t export_graph_to_dot_file(graph_t *graph, const char *filename)
         for (size_t i = 0; i < graph->cities_quantity; i++)
             if (graph->cities_names[i])
                 fprintf(filestream, "   \"%s\";\n", graph->cities_names[i]);
+
+        if (graph->capital && graph->capital[0] != '\0')
+            fprintf(filestream, "   \"%s\" [fillcolor=\"#a38cde\", fontcolor=\"#1c1034ff\"];\n", graph->capital);
 
         for (size_t i = 0; i < graph->cities_quantity; i++)
             for (size_t j = 0; j < graph->cities_quantity; j++)

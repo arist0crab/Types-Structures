@@ -68,6 +68,26 @@ status_t print_dijkstra_result(graph_t *graph, const size_t *distances, size_t i
     return SUCCESS_CODE;
 }
 
+status_t print_farther_than_t_distance_cities(graph_t *graph, size_t *farther_t_distance_cities, size_t farther_t_distance_cities_quantity)
+{
+    if (!graph || !graph->cities_names || !graph->capital || !farther_t_distance_cities || !farther_t_distance_cities_quantity)
+        return ERR_ARGS;
+
+    printf("%s", BLUE);
+    printf("╔══════════════════════════════════════════════╗\n");
+    printf("║           ГОРОДА, СТОЛЬ ОТДАЛЕННЫЕ           ║\n");
+    printf("╠══════════════════════════════════════════════╣\n");
+    printf("║  Столица: %-34s ║\n", graph->capital);
+
+    for (size_t i = 0; i < farther_t_distance_cities_quantity; i++)
+        printf("║ %2lu. %-39s  ║\n", i, graph->cities_names[farther_t_distance_cities[i]]);
+
+    printf("╚══════════════════════════════════════════════╝\n");
+    printf("%s", BLUE);
+
+    return SUCCESS_CODE;
+}
+
 status_t print_exit_code_result(status_t exit_code)
 {
     status_t ec = SUCCESS_CODE;

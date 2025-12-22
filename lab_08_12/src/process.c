@@ -15,6 +15,10 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
 
     size_t *distances = NULL;
 
+    size_t distance_t = 0;
+    size_t *farther_t_distance_cities = NULL;
+    size_t farther_t_distance_cities_quantity = 0;
+
     if (!graph) ec = ERR_ARGS;
 
     if (ec == SUCCESS_CODE)
@@ -83,7 +87,15 @@ status_t procces_menu_choice(menu_option_t menu_option, graph_t *graph)
                 break;
 
             case FIND_FURTHER_THAN_T_CITIES:
-                // TODO
+                if (!graph || !graph->cities_names  || !graph->roads || !graph->capital)
+                    ec = ERR_GRAPH_DOESNT_EXIST;
+                if (ec == SUCCESS_CODE)
+                    ec = input_size(&distance_t, "Введите расстояние Т, будем искать места столь отдаленные: ");
+                if (ec == SUCCESS_CODE)
+                    ec = find_cities_farther_than_t_distance(graph, distance_t, &farther_t_distance_cities, &farther_t_distance_cities_quantity);
+                if (ec == SUCCESS_CODE)
+                    print_farther_than_t_distance_cities(graph, farther_t_distance_cities, farther_t_distance_cities_quantity);
+                if (farther_t_distance_cities) free(farther_t_distance_cities);
                 break;
 
             case CONNECTIVITY_CHECK:
