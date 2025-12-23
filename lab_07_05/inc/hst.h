@@ -1,32 +1,70 @@
-#ifndef __HST_H__
-#define __HST_H__
+#ifndef HASH_TABLE_H
+#define HASH_TABLE_H
 
-#include "data.h"
-#include "input.h"
-#include "auxiliary.h"
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "auxiliary.h"
 
-typedef struct hash_node {
+#define MAX_LOAD_FACTOR 0.7
+#define INITIAL_TABLE_SIZE 101
+
+typedef struct hash_node_t
+{
     char *word;
-    size_t tail_length;  // сколько узлов "прицепилось" к данному
-    struct hash_node *next;
+    int count;
+    struct hash_node_t *next;
+    bool is_deleted;
 } hash_node_t;
 
-typedef struct hash_table {
-    hash_node_t **data;     
-    size_t max_size;
-    size_t uniq_words_quantity;
-} hash_table_t;
+typedef struct
+{
+    hash_node_t **table;
+    int size;
+    int count;
+    int collisions;
+    int total_comparisons;
+    int searches_count;
+} hst_chaining_t;
 
-// TODO добавить doxygen
-status_t delete_hst_node(hash_table_t **table, const char *word);
-status_t user_init_table(hash_table_t **table);
-status_t print_hash_table(const hash_table_t *table);
-status_t build_hash_from_file(hash_table_t **table, const char *filename);
-status_t insert_hst_node(hash_table_t *table, const char *word);
-status_t clear_hst_table(hash_table_t **table);
-status_t resize_hst_table(hash_table_t **table);
+typedef struct
+{
+    char **keys;
+    int *counts;
+    bool *occupied;
+    bool *deleted;
+    int size;
+    int count;
+    int collisions;
+    int total_comparisons;
+    int searches_count;
+} hst_open_t;
+
+hst_chaining_t *create_hash_table_chaining(int size);
+void free_hash_table_chaining(hst_chaining_t *ht);
+unsigned int hash_function(const char *word, int table_size);
+void hash_table_insert_chaining(hst_chaining_t *ht, const char *word);
+hash_node_t *hash_table_search_chaining(hst_chaining_t *ht, const char *word, int *comparisons);
+void hash_table_delete_chaining(hst_chaining_t *ht, const char *word);
+void display_hash_table_chaining(hst_chaining_t *ht);
+void hash_table_statistics_chaining(hst_chaining_t *ht);
+void rehash_chaining(hst_chaining_t *ht);
+
+hst_open_t *create_hash_table_open(int size);
+void free_hash_table_open(hst_open_t *ht);
+void hash_table_insert_open(hst_open_t *ht, const char *word);
+int hash_table_search_open(hst_open_t *ht, const char *word, int *comparisons);
+void hash_table_delete_open(hst_open_t *ht, const char *word);
+void display_hash_table_open(hst_open_t *ht);
+void hash_table_statistics_open(hst_open_t *ht);
+void rehash_open(hst_open_t *ht);
+
+double calculate_load_factor_chaining(hst_chaining_t *ht);
+double calculate_load_factor_open(hst_open_t *ht);
+void build_hash_table_from_file_chaining(hst_chaining_t *ht, const char *filename);
+void build_hash_table_from_file_open(hst_open_t *ht, const char *filename);
+double get_average_comparisons_chaining(hst_chaining_t *ht);
+double get_average_comparisons_open(hst_open_t *ht);
 
 #endif

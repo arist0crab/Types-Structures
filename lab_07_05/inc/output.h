@@ -1,22 +1,18 @@
-#ifndef __OUTPUT_H__
-#define __OUTPUT_H__
+#ifndef OUTPUT_H
+#define OUTPUT_H
 
-#include "data.h"
-#include "color.h"
-#include "bst.h"
-#include "hst.h"
 #include <stdio.h>
+#include <string.h>
+#include "data.h"
+#include "hst.h"
+#include "color.h"
 
-// TODO добавить doxygen
-status_t print_menu(void);
-status_t print_exit_code_result(status_t exit_code);
-status_t print_insert_menu(char *target_word);
-status_t print_pretty_bst(bst_node_t *root);
-status_t print_hst_resize_warning(void);
-
-/* TODO
-status_t print_compare_find_operation_table(double time_balanced, double time_degenerate, double time_random);
-status_t print_compare_sort_operation_table(double time_balanced, double time_degenerate, double time_random);
-*/
+void print_menu(void);
+void print_result(const result_t exit_code);
+result_t print_chaining_hash_table(const hst_chaining_t *table);
+result_t print_open_hash_table(const hst_open_t *table);
+void print_compare_table(double average_tree_time_ns, double average_file_time_ns);
+void print_compare_trees_table(double average_balanced_time_ns, double average_degenerate_time_ns, double average_random_time_ns);
+void print_compare_trees_table_2(double average_balanced_time_ns, double average_degenerate_time_ns, double average_random_time_ns);
 
 #endif

@@ -1,310 +1,690 @@
-#include "hst.h"
+#define _GNU_SOURCE
+#include "../inc/hst.h"
+#include <math.h>
 
-// TODO разбить адекватно
-status_t free_hash_table(hash_table_t **table);
-status_t create_hash_table(hash_table_t **table, size_t table_size);
-status_t hash_djb2(const char *str, size_t table_size, size_t *hash_value);
-status_t find_word_in_hash_table(const hash_table_t *table, const char *word, hash_node_t **found_node);
-status_t free_hst_node(hash_node_t *hst_node);
+static int current_hash_func = 1;
 
-status_t build_hash_from_file(hash_table_t **table, const char *filename)
+hst_chaining_t *create_hash_table_chaining(int size)
 {
-    status_t ec = SUCCESS_CODE;
-    char **words = NULL;
-    size_t words_quantity = 0;
+    hst_chaining_t *ht = (hst_chaining_t *)malloc(sizeof(hst_chaining_t));
+    if (!ht)
+        return NULL;
 
-    if (!table || !(*table) || !filename)
-        ec = ERR_ARGS;
+    ht->size = size;
+    ht->count = 0;
+    ht->collisions = 0;
+    ht->total_comparisons = 0;
+    ht->searches_count = 0;
 
-    if (ec == SUCCESS_CODE)
-        ec = get_words_arr_from_file(filename, &words, &words_quantity);
+    ht->table = (hash_node_t **)calloc(size, sizeof(hash_node_t *));
+    if (!ht->table)
+    {
+        free(ht);
+        return NULL;
+    }
 
-    for (size_t i = 0; ec == SUCCESS_CODE && i < words_quantity; i++)
-        ec = insert_hst_node(*table, words[i]);
-    
-    free_words_arr(&words, words_quantity);
-
-    return ec;
+    return ht;
 }
 
-status_t user_init_table(hash_table_t **table)
+void free_hash_table_chaining(hst_chaining_t *ht)
 {
-    status_t ec = SUCCESS_CODE;
-    size_t temp_size = 0;
+    if (!ht)
+        return;
 
-    if (!table) ec = ERR_ARGS;
-
-    if (ec == SUCCESS_CODE)
-        ec = input_size(&temp_size);
-
-    if (ec == SUCCESS_CODE)
-        ec = create_hash_table(table, temp_size);
-
-    return ec;
-}
-
-status_t create_hash_table(hash_table_t **table, size_t table_size)
-{
-    status_t ec = SUCCESS_CODE;
-
-    if (!table) ec = ERR_ARGS;
-
-    if (ec == SUCCESS_CODE && *table)
-        free_hash_table(table);
-
-    if (ec == SUCCESS_CODE)
+    for (int i = 0; i < ht->size; i++)
     {
-        *table = malloc(sizeof(hash_table_t));
-        if (*table == NULL)
-            ec = ERR_MEM;
-    }
-
-    if (ec == SUCCESS_CODE)
-    {
-        (*table)->data = calloc(table_size, sizeof(hash_node_t *));
-        if ((*table)->data == NULL)
-            ec = ERR_MEM;
-    }
-
-    if (ec == SUCCESS_CODE)
-    {
-        (*table)->max_size = table_size;
-        (*table)->uniq_words_quantity = 0;
-    }
-
-    if (ec != SUCCESS_CODE)
-        ec = free_hash_table(table);
-
-    return ec;
-}
-
-status_t insert_hst_node(hash_table_t *table, const char *word)
-{
-    status_t ec = SUCCESS_CODE;
-
-    size_t idx = 0;
-    bool exists = false;
-    hash_node_t *node = NULL, *search_node = NULL;
-
-    if (!table || !word || word[0] == '\0')
-        ec = ERR_ARGS;
-
-    if (ec == SUCCESS_CODE)
-    {
-        find_word_in_hash_table(table, word, &search_node);
-        exists = (search_node != NULL);
-    }
-
-    if (ec == SUCCESS_CODE && !exists)
-        ec = hash_djb2(word, table->max_size, &idx);
-
-    if (ec == SUCCESS_CODE && !exists) 
-    {
-        node = malloc(sizeof(hash_node_t));
-        if (!node) ec = ERR_MEM;
-    }
-
-    if (ec == SUCCESS_CODE && !exists) 
-    {
-        node->word = str_dynamic_copy(word);
-        if (!node->word) ec = ERR_MEM;
-    }
-
-    if (ec == SUCCESS_CODE && !exists) 
-    {
-        node->next = table->data[idx];
-        table->data[idx] = node;
-        table->uniq_words_quantity++;
-        node->tail_length = (node->next) ? node->next->tail_length + 1 : 0;
-    }
-
-    if (ec != SUCCESS_CODE && node) 
-    {
-        if (node->word) free(node->word);
-        free(node);
-    }
-
-    return ec;
-}
-
-status_t find_word_in_hash_table(const hash_table_t *table, const char *word, hash_node_t **found_node)
-{
-    status_t ec = SUCCESS_CODE;
-
-    size_t idx = 0;
-    hash_node_t *current = NULL;
-
-    if (!table || !word || !found_node)
-        ec = ERR_ARGS;
-
-    if (ec == SUCCESS_CODE)
-        *found_node = NULL;
-
-    if (ec == SUCCESS_CODE)
-        ec = hash_djb2(word, table->max_size, &idx);
-
-    if (ec == SUCCESS_CODE)
-    {
-        current = table->data[idx];
+        hash_node_t *current = ht->table[i];
         while (current)
         {
-            if (strcmp(current->word, word) == 0)
-            {
-                *found_node = current;
-                break;
-            }
+            hash_node_t *temp = current;
             current = current->next;
+            free(temp);
         }
     }
 
-    return ec;
+    free(ht->table);
+    free(ht);
 }
 
-status_t delete_hst_node(hash_table_t **table, const char *word)
+// djb2
+unsigned int hash_function1(const char *word, int table_size)
 {
-    status_t ec = SUCCESS_CODE;
-    hash_node_t *temp_node = NULL, *current = NULL;
-    bool found = false;
-    size_t idx = 0;
+    unsigned long hash = 5381;
+    int c;
 
-    if (!table || !*table || !word || word[0] == '\0')
-        ec = ERR_ARGS;
+    while ((c = (unsigned char)*word++))
+        hash = ((hash << 5) + hash) + c; 
 
-    if (ec == SUCCESS_CODE)
-        ec = hash_djb2(word, (*table)->max_size, &idx);
+    return (unsigned int)(hash % table_size);
+}
 
-    if (ec == SUCCESS_CODE)
-        current = (*table)->data[idx];
+// sdbm
+unsigned int hash_function2(const char *word, int table_size)
+{
+    unsigned long hash = 0;
+    int c;
 
-    // если удаляем самый первый узел ячейки
-    if (ec == SUCCESS_CODE && strcmp(current->word, word) == 0)
+    while ((c = (unsigned char)*word++))
+        hash = c + (hash << 6) + (hash << 16) - hash; 
+
+    return (unsigned int)(hash % table_size);
+}
+
+unsigned int hash_function(const char *word, int table_size)
+{
+    if (current_hash_func == 1)
+        return hash_function1(word, table_size);
+    else
+        return hash_function2(word, table_size);
+}
+
+void hash_table_insert_chaining(hst_chaining_t *ht, const char *word)
+{
+    if (!ht || !word)
+        return;
+
+    if ((double)(ht->count + 1) / ht->size > MAX_LOAD_FACTOR)
     {
-        found = true;
-        (*table)->data[idx] = current->next;
-        free_hst_node(current);
+        printf("Загруженность таблицы превышена (%.2f > %.2f). Выполняется рехеширование...\n",
+               (double)ht->count / ht->size, MAX_LOAD_FACTOR);
+        rehash_chaining(ht);
     }
 
-    // иначе ищем в остальной цепочке
-    while (ec == SUCCESS_CODE && current && !found)
+    unsigned int index = hash_function(word, ht->size);
+    hash_node_t *current = ht->table[index];
+    int chain_length = 0;
+
+    while (current)
     {
-        if (current->next && strcmp(current->next->word, word) == 0)
+        chain_length++;
+        if (strcmp(current->word, word) == 0)
         {
-            found = true;
-            temp_node = current->next;
-            current->next = temp_node->next;
-            free_hst_node(temp_node);
+            current->count++;
+            return;
         }
         current = current->next;
     }
 
-    if (ec == SUCCESS_CODE && !found)
-        ec = ERR_NOT_FOUND;
+    if (chain_length >= 4)
+    {
+        printf("Длина цепочки %d превышает лимит. Пробуем другую хэш-функцию...\n", chain_length);
+        current_hash_func = (current_hash_func == 1) ? 2 : 1;
+        rehash_chaining(ht);
+        hash_table_insert_chaining(ht, word);
+        return;
+    }
 
-    return ec;
+    hash_node_t *new_node = malloc(sizeof(hash_node_t));
+    if (!new_node)
+        return;
+
+    new_node->word = str_dynamic_copy(word);   
+    new_node->count = 1;
+    new_node->is_deleted = false;
+
+    new_node->next = ht->table[index];
+    if (ht->table[index] != NULL)
+        ht->collisions++;
+
+    ht->table[index] = new_node;
+    ht->count++;
+
+    if ((double)ht->count / ht->size > MAX_LOAD_FACTOR)
+    {
+        printf("Загруженность превышена после вставки (%.2f > %.2f). Выполняется рехеширование...\n",
+               (double)ht->count / ht->size, MAX_LOAD_FACTOR);
+        rehash_chaining(ht);
+    }
 }
 
-status_t clear_hst_table(hash_table_t **table)
+
+hash_node_t *hash_table_search_chaining(hst_chaining_t *ht, const char *word, int *comparisons)
 {
-    status_t ec = SUCCESS_CODE;
-    hash_node_t *current = NULL, *temp = NULL;
-
-    if (!table || !*table)
-        ec = ERR_ARGS;
-
-    if (ec == SUCCESS_CODE)
+    if (!ht)
+        return NULL;
+    unsigned int index = hash_function(word, ht->size);
+    hash_node_t *current = ht->table[index];
+    *comparisons = 0;
+    while (current)
     {
-        for (size_t i = 0; i < (*table)->max_size; i++)
+        (*comparisons)++;
+        ht->total_comparisons++;
+
+        if (!current->is_deleted && (strcmp(current->word, word) == 0))
         {
-            current = (*table)->data[i];
+            ht->searches_count++;
+
+            if (*comparisons > 4)
+            {
+                printf("Для поиска потребовалось %d сравнений (>4). Меняем хэш-функцию...\n", *comparisons);
+                if (current_hash_func == 1)
+                    current_hash_func = 2;
+                else
+                    current_hash_func = 1;
+                rehash_chaining(ht);
+            }
+
+            return current;
+        }
+        current = current->next;
+    }
+    ht->searches_count++;
+    if (*comparisons == 0)
+        *comparisons = 1;
+    return NULL;
+}
+
+void hash_table_delete_chaining(hst_chaining_t *ht, const char *word)
+{
+    if (!ht)
+        return;
+
+    unsigned int index = hash_function(word, ht->size);
+    hash_node_t *current = ht->table[index];
+    hash_node_t *prev = NULL;
+
+    while (current)
+    {
+        if (!current->is_deleted && (strcmp(current->word, word) == 0))
+        {
+            if (prev == NULL)
+            {
+
+                ht->table[index] = current->next;
+            }
+            else
+            {
+
+                prev->next = current->next;
+            }
+
+            current->is_deleted = true;
+            ht->count--;
+            return;
+        }
+        prev = current;
+        current = current->next;
+    }
+}
+
+void display_hash_table_chaining(hst_chaining_t *ht)
+{
+    if (!ht)
+    {
+        printf("Хеш-таблица не инициализирована!\n");
+        return;
+    }
+
+    printf("\n=== Хеш-таблица с цепочками (размер: %d) ===\n", ht->size);
+    printf("Индекс | Слова\n");
+    printf("-------|--------------------------------------------------\n");
+
+    for (int i = 0; i < ht->size; i++)
+    {
+        if (ht->table[i] != NULL)
+        {
+            printf("%6d | ", i);
+
+            hash_node_t *current = ht->table[i];
+            bool first = true;
+            int chain_length = 0;
+
             while (current)
             {
-                temp = current;
+                if (!current->is_deleted)
+                {
+                    if (!first)
+                        printf(" -> ");
+                    printf("%s (%d)", current->word, current->count);
+                    first = false;
+                    chain_length++;
+                }
                 current = current->next;
-                free_hst_node(temp);
-            }   
+            }
+
+            if (chain_length > 1)
+            {
+                printf(" [длина цепочки: %d]", chain_length);
+            }
+
+            printf("\n");
         }
     }
-
-    return ec;
+    printf("--------------------------------------------------------\n");
 }
 
-status_t resize_hst_table(hash_table_t **table)
+void hash_table_statistics_chaining(hst_chaining_t *ht)
 {
-    status_t ec = SUCCESS_CODE;
-    size_t new_table_size = 0;
+    if (!ht)
+        return;
 
-    if (!table || !*table)
-        ec = ERR_ARGS;
+    printf("\n=== Статистика хеш-таблицы с цепочками ===\n");
+    printf("Размер таблицы: %d\n", ht->size);
+    printf("Количество элементов: %d\n", ht->count);
+    printf("Загруженность: %.2f%%\n", (double)ht->count / ht->size * 100);
+    printf("Количество коллизий: %d\n", ht->collisions);
+    printf("Средняя длина цепочки: %.2f\n", (double)ht->count / ht->size);
+    printf("Всего сравнений при поиске: %d\n", ht->total_comparisons);
+    printf("Количество поисков: %d\n", ht->searches_count);
+    printf("Среднее количество сравнений на поиск: %.2f\n", get_average_comparisons_chaining(ht));
 
-    if (ec == SUCCESS_CODE)
-        ec = input_size(&new_table_size);
-
-    if (ec == SUCCESS_CODE)
-        ec = free_hash_table(table);
-
-    if (ec == SUCCESS_CODE)
-        ec = create_hash_table(table, new_table_size);
-
-    return ec;
-}
-
-status_t free_hash_table(hash_table_t **table)
-{
-    status_t ec = SUCCESS_CODE;
-    hash_node_t *current = NULL, *next = NULL;
-
-    if (!table || !(*table)) 
-        ec = ERR_ARGS;
-
-    for (size_t i = 0; ec == SUCCESS_CODE && i < (*table)->max_size; i++)
+    int empty_cells = 0;
+    int max_chain_length = 0;
+    for (int i = 0; i < ht->size; i++)
     {
-        current = (*table)->data[i];
+        int chain_length = 0;
+        hash_node_t *current = ht->table[i];
+
         while (current)
         {
-            next = current->next;
-            if (current->word) free(current->word);
-            free(current);
-            current = next;
+            if (!current->is_deleted)
+                chain_length++;
+            current = current->next;
+        }
+
+        if (chain_length == 0)
+            empty_cells++;
+        if (chain_length > max_chain_length)
+            max_chain_length = chain_length;
+    }
+
+    printf("Пустых ячеек: %d (%.2f%%)\n", empty_cells, (double)empty_cells / ht->size * 100);
+    printf("Максимальная длина цепочки: %d\n", max_chain_length);
+    printf("===========================================\n");
+}
+
+double calculate_load_factor_chaining(hst_chaining_t *ht)
+{
+    return (double)ht->count / ht->size;
+}
+
+void rehash_chaining(hst_chaining_t *ht)
+{
+    int old_size = ht->size;
+    hash_node_t **old_table = ht->table;
+
+    int new_size = (int)(old_size * 1.3);
+    while (new_size % 2 == 0 || new_size % 3 == 0)
+    {
+        new_size++;
+    }
+
+    ht->size = new_size;
+    ht->table = (hash_node_t **)calloc(new_size, sizeof(hash_node_t *));
+    ht->count = 0;
+    ht->collisions = 0;
+
+    for (int i = 0; i < old_size; i++)
+    {
+        hash_node_t *current = old_table[i];
+        while (current)
+        {
+            if (!current->is_deleted)
+                hash_table_insert_chaining(ht, current->word);
+
+            hash_node_t *temp = current;
+            current = current->next;
+            free(temp);
         }
     }
 
-    if (ec == SUCCESS_CODE)
-    {
-        free((*table)->data);
-        free(*table);
-        *table = NULL;
-    }
-
-    return ec;
+    free(old_table);
+    printf("Рехеширование завершено. Новый размер: %d\n", ht->size);
 }
 
-status_t free_hst_node(hash_node_t *hst_node)
+hst_open_t *create_hash_table_open(int size)
 {
-    if (hst_node)
+    hst_open_t *ht = (hst_open_t *)malloc(sizeof(hst_open_t));
+    if (!ht)
+        return NULL;
+
+    ht->size = size;
+    ht->count = 0;
+    ht->collisions = 0;
+    ht->total_comparisons = 0;
+    ht->searches_count = 0;
+
+    ht->keys = (char**)calloc(size, sizeof(char*));
+    ht->counts = (int *)calloc(size, sizeof(int));
+    ht->occupied = (bool *)calloc(size, sizeof(bool));
+    ht->deleted = (bool *)calloc(size, sizeof(bool));
+
+    if (!ht->keys || !ht->counts || !ht->occupied || !ht->deleted)
     {
-        if (hst_node->word) free(hst_node->word);
-        free(hst_node);
+        free(ht->keys);
+        free(ht->counts);
+        free(ht->occupied);
+        free(ht->deleted);
+        free(ht);
+        return NULL;
     }
 
-    return SUCCESS_CODE;
+    return ht;
 }
 
-status_t hash_djb2(const char *str, size_t table_size, size_t *hash_value)
+void free_hash_table_open(hst_open_t *ht)
 {
-    status_t ec = SUCCESS_CODE;
-    size_t hash = 5381;
-    int c = 0;
+    if (!ht)
+        return;
 
-    if (!str || !hash_value)
-        ec = ERR_ARGS;
-
-    if (ec == SUCCESS_CODE) 
+    if (ht->keys)
     {
-        while ((c = *str++))
-            hash = ((hash << 5) + hash) + c;  // hash * 33 + c (djb2)
-        
-        *hash_value = hash % table_size;
+        for (int i = 0; i < ht->size; i++)
+        {
+            if (ht->keys[i])          
+                free(ht->keys[i]);
+        }
     }
 
-    return ec;
+    free(ht->keys);
+    free(ht->counts);
+    free(ht->occupied);
+    free(ht->deleted);
+    free(ht);
+}
+
+
+void hash_table_insert_open(hst_open_t *ht, const char *word)
+{
+    if (!ht)
+        return;
+
+    if ((double)ht->count / ht->size > MAX_LOAD_FACTOR)
+    {
+        printf("Загруженность таблицы превышена (%.2f > %.2f). Выполняется рехеширование...\n",
+               (double)ht->count / ht->size, MAX_LOAD_FACTOR);
+        rehash_open(ht);
+    }
+
+    int index = hash_function(word, ht->size);
+    int original_index = index;
+    int probe_count = 0;
+
+    while (ht->occupied[index] && !ht->deleted[index])
+    {
+        if (strcmp(ht->keys[index], word) == 0)
+        {
+            ht->counts[index]++;
+            return;
+        }
+
+        probe_count++;
+
+        if (probe_count > 4)
+        {
+            printf("Для вставки потребовалось %d проб (>4). Меняем хэш-функцию...\n", probe_count);
+            if (current_hash_func == 1)
+                current_hash_func = 2;
+            else
+                current_hash_func = 1;
+            rehash_open(ht);
+            hash_table_insert_open(ht, word);
+            return;
+        }
+
+        index = (index + 1) % ht->size;
+        if (index == original_index)
+        {
+            printf("Хеш-таблица переполнена!\n");
+            rehash_open(ht);
+            hash_table_insert_open(ht, word);
+            return;
+        }
+    }
+
+    ht->keys[index] = str_dynamic_copy(word);
+    ht->counts[index] = 1;
+    ht->occupied[index] = true;
+    ht->deleted[index] = false;
+    ht->count++;
+
+    if (probe_count > 0)
+        ht->collisions++;
+}
+
+int hash_table_search_open(hst_open_t *ht, const char *word, int *comparisons)
+{
+    if (!ht)
+        return -1;
+
+    int index = hash_function(word, ht->size);
+    int original_index = index;
+    *comparisons = 0;
+
+    while (ht->occupied[index] || ht->deleted[index])
+    {
+        (*comparisons)++;
+        ht->total_comparisons++;
+
+        if (ht->occupied[index] && !ht->deleted[index] && (strcmp(ht->keys[index], word) == 0))
+        {
+            ht->searches_count++;
+
+            if (*comparisons > 4)
+            {
+                printf("Для поиска потребовалось %d сравнений (>4). Меняем хэш-функцию...\n", *comparisons);
+                if (current_hash_func == 1)
+                    current_hash_func = 2;
+                else
+                    current_hash_func = 1;
+                rehash_open(ht);
+            }
+
+            return index;
+        }
+
+        index = (index + 1) % ht->size;
+        if (index == original_index)
+            break;
+    }
+
+    if (*comparisons == 0)
+        *comparisons = 1;
+
+    ht->searches_count++;
+    return -1;
+}
+
+void hash_table_delete_open(hst_open_t *ht, const char *word)
+{
+    if (!ht)
+        return;
+
+    int comparisons;
+    int index = hash_table_search_open(ht, word, &comparisons);
+
+    if (index != -1)
+    {
+        ht->deleted[index] = true;
+        ht->occupied[index] = false;
+        ht->count--;
+    }
+}
+
+void display_hash_table_open(hst_open_t *ht)
+{
+    if (!ht)
+    {
+        printf("Хеш-таблица не инициализирована!\n");
+        return;
+    }
+
+    printf("\n=== Хеш-таблица с открытой адресацией (размер: %d) ===\n", ht->size);
+    printf("Индекс | Состояние      | Слово          | Количество\n");
+    printf("-------|----------------|----------------|------------\n");
+
+    for (int i = 0; i < ht->size; i++)
+    {
+        printf("%6d | ", i);
+
+        if (!ht->occupied[i] && !ht->deleted[i])
+        {
+            printf("Свободно       |                | \n");
+        }
+        else if (ht->deleted[i])
+        {
+            printf("Удалено        |                | \n");
+        }
+        else
+        {
+            printf("Занято         | %-14s | %d\n", ht->keys[i], ht->counts[i]);
+        }
+    }
+    printf("----------------------------------------------------\n");
+}
+
+void hash_table_statistics_open(hst_open_t *ht)
+{
+    if (!ht)
+        return;
+
+    printf("\n=== Статистика хеш-таблицы с открытой адресацией ===\n");
+    printf("Размер таблицы: %d\n", ht->size);
+    printf("Количество элементов: %d\n", ht->count);
+    printf("Загруженность: %.2f%%\n", (double)ht->count / ht->size * 100);
+    printf("Количество коллизий: %d\n", ht->collisions);
+    printf("Всего сравнений при поиске: %d\n", ht->total_comparisons);
+    printf("Количество поисков: %d\n", ht->searches_count);
+    printf("Среднее количество сравнений на поиск: %.2f\n", get_average_comparisons_open(ht));
+
+    int clusters = 0;
+    int max_cluster = 0;
+    int current_cluster = 0;
+
+    for (int i = 0; i < ht->size; i++)
+    {
+        if (ht->occupied[i] && !ht->deleted[i])
+        {
+            current_cluster++;
+        }
+        else
+        {
+            if (current_cluster > 0)
+            {
+                clusters++;
+                if (current_cluster > max_cluster)
+                {
+                    max_cluster = current_cluster;
+                }
+                current_cluster = 0;
+            }
+        }
+    }
+
+    if (current_cluster > 0)
+    {
+        clusters++;
+        if (current_cluster > max_cluster)
+        {
+            max_cluster = current_cluster;
+        }
+    }
+
+    printf("Количество кластеров: %d\n", clusters);
+    printf("Максимальный размер кластера: %d\n", max_cluster);
+    printf("Средний размер кластера: %.2f\n", clusters > 0 ? (double)ht->count / clusters : 0);
+    printf("====================================================\n");
+}
+
+double calculate_load_factor_open(hst_open_t *ht)
+{
+    return (double)ht->count / ht->size;
+}
+
+void rehash_open(hst_open_t *ht)
+{
+    int old_size = ht->size;
+    char **old_keys = ht->keys;
+    int *old_counts = ht->counts;
+    bool *old_occupied = ht->occupied;
+
+    int new_size = (int)(old_size * 1.3);
+    while (new_size % 2 == 0 || new_size % 3 == 0)
+    {
+        new_size++;
+    }
+
+    ht->size = new_size;
+    ht->keys = (char **)calloc(new_size, sizeof(char *));
+    ht->counts = (int *)calloc(new_size, sizeof(int));
+    ht->occupied = (bool *)calloc(new_size, sizeof(bool));
+    free(ht->deleted);
+    ht->deleted = (bool *)calloc(new_size, sizeof(bool));
+    ht->count = 0;
+    ht->collisions = 0;
+
+    for (int i = 0; i < old_size; i++)
+    {
+        if (old_occupied[i] && old_keys[i])
+        {
+            for (int j = 0; j < old_counts[i]; j++)
+            {
+                hash_table_insert_open(ht, old_keys[i]);
+            }
+        }
+    }
+
+    free(old_keys);
+    free(old_counts);
+    free(old_occupied);
+
+    printf("Рехеширование завершено. Новый размер: %d\n", ht->size);
+}
+
+void build_hash_table_from_file_chaining(hst_chaining_t *ht, const char *filename)
+{
+    FILE *file = fopen(filename, "r");
+    if (!file)
+    {
+        printf("Ошибка открытия файла '%s'\n", filename);
+        return;
+    }
+
+    char buffer[MAX_STRING_LENGTH];
+    int words_processed = 0;
+
+    printf("Построение хеш-таблицы с цепочками...\n");
+
+    while (fscanf(file, "%s", buffer) == 1)   /* лучше "%<N>s" */
+    {
+        hash_table_insert_chaining(ht, buffer);
+        words_processed++;
+    }
+
+    fclose(file);
+    printf("Обработано слов: %d\n", words_processed);
+}
+
+void build_hash_table_from_file_open(hst_open_t *ht, const char *filename)
+{
+    FILE *file = fopen(filename, "r");
+    if (!file)
+    {
+        printf("Ошибка открытия файла '%s'\n", filename);
+        return;
+    }
+
+    char buffer[MAX_STRING_LENGTH];
+    int words_processed = 0;
+
+    printf("Построение хеш-таблицы с открытой адресацией...\n");
+
+    while (fscanf(file, "%s", buffer) == 1)   /* можно "%<N>s" */
+    {
+        hash_table_insert_open(ht, buffer);
+        words_processed++;
+    }
+
+    fclose(file);
+    printf("Обработано слов: %d\n", words_processed);
+}
+
+double get_average_comparisons_chaining(hst_chaining_t *ht)
+{
+    return ht->searches_count > 0 ? (double)ht->total_comparisons / ht->searches_count : 0;
+}
+
+double get_average_comparisons_open(hst_open_t *ht)
+{
+    return ht->searches_count > 0 ? (double)ht->total_comparisons / ht->searches_count : 0;
 }

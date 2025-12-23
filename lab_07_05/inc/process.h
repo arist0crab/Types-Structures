@@ -1,14 +1,18 @@
-#ifndef __PROCESS_H__
-#define __PROCESS_H__
+#ifndef PROCESS_H
+#define PROCESS_H
 
+#include <stdio.h>
+#include <time.h>
+#include <stdbool.h>
 #include "data.h"
-#include "bst.h"
-#include "hst.h"
-#include "avl.h"
 #include "input.h"
 #include "output.h"
+#include "bst.h"
+#include "avl.h"
+#include "visualization.h"
+#include "hst.h"
+#include "comparison.h"
 
-// TODO добавить doxygen
-status_t procces_menu_choice(menu_option_t menu_option, bst_node_t **bst_root, hash_table_t **hst);
+result_t process_current_option(menu_option_t current_option, bst_node_t **bst_root, avl_node_t **avl_root, hst_chaining_t **chaining_hst, hst_open_t **open_hst);
 
 #endif

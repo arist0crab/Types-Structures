@@ -1,189 +1,266 @@
-#include "bst.h"
+#include "../inc/bst.h"
 
-status_t create_bst_node(bst_node_t **new_bst_node, const char *word);
+typedef result_t (*rotation_function_t)(bst_node_t *root, bst_node_t **result_root);
 
-status_t create_bst_node(bst_node_t **new_bst_node, const char *word)
+result_t create_bst_node(bst_node_t **new_tree_node, const char *word)
 {
-    status_t ec = SUCCESS_CODE;
+    result_t exit_code = OK_CODE;
 
-    if (!new_bst_node || !word)
-        ec = ERR_ARGS;
-
-    if (ec == SUCCESS_CODE)
+    if (!new_tree_node)
+        exit_code = INVALID_PTR_CODE;
+    else
     {
-        *new_bst_node = NULL;
-        *new_bst_node = malloc(sizeof(bst_node_t));
-        if (*new_bst_node == NULL)
-            ec = ERR_MEM;
+        *new_tree_node = NULL;
+        *new_tree_node = malloc(sizeof(bst_node_t));
+        if (!(*new_tree_node))
+            exit_code = MEMORY_ERR_CODE;
     }
 
-    if (ec == SUCCESS_CODE)
+    if (exit_code == OK_CODE)
     {
-        (*new_bst_node)->word = str_dynamic_copy(word);
-        (*new_bst_node)->counted = 0;
-        (*new_bst_node)->left = NULL;
-        (*new_bst_node)->right = NULL;
+        (*new_tree_node)->word = str_dynamic_copy(word);
+        (*new_tree_node)->count = 1;
+        (*new_tree_node)->left = NULL;
+        (*new_tree_node)->right = NULL;
     }
 
-    return ec;
+    return exit_code;
 }
 
-status_t insert_bst_node(bst_node_t **root, const char *word)
+result_t insert_bst_node(bst_node_t **root, const char *word)
 {
-    status_t ec = SUCCESS_CODE;
-    int cmp = 0;
+    result_t exit_code = OK_CODE;
 
-    if (!root || !word)
-        ec = ERR_ARGS;
-
-    // если вершина дерева пуста
-    if (ec == SUCCESS_CODE && !(*root))
-        ec = create_bst_node(root, word);
-
-    // если вершина дерева не пуста
-    if (ec == SUCCESS_CODE && *root)
-    {
-        cmp = strcmp(word, (*root)->word);
-
-        if (cmp == 0)
-            (*root)->counted++;
-        else if (cmp < 0)
-            ec = insert_bst_node(&((*root)->left), word);
-        else
-            ec = insert_bst_node(&((*root)->right), word);
-    }
-
-    return ec;
-}
-
-status_t delete_bst_node(bst_node_t **root, const char *word)
-{
-    status_t ec = SUCCESS_CODE;
-    bst_node_t *min_parent = NULL;
-    bst_node_t *tmp = NULL;
-    int cmp = 0;
-
-    if (!root || !word)
-        ec = ERR_ARGS;
+    if (!root)
+        exit_code = INVALID_PTR_CODE;
     else if (!(*root))
-        ec = ERR_NOT_FOUND;
+        exit_code = create_bst_node(root, word);
+    else if (strcmp(word, (*root)->word) < 0)
+        exit_code = insert_bst_node(&((*root)->left), word);
+    else if (strcmp(word, (*root)->word) > 0)
+        exit_code = insert_bst_node(&((*root)->right), word);
+    else
+        (*root)->count++;
 
-    if (ec == SUCCESS_CODE)
-    {
-        cmp = strcmp(word, (*root)->word);
+    return exit_code;
+}
 
-        if (cmp < 0)
-            ec = delete_bst_node(&((*root)->left), word);
-        else if (cmp > 0)
-            ec = delete_bst_node(&((*root)->right), word);
-        else  // нашли узел для удаления
+result_t make_bst_from_file(bst_node_t **root, const char *filename)
+{
+    result_t exit_code = OK_CODE;
+    char buffer[MAX_STRING_LENGTH];
+
+    if (!root || !filename)
+        exit_code = INVALID_PTR_CODE;
+    else
         {
-            if ((*root)->left == NULL) 
+        if (*root)
+        {
+            free_bst(*root);
+            *root = NULL;
+        }
+
+        FILE *file = NULL;
+        if (safe_open_file(filename, &file) == OK_CODE)
+        {
+            while ((exit_code == OK_CODE) && (fscanf(file, "%s", buffer) == 1))
+                exit_code = insert_bst_node(root, buffer);
+            fclose(file);
+        }
+    }
+
+    return exit_code;
+}
+
+result_t delete_bst_node(bst_node_t **root, const char *word, bool *to_del_found)
+{
+    result_t exit_code = OK_CODE;
+    bst_node_t *temp_root = NULL;
+    bst_node_t *min_parent = NULL;
+
+    if (!root)
+        exit_code = INVALID_PTR_CODE;
+    else if (!(*root))
+        exit_code = NOTHING_TO_DELETE_CODE;
+    else
+    {
+        if (strcmp(word, (*root)->word) < 0)
+            delete_bst_node(&((*root)->left), word, to_del_found);
+        else if (strcmp(word, (*root)->word) > 0)
+            delete_bst_node(&((*root)->right), word, to_del_found);
+        else
+        {
+            *to_del_found = true;
+            if (!(*root)->left || !(*root)->right)
             {
-                tmp = (*root)->right;  
-                free((*root)->word);
+                temp_root = (!(*root)->left) ? (*root)->right : (*root)->left;
                 free(*root);
-                *root = tmp;
-            }
-            else if ((*root)->right == NULL)
-            {
-                tmp = (*root)->left;
-                free((*root)->word);
-                free(*root);
-                *root = tmp;
+                *root = temp_root;
             }
             else
             {
                 min_parent = *root;
-                tmp = (*root)->right;
-                while (tmp->left != NULL)
+                temp_root = (*root)->right;
+                while (temp_root->left)
                 {
-                    min_parent = tmp;
-                    tmp = tmp->left;
+                    min_parent = temp_root;
+                    temp_root = temp_root->left;
                 }
 
-                free((*root)->word);
-                (*root)->word = str_dynamic_copy(tmp->word);
-                (*root)->counted = tmp->counted;
-
+                (*root)->word = str_dynamic_copy(temp_root->word);
                 if (min_parent == *root)
-                    min_parent->right = tmp->right;
+                    min_parent->right = temp_root->right;
                 else
-                    min_parent->left = tmp->right;
-
-                free(tmp->word);
-                free(tmp);
+                    min_parent->left = temp_root->right;
+                free(temp_root);
             }
         }
     }
-    return ec;
+    return exit_code;
 }
 
-status_t clear_bst(bst_node_t **root)
+result_t find_word_in_bst(bst_node_t **root, const char *word, bool flag, int *comparisons)
 {
-    status_t ec = SUCCESS_CODE;
+    result_t exit_code = OK_CODE;
+    bst_node_t *target_node = NULL;
+
+    if (comparisons)
+        *comparisons = 0;
 
     if (!root)
-        ec = ERR_ARGS;
-
-    if (ec == SUCCESS_CODE && *root)
+        exit_code = INVALID_PTR_CODE;
+    else
     {
-        clear_bst(&(*root)->left);
-        clear_bst(&(*root)->right);
+        bst_node_t *current = *root;
+        while (current && !target_node)
+        {
+            if (comparisons)
+                (*comparisons)++;
 
-        free((*root)->word);
-        free(*root);
-        *root = NULL;
+            if (strcmp(current->word, word) == 0)
+                target_node = current;
+            else
+                current = (strcmp(current->word, word) > 0) ? current->left : current->right;
+        }
+
+        if (flag)
+        {
+            if (target_node)
+                printf("Слово было найдено!\n");
+            else
+                printf("Слово не было найдено!\n");
+        }
     }
 
-    return ec;
+    return exit_code;
 }
 
-status_t find_word_in_bst(bst_node_t *root, bst_node_t **target_root, const char *word)
+
+void count_nodes_on_levels(bst_node_t *root, size_t level, size_t *levels)
 {
-    status_t ec = SUCCESS_CODE;
-    int cmp = 0;
+    if (!root)
+        return;
+    levels[level]++;
+    count_nodes_on_levels(root->left,  level + 1, levels);
+    count_nodes_on_levels(root->right, level + 1, levels);
+}
 
-    if (!root || !target_root || !word || word[0] == '\0')
-        ec = ERR_ARGS;
+size_t tree_height(bst_node_t *root)
+{
+     if (root == NULL)
+        return 0;
 
-    if (ec == SUCCESS_CODE)
-        *target_root = NULL;
+    size_t left_h  = tree_height(root->left);
+    size_t  right_h = tree_height(root->right);
 
-    while (ec == SUCCESS_CODE && root && !(*target_root))
+    return (left_h > right_h ? left_h : right_h) + 1;
+}
+
+result_t define_nodes_quantity_on_each_level(bst_node_t **root)
+{
+    result_t exit_code = OK_CODE;
+
+    if (!root)
+        exit_code = INVALID_PTR_CODE;
+    else
     {
-        cmp = strcmp(word, root->word);
-        if (cmp == 0) (*target_root) = root;
-        else root = (cmp < 0) ? root->left : root->right;
+        size_t height = tree_height(*root);
+        size_t *levels = calloc(height + 1, sizeof(size_t));
+        count_nodes_on_levels(*root, 0, levels);
+
+        for (size_t i = 0; i < height; i++)
+            printf("Уровень %zu: %zu узлов\n", i, levels[i]);
+        
+        free(levels);
     }
 
-    if (ec == SUCCESS_CODE && *target_root == NULL)
-        ec = ERR_NOT_FOUND;
-
-    return ec;
+    return exit_code;
 }
 
-status_t read_tree_from_file(bst_node_t **root, char *filename)
+void infix(bst_node_t *root)
 {
-    status_t ec = SUCCESS_CODE;
-    FILE *filestream = NULL;
-    char buf[MAX_STRING_LENGTH];
+    if (!root)
+        return;
 
-    if (!filename || filename[0] == '\0')
-        ec = ERR_ARGS;
+    infix(root->left);             
+    infix(root->right);             
+}
 
-    if (ec == SUCCESS_CODE)
-        ec = clear_bst(root);
+void free_bst(bst_node_t *root)
+{
+    if (!root)
+        return;
+    free_bst(root->left);
+    free_bst(root->right);
+    free(root);
+}
 
-    if (ec == SUCCESS_CODE)
-        ec = safe_open_file(filename, &filestream);
+void print_bst_branch(bst_node_t *node, char* prefix, int is_tail, char *color) 
+{
+    char new_prefix[MAX_PREFIX_SIZE];
 
-    if (ec == SUCCESS_CODE)
-        while (fscanf(filestream, "%s", buf) == 1)
-            insert_bst_node(root, buf);
+    if (node)
+    {
+        printf("%s%s%s%s%s (%d)\n", prefix, color, (is_tail ? "└── " : "├── "), RESET, node->word, node->count);
+        snprintf(new_prefix, sizeof(new_prefix), "%s%s", prefix, (is_tail ? "    " : "│   "));
+
+        if (node->right)
+            print_bst_branch(node->right, new_prefix, node->left == NULL, BLUE);
+
+        if (node->left)
+            print_bst_branch(node->left, new_prefix, 1, GREEN);
+    }
+}
+
+result_t print_bst_rec(bst_node_t *root)
+{
+    result_t exit_code = OK_CODE;
+
+    if (!root)
+        exit_code = EMPTY_TREE_CODE;
     
-    if (filestream)
-        fclose(filestream);
+    if (exit_code == OK_CODE) 
+        printf("* %s (%d)\n", root->word, root->count);
+    
+    if (exit_code == OK_CODE && root->right)
+        print_bst_branch(root->right, "", root->left == NULL, BLUE);
 
-    return ec;
+    if (exit_code == OK_CODE && root->left)
+        print_bst_branch(root->left, "", 1, GREEN);
+
+    return exit_code;
+}
+
+void print_bst(bst_node_t *root)
+{
+    if (print_bst_rec(root) == EMPTY_TREE_CODE)
+        printf("Дерево пустое.\n");
+}
+
+size_t count_nodes_bst(bst_node_t *root)
+{
+    if (root == NULL)
+        return 0;
+
+    return 1 + count_nodes_bst(root->left) + count_nodes_bst(root->right);
 }

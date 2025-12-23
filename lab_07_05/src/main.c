@@ -1,31 +1,37 @@
-// TODO Подсчитать среднее количество сравнений для поиска данных в указанных структурах.
-// TODO Произвести реструктуризацию хеш-таблицы, если среднее количество сравнений больше указанного.
-
-#include "../inc/data.h"  // TODO
-#include "bst.h"
-#include "avl.h"
-#include "process.h"
-#include "input.h"
-#include "output.h"
-
+#include <stdio.h>
+#include "../inc/data.h"
+#include "../inc/input.h"
+#include "../inc/output.h"
+#include "../inc/process.h"
+#include "../inc/hst.h"
+#include "../inc/bst.h"
 
 int main(void)
 {
-    status_t menu_opt_processing_status = SUCCESS_CODE;
-    menu_option_t cur_menu_opt = 0;  // выбранная опция меню
+    result_t exit_code = OK_CODE;
+    menu_option_t current_option = 1;
 
     bst_node_t *bst_root = NULL;
-    hash_table_t *hst = NULL;
+    avl_node_t *avl_root = NULL;
+    hst_chaining_t *chaining_hst = NULL;
+    hst_open_t *open_hst = NULL;
+
+    chaining_hst = create_hash_table_chaining(10);
+    open_hst = create_hash_table_open(10);
 
     print_menu();
-    while (input_cur_menu_opt((int *)&cur_menu_opt, MENU_OPTIONS_QUANTITY) != SUCCESS_CODE);
-    while (cur_menu_opt != 0)
+
+    while (((exit_code = input_menu_option(&current_option)) == OK_CODE) && current_option)
     {
-        menu_opt_processing_status = procces_menu_choice(cur_menu_opt, &bst_root, &hst);
-        print_exit_code_result(menu_opt_processing_status);
+        exit_code = process_current_option(current_option, &bst_root, &avl_root, &chaining_hst, &open_hst);
+        print_result(exit_code);
         print_menu();
-        while (input_cur_menu_opt((int *)&cur_menu_opt, MENU_OPTIONS_QUANTITY) != SUCCESS_CODE);
     }
 
-    return SUCCESS_CODE;
+    print_result(exit_code);
+
+    free_bst(bst_root);
+    free_avl(avl_root);
+
+    return exit_code;
 }

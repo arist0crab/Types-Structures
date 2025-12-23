@@ -1,53 +1,48 @@
-#ifndef __DATA_H__
-#define __DATA_H__
+#ifndef DATA_H
+#define DATA_H
 
-// BST - Binary Search Tree
-// HST - Hash Search table
-// AVG - Adelson-Velsky and Landis (фамилии создателей)
+#include "stdio.h"
+#include <stdlib.h>
 
-#define MENU_OPTIONS_QUANTITY 16  // TODO
-#define MAX_PREFIX_SIZE 256
+#define MENU_OPTIONS 17
+#define MAX_FILENAME_LENGTH 50
+#define MAX_PREFIX_SIZE 1000
+#define TESTS_QUANTITY 1000
 #define MAX_STRING_LENGTH 256
 
-typedef enum 
+typedef enum
 {
-    SUCCESS_CODE,
-    ERR_IO,
-    ERR_MEM,
-    ERR_ARGS,
-    ERR_FILE,
-    ERR_RANGE,
-    ERR_NOT_FOUND,
-    ERR_ALREADY_EXISTS,
-    ERR_INVALID_POINTER,
-    ERR_TABLE_DOESNT_EXIST
-} status_t;
+    OK_CODE,
+    INPUT_ERR_CODE,
+    INVALID_PTR_CODE,
+    MEMORY_ERR_CODE,
+    FILE_OPEN_ERR_CODE,
+    FILE_READ_ERR_CODE,
+    NOTHING_TO_DELETE_CODE,
+    EMPTY_TREE_CODE,
+    NOT_FOUND_CODE
+} result_t;
 
-typedef enum 
+typedef enum
 {
-    EXIT_PROGRAM,
-
-    // работа с BST
-    CREATE_BST_FROM_FILE,
-    ADD_BST_ELEM,
-    DELETE_BST_ELEM,
-    CLEAR_BST,
-    FIND_WORD_IN_BST,
-    BALANCE_BST,
-
-    // работа с HST
-    CREATE_HST_FROM_FILE,
-    ADD_HST_ELEM,
-    DELETE_HST_ELEM,
-    CLEAR_HST,
-    RESIZE_HST,
-    
-    // печать
-    PRINT_BST,
-    PRINT_HST,
-
-    // эффективность
-    MEASURE_SEARCH_TIME
+    EXIT,
+    MAKE_TREE_FROM_FILE,
+    PRINT_BST_TREE,
+    PRINT_AVL_TREE,
+    SHOW_BST_TREE,
+    SHOW_AVL_TREE,
+    ADD_WORD_TO_TREE,
+    DELETE_WORD_FROM_TREE,
+    FIND_WORD_IN_TREE,
+    MAKE_HASH_TABLE_FROM_FILE,
+    PRINT_CHAINING_HASH_TABLE,
+    PRINT_OPEN_HASH_TABLE,
+    SHOW_CHAINING_HASH_TABLE,
+    SHOW_OPEN_HASH_TABLE,
+    ADD_WORD_TO_HASH_TABLE,
+    DELETE_WORD_FROM_HASH_TABLE,
+    FIND_WORD_IN_HASH_TABLE,
+    COMPARE_EFFICIENCY
 } menu_option_t;
 
 #endif

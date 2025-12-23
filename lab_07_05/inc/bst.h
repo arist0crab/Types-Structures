@@ -1,26 +1,33 @@
-#ifndef __BST_H__
-#define __BST_H__
+#ifndef BST_H
+#define BST_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include "data.h"
 #include "color.h"
 #include "auxiliary.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
-typedef struct tree_node
+typedef struct bst_node bst_node_t;
+
+struct bst_node
 {
     char *word;
-    size_t counted;
-    struct tree_node *left;
-    struct tree_node *right;
-} bst_node_t;
+    int count;
+    bst_node_t *left;
+    bst_node_t *right;
+};
 
-// TODO добавить doxygen
-status_t read_tree_from_file(bst_node_t **root, char *filename);
-status_t delete_bst_node(bst_node_t **root, const char *word);
-status_t clear_bst(bst_node_t **root);
-status_t find_word_in_bst(bst_node_t *root, bst_node_t **target_root, const char *word);
-status_t insert_bst_node(bst_node_t **root, const char *word);
+void print_bst(bst_node_t *root);
+result_t make_bst_from_file(bst_node_t **root, const char *filename);
+result_t insert_bst_node(bst_node_t **root, const char *word);
+result_t delete_bst_node(bst_node_t **root, const char *word, bool *to_del_found);
+result_t find_word_in_bst(bst_node_t **root, const char *word, bool flag, int *comparisons);
+result_t define_nodes_quantity_on_each_level(bst_node_t **root);
+result_t balance_tree(bst_node_t **root);
+void infix(bst_node_t *root);
+size_t tree_height(bst_node_t *root);
+void free_bst(bst_node_t *root);
+size_t count_nodes_bst(bst_node_t *root);
 
 #endif
