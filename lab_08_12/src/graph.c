@@ -230,7 +230,7 @@ status_t export_graph_to_dot_file(graph_t *graph, const char *filename)
     if (ec == SUCCESS_CODE)
     {
         fprintf(filestream, "digraph G {\n");
-        fprintf(filestream, "   node [shape=\"circle\", style=\"filled\", fillcolor=\"#8cafdd\", fontcolor=\"#102034\"];\n");
+        fprintf(filestream, "   node [shape=\"circle\", style=\"filled\", fillcolor=\"%s\", fontcolor=\"%s\"];\n", HEX_PINK, HEX_VINOUS);
         fprintf(filestream, "   rankdir=\"LR\";\n");
 
         for (size_t i = 0; i < graph->cities_quantity; i++)
@@ -238,7 +238,7 @@ status_t export_graph_to_dot_file(graph_t *graph, const char *filename)
                 fprintf(filestream, "   \"%s\";\n", graph->cities_names[i]);
 
         if (graph->capital && graph->capital[0] != '\0')
-            fprintf(filestream, "   \"%s\" [fillcolor=\"#a38cde\", fontcolor=\"#1c1034ff\"];\n", graph->capital);
+            fprintf(filestream, "   \"%s\" [fillcolor=\"%s\", fontcolor=\"%s\"];\n", graph->capital, HEX_VINOUS, HEX_PALE);
 
         for (size_t i = 0; i < graph->cities_quantity; i++)
             for (size_t j = 0; j < graph->cities_quantity; j++)

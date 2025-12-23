@@ -10,4 +10,8 @@
 #define GREEN_BOLD "\033[1;92m"
 #define BOLD "\033[1;37m"
 
+#define HEX_VINOUS "#800000"
+#define HEX_PALE "#FFE4E1"
+#define HEX_PINK "#FFB6C1"
+
 #endif
