@@ -10,9 +10,9 @@ int check_avl(avl_node_t *root)
     return check_avl(root->left) && check_avl(root->right);
 }
 
-result_t process_current_option(menu_option_t current_option, bst_node_t **bst_root, avl_node_t **avl_root, hst_chaining_t **chaining_hst, hst_open_t **open_hst)
+status_t process_current_option(menu_option_t current_option, bst_node_t **bst_root, avl_node_t **avl_root, hst_chaining_t **chaining_hst, hst_open_t **open_hst)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     char filename[MAX_FILENAME_LENGTH];
     char *buffer = NULL;
     int comp = 0;
@@ -30,9 +30,9 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 
         case MAKE_TREE_FROM_FILE:
             exit_code = input_filename(filename);
-            if (exit_code == OK_CODE)
+            if (exit_code == SUCCESS_CODE)
                 exit_code = make_bst_from_file(bst_root, filename);
-            if (exit_code == OK_CODE)
+            if (exit_code == SUCCESS_CODE)
                 exit_code = make_avl_from_file(avl_root, filename);
             break;
 
@@ -55,21 +55,21 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 
         case ADD_WORD_TO_TREE:
             exit_code = input_string(&buffer, "Введите слово: ");
-            if (exit_code == OK_CODE)
+            if (exit_code == SUCCESS_CODE)
                 exit_code = insert_bst_node(bst_root, buffer);
-            if (exit_code == OK_CODE)
+            if (exit_code == SUCCESS_CODE)
                 exit_code = insert_avl_node(avl_root, buffer);
             break;
 
         case DELETE_WORD_FROM_TREE:
             exit_code = input_string(&buffer, "Введите слово: ");
-            if (exit_code == OK_CODE)
+            if (exit_code == SUCCESS_CODE)
                 exit_code = delete_bst_node(bst_root, buffer, &to_del_found);
-            if (exit_code == OK_CODE)
+            if (exit_code == SUCCESS_CODE)
                 exit_code = delete_avl_node(avl_root, buffer, &to_del_found);
-            if ((exit_code == OK_CODE) && !to_del_found)
+            if ((exit_code == SUCCESS_CODE) && !to_del_found)
                 printf("Такого элемента в дереве нет.\n");
-            else if (exit_code == OK_CODE)
+            else if (exit_code == SUCCESS_CODE)
                 printf("Элемент есть в дереве.\n");
             break;
 
@@ -79,10 +79,10 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
             else
             {
                 exit_code = input_string(&buffer, "Введите слово: ");
-                if (exit_code == OK_CODE)
+                if (exit_code == SUCCESS_CODE)
                     exit_code = find_word_in_bst(bst_root, buffer, 1, &comp);
                 printf("Для поиска элемента в bst дереве было проведено %d сравнений.\n", comp);
-                if (exit_code == OK_CODE)
+                if (exit_code == SUCCESS_CODE)
                     exit_code = find_word_in_avl(avl_root, buffer, 1, &comp);
                 printf("Для поиска элемента в avl дереве было проведено %d сравнений.\n", comp);
             }
@@ -90,9 +90,9 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 
         case MAKE_HASH_TABLE_FROM_FILE:
             exit_code = input_filename(filename);
-            if (exit_code == OK_CODE)
+            if (exit_code == SUCCESS_CODE)
                 input_size(&chaining_size);
-            if (exit_code == OK_CODE)
+            if (exit_code == SUCCESS_CODE)
             {
                 open_size = chaining_size;
                 *chaining_hst = create_hash_table_chaining(chaining_size);
@@ -120,7 +120,7 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 
         case ADD_WORD_TO_HASH_TABLE:
             exit_code = input_string(&buffer, "Введите слово: ");
-            if (exit_code == OK_CODE)
+            if (exit_code == SUCCESS_CODE)
             {
                 hash_table_insert_chaining(*chaining_hst, buffer);
                 hash_table_insert_open(*open_hst, buffer);
@@ -129,18 +129,18 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 
         case DELETE_WORD_FROM_HASH_TABLE:
             exit_code = input_string(&buffer, "Введите слово: ");
-            if (exit_code == OK_CODE && (*chaining_hst)->count && (*open_hst)->count)
+            if (exit_code == SUCCESS_CODE && (*chaining_hst)->count && (*open_hst)->count)
             {
                 hash_table_delete_chaining(*chaining_hst, buffer);
                 hash_table_delete_open(*open_hst, buffer);
             }
-            else if (exit_code == OK_CODE)
+            else if (exit_code == SUCCESS_CODE)
                 printf(RED_BOLD "Таблица пуста, нечего удалять.\n" RESET);
             break;
 
         case FIND_WORD_IN_HASH_TABLE:
             exit_code = input_string(&buffer, "Введите слово: ");
-            if (exit_code == OK_CODE)
+            if (exit_code == SUCCESS_CODE)
             {
                 int comparisons = 0;
                 hash_node_t *check_node = hash_table_search_chaining(*chaining_hst, buffer, &comparisons);
@@ -174,9 +174,9 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
     return exit_code;
 }
 
-// result_t compare_add_times(tree_node_t **root, const char *filename)
+// status_t compare_add_times(tree_node_t **root, const char *filename)
 // {
-//     result_t exit_code = OK_CODE;
+//     status_t exit_code = SUCCESS_CODE;
 //     struct timespec start_time, end_time;
 //     double total_tree_time_ns = 0, total_file_time_ns = 0; 
 //     double average_tree_time_ns = 0, average_file_time_ns = 0; 
@@ -189,9 +189,9 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 //     if (!(*root) || !filename)
 //         exit_code = INVALID_PTR_CODE;
 
-//     if (exit_code == OK_CODE)
+//     if (exit_code == SUCCESS_CODE)
 //     {
-//         for (size_t i = 0; exit_code == OK_CODE && i < TESTS_QUANTITY; i++)
+//         for (size_t i = 0; exit_code == SUCCESS_CODE && i < TESTS_QUANTITY; i++)
 //         {
 //             current_number = rand() % 1000;
 //             clock_gettime(CLOCK_MONOTONIC, &start_time);
@@ -201,7 +201,7 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 //             // exit_code = delete_tree_node(&root, current_number, &stub);
 //         }
 
-//         for (size_t i = 0; exit_code == OK_CODE && i < TESTS_QUANTITY; i++)
+//         for (size_t i = 0; exit_code == SUCCESS_CODE && i < TESTS_QUANTITY; i++)
 //         {
 //             current_number = rand() % 1000;
 //             clock_gettime(CLOCK_MONOTONIC, &start_time);
@@ -210,7 +210,7 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 //             total_file_time_ns += (end_time.tv_sec - start_time.tv_sec) * 1e9 + (end_time.tv_nsec - start_time.tv_nsec);
 //         }
 
-//         if (exit_code == OK_CODE)
+//         if (exit_code == SUCCESS_CODE)
 //         {
 //             average_tree_time_ns = total_tree_time_ns / TESTS_QUANTITY;
 //             average_file_time_ns = total_file_time_ns / TESTS_QUANTITY;
@@ -223,9 +223,9 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 //     return exit_code;
 // }
 
-// result_t compare_tree_types(tree_node_t **root)
+// status_t compare_tree_types(tree_node_t **root)
 // {
-//     result_t exit_code = OK_CODE;
+//     status_t exit_code = SUCCESS_CODE;
 
 //     struct timespec start_time, end_time;
 //     double total_degenerate_time_ns = 0, total_balanced_time_ns = 0, total_random_time_ns = 0; 
@@ -234,10 +234,10 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 //     // bool stub = false;
 //     srand((unsigned) time(NULL));
 
-//     if (exit_code == OK_CODE)
+//     if (exit_code == SUCCESS_CODE)
 //     {
 //         exit_code = make_tree_from_file(root, "balanced_tree.txt");
-//         for (size_t i = 0; exit_code == OK_CODE && i < TESTS_QUANTITY; i++)
+//         for (size_t i = 0; exit_code == SUCCESS_CODE && i < TESTS_QUANTITY; i++)
 //         {
 //             current_number = rand() % 63 + 1;
 //             clock_gettime(CLOCK_MONOTONIC, &start_time);
@@ -248,7 +248,7 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 //         }
 
 //         exit_code = make_tree_from_file(root, "degenerate_tree.txt");
-//         for (size_t i = 0; exit_code == OK_CODE && i < TESTS_QUANTITY; i++)
+//         for (size_t i = 0; exit_code == SUCCESS_CODE && i < TESTS_QUANTITY; i++)
 //         {
 //             current_number = rand() % 63 + 1;
 //             clock_gettime(CLOCK_MONOTONIC, &start_time);
@@ -258,7 +258,7 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 //         }
 
 //         exit_code = make_tree_from_file(root, "random_tree.txt");
-//         for (size_t i = 0; exit_code == OK_CODE && i < TESTS_QUANTITY; i++)
+//         for (size_t i = 0; exit_code == SUCCESS_CODE && i < TESTS_QUANTITY; i++)
 //         {
 //             current_number = rand() % 63 + 1;
 //             clock_gettime(CLOCK_MONOTONIC, &start_time);
@@ -267,7 +267,7 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 //             total_random_time_ns += (end_time.tv_sec - start_time.tv_sec) * 1e9 + (end_time.tv_nsec - start_time.tv_nsec);
 //         }
 
-//         if (exit_code == OK_CODE)
+//         if (exit_code == SUCCESS_CODE)
 //         {
 //             average_balanced_time_ns = total_balanced_time_ns / TESTS_QUANTITY;
 //             average_degenerate_time_ns = total_degenerate_time_ns / TESTS_QUANTITY;
@@ -279,9 +279,9 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 //     return exit_code;
 // }
 
-// result_t compare_tree_types_2(tree_node_t **root)
+// status_t compare_tree_types_2(tree_node_t **root)
 // {
-//     result_t exit_code = OK_CODE;
+//     status_t exit_code = SUCCESS_CODE;
 
 //     struct timespec start_time, end_time;
 //     double total_degenerate_time_ns = 0, total_balanced_time_ns = 0, total_random_time_ns = 0; 
@@ -289,10 +289,10 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 //     // bool stub = false;
 //     srand((unsigned) time(NULL));
 
-//     if (exit_code == OK_CODE)
+//     if (exit_code == SUCCESS_CODE)
 //     {
 //         exit_code = make_tree_from_file(root, "balanced_tree.txt");
-//         for (size_t i = 0; exit_code == OK_CODE && i < TESTS_QUANTITY; i++)
+//         for (size_t i = 0; exit_code == SUCCESS_CODE && i < TESTS_QUANTITY; i++)
 //         {
 //             clock_gettime(CLOCK_MONOTONIC, &start_time);
 //             infix(*root);
@@ -302,7 +302,7 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 //         }
 
 //         exit_code = make_tree_from_file(root, "degenerate_tree.txt");
-//         for (size_t i = 0; exit_code == OK_CODE && i < TESTS_QUANTITY; i++)
+//         for (size_t i = 0; exit_code == SUCCESS_CODE && i < TESTS_QUANTITY; i++)
 //         {
 //             clock_gettime(CLOCK_MONOTONIC, &start_time);
 //             infix(*root);
@@ -311,7 +311,7 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 //         }
 
 //         exit_code = make_tree_from_file(root, "random_tree.txt");
-//         for (size_t i = 0; exit_code == OK_CODE && i < TESTS_QUANTITY; i++)
+//         for (size_t i = 0; exit_code == SUCCESS_CODE && i < TESTS_QUANTITY; i++)
 //         {
 //             clock_gettime(CLOCK_MONOTONIC, &start_time);
 //             infix(*root);
@@ -319,7 +319,7 @@ result_t process_current_option(menu_option_t current_option, bst_node_t **bst_r
 //             total_random_time_ns += (end_time.tv_sec - start_time.tv_sec) * 1e9 + (end_time.tv_nsec - start_time.tv_nsec);
 //         }
 
-//         if (exit_code == OK_CODE)
+//         if (exit_code == SUCCESS_CODE)
 //         {
 //             average_balanced_time_ns = total_balanced_time_ns / TESTS_QUANTITY;
 //             average_degenerate_time_ns = total_degenerate_time_ns / TESTS_QUANTITY;

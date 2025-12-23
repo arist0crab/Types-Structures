@@ -8,7 +8,7 @@
 
 int main(void)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     menu_option_t current_option = 1;
 
     bst_node_t *bst_root = NULL;
@@ -21,7 +21,7 @@ int main(void)
 
     print_menu();
 
-    while (((exit_code = input_menu_option(&current_option)) == OK_CODE) && current_option)
+    while (((exit_code = input_menu_option(&current_option)) == SUCCESS_CODE) && current_option)
     {
         exit_code = process_current_option(current_option, &bst_root, &avl_root, &chaining_hst, &open_hst);
         print_result(exit_code);

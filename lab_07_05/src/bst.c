@@ -1,10 +1,10 @@
 #include "../inc/bst.h"
 
-typedef result_t (*rotation_function_t)(bst_node_t *root, bst_node_t **result_root);
+typedef status_t (*rotation_function_t)(bst_node_t *root, bst_node_t **result_root);
 
-result_t create_bst_node(bst_node_t **new_tree_node, const char *word)
+status_t create_bst_node(bst_node_t **new_tree_node, const char *word)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     if (!new_tree_node)
         exit_code = INVALID_PTR_CODE;
@@ -16,7 +16,7 @@ result_t create_bst_node(bst_node_t **new_tree_node, const char *word)
             exit_code = MEMORY_ERR_CODE;
     }
 
-    if (exit_code == OK_CODE)
+    if (exit_code == SUCCESS_CODE)
     {
         (*new_tree_node)->word = str_dynamic_copy(word);
         (*new_tree_node)->count = 1;
@@ -27,9 +27,9 @@ result_t create_bst_node(bst_node_t **new_tree_node, const char *word)
     return exit_code;
 }
 
-result_t insert_bst_node(bst_node_t **root, const char *word)
+status_t insert_bst_node(bst_node_t **root, const char *word)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     if (!root)
         exit_code = INVALID_PTR_CODE;
@@ -45,9 +45,9 @@ result_t insert_bst_node(bst_node_t **root, const char *word)
     return exit_code;
 }
 
-result_t make_bst_from_file(bst_node_t **root, const char *filename)
+status_t make_bst_from_file(bst_node_t **root, const char *filename)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     char buffer[MAX_STRING_LENGTH];
 
     if (!root || !filename)
@@ -61,9 +61,10 @@ result_t make_bst_from_file(bst_node_t **root, const char *filename)
         }
 
         FILE *file = NULL;
-        if (safe_open_file(filename, &file) == OK_CODE)
+        exit_code = safe_open_file(filename, &file);
+        if (exit_code == SUCCESS_CODE)
         {
-            while ((exit_code == OK_CODE) && (fscanf(file, "%s", buffer) == 1))
+            while ((exit_code == SUCCESS_CODE) && (fscanf(file, "%s", buffer) == 1))
                 exit_code = insert_bst_node(root, buffer);
             fclose(file);
         }
@@ -72,9 +73,9 @@ result_t make_bst_from_file(bst_node_t **root, const char *filename)
     return exit_code;
 }
 
-result_t delete_bst_node(bst_node_t **root, const char *word, bool *to_del_found)
+status_t delete_bst_node(bst_node_t **root, const char *word, bool *to_del_found)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     bst_node_t *temp_root = NULL;
     bst_node_t *min_parent = NULL;
 
@@ -119,9 +120,9 @@ result_t delete_bst_node(bst_node_t **root, const char *word, bool *to_del_found
     return exit_code;
 }
 
-result_t find_word_in_bst(bst_node_t **root, const char *word, bool flag, int *comparisons)
+status_t find_word_in_bst(bst_node_t **root, const char *word, bool flag, int *comparisons)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     bst_node_t *target_node = NULL;
 
     if (comparisons)
@@ -176,9 +177,9 @@ size_t tree_height(bst_node_t *root)
     return (left_h > right_h ? left_h : right_h) + 1;
 }
 
-result_t define_nodes_quantity_on_each_level(bst_node_t **root)
+status_t define_nodes_quantity_on_each_level(bst_node_t **root)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     if (!root)
         exit_code = INVALID_PTR_CODE;
@@ -232,20 +233,20 @@ void print_bst_branch(bst_node_t *node, char* prefix, int is_tail, char *color)
     }
 }
 
-result_t print_bst_rec(bst_node_t *root)
+status_t print_bst_rec(bst_node_t *root)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     if (!root)
         exit_code = EMPTY_TREE_CODE;
     
-    if (exit_code == OK_CODE) 
+    if (exit_code == SUCCESS_CODE) 
         printf("* %s (%d)\n", root->word, root->count);
     
-    if (exit_code == OK_CODE && root->right)
+    if (exit_code == SUCCESS_CODE && root->right)
         print_bst_branch(root->right, "", root->left == NULL, BLUE);
 
-    if (exit_code == OK_CODE && root->left)
+    if (exit_code == SUCCESS_CODE && root->left)
         print_bst_branch(root->left, "", 1, GREEN);
 
     return exit_code;

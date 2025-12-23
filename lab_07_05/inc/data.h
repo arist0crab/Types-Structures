@@ -12,7 +12,7 @@
 
 typedef enum
 {
-    OK_CODE,
+    SUCCESS_CODE,
     INPUT_ERR_CODE,
     INVALID_PTR_CODE,
     MEMORY_ERR_CODE,
@@ -21,7 +21,7 @@ typedef enum
     NOTHING_TO_DELETE_CODE,
     EMPTY_TREE_CODE,
     NOT_FOUND_CODE
-} result_t;
+} status_t;
 
 typedef enum
 {

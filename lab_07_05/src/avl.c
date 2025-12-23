@@ -1,6 +1,6 @@
 #include "../inc/avl.h"
 
-typedef result_t (*rotation_function_t)(avl_node_t *root, avl_node_t **result_root);
+typedef status_t (*rotation_function_t)(avl_node_t *root, avl_node_t **result_root);
 
 int get_height(avl_node_t *node)
 {
@@ -20,9 +20,9 @@ void update_height(avl_node_t *node)
         node->height = 1 + max(get_height(node->left), get_height(node->right));
 }
 
-result_t node_balance_factor(avl_node_t *root, int *balance_factor)
+status_t node_balance_factor(avl_node_t *root, int *balance_factor)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     if (!balance_factor)
         exit_code = INVALID_PTR_CODE;
@@ -32,9 +32,9 @@ result_t node_balance_factor(avl_node_t *root, int *balance_factor)
     return exit_code;
 }
 
-result_t rotate_tree_right(avl_node_t *root, avl_node_t **result_root)
+status_t rotate_tree_right(avl_node_t *root, avl_node_t **result_root)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     avl_node_t *hanging_root = NULL;
     avl_node_t *new_root = NULL;
@@ -59,9 +59,9 @@ result_t rotate_tree_right(avl_node_t *root, avl_node_t **result_root)
     return exit_code;
 }
 
-result_t rotate_tree_left(avl_node_t *root, avl_node_t **result_root)
+status_t rotate_tree_left(avl_node_t *root, avl_node_t **result_root)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     avl_node_t *hanging_root = NULL;
     avl_node_t *new_root = NULL;
@@ -86,25 +86,25 @@ result_t rotate_tree_left(avl_node_t *root, avl_node_t **result_root)
     return exit_code;
 }
 
-result_t rotate_tree_twice(avl_node_t **root, avl_node_t **subroot, rotation_function_t first_rotation, rotation_function_t second_rotation)
+status_t rotate_tree_twice(avl_node_t **root, avl_node_t **subroot, rotation_function_t first_rotation, rotation_function_t second_rotation)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     if (!root || !subroot)
         exit_code = INVALID_PTR_CODE;
     else
     {
         exit_code = first_rotation(*subroot, subroot);
-        if (exit_code == OK_CODE)
+        if (exit_code == SUCCESS_CODE)
             exit_code = second_rotation(*root, root);
     }
 
     return exit_code;
 }
 
-result_t balance_node(avl_node_t **root)
+status_t balance_node(avl_node_t **root)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     int balance_factor = 0, left_balance_factor = 0, right_balance_factor = 0;
 
     if (!root)
@@ -113,33 +113,33 @@ result_t balance_node(avl_node_t **root)
     {
         exit_code = node_balance_factor(*root, &balance_factor);
         
-        if ((exit_code == OK_CODE) && (balance_factor > 1))
+        if ((exit_code == SUCCESS_CODE) && (balance_factor > 1))
         {
             exit_code = node_balance_factor((*root)->left, &left_balance_factor);
-            if ((exit_code == OK_CODE) && (left_balance_factor < 0))
+            if ((exit_code == SUCCESS_CODE) && (left_balance_factor < 0))
                 exit_code = rotate_tree_twice(root, &(*root)->left, rotate_tree_left, rotate_tree_right);
-            else if (exit_code == OK_CODE)
+            else if (exit_code == SUCCESS_CODE)
                 exit_code = rotate_tree_right(*root, root);
         }
-        if ((exit_code == OK_CODE) && (balance_factor < - 1))
+        if ((exit_code == SUCCESS_CODE) && (balance_factor < - 1))
         {
             exit_code = node_balance_factor((*root)->right, &right_balance_factor);
-            if ((exit_code == OK_CODE) && (right_balance_factor > 0))
+            if ((exit_code == SUCCESS_CODE) && (right_balance_factor > 0))
                 exit_code = rotate_tree_twice(root, &(*root)->right, rotate_tree_right, rotate_tree_left);
-            else if (exit_code == OK_CODE)
+            else if (exit_code == SUCCESS_CODE)
                 exit_code = rotate_tree_left(*root, root);
         }
 
-        if (exit_code == OK_CODE)
+        if (exit_code == SUCCESS_CODE)
             update_height(*root);
     }
 
     return exit_code;
 }
 
-result_t create_avl_node(avl_node_t **new_tree_node, const char *word)
+status_t create_avl_node(avl_node_t **new_tree_node, const char *word)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     if (!new_tree_node)
         exit_code = INVALID_PTR_CODE;
@@ -151,7 +151,7 @@ result_t create_avl_node(avl_node_t **new_tree_node, const char *word)
             exit_code = MEMORY_ERR_CODE;
     }
 
-    if (exit_code == OK_CODE)
+    if (exit_code == SUCCESS_CODE)
     {
         (*new_tree_node)->word = str_dynamic_copy(word);
         (*new_tree_node)->count = 1;
@@ -163,9 +163,9 @@ result_t create_avl_node(avl_node_t **new_tree_node, const char *word)
     return exit_code;
 }
 
-result_t insert_avl_node(avl_node_t **root, const char *word)
+status_t insert_avl_node(avl_node_t **root, const char *word)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     if (!root)
         exit_code = INVALID_PTR_CODE;
@@ -178,7 +178,7 @@ result_t insert_avl_node(avl_node_t **root, const char *word)
     else
         (*root)->count++;
 
-    if (exit_code == OK_CODE)
+    if (exit_code == SUCCESS_CODE)
     {
         update_height(*root);
         exit_code = balance_node(root);
@@ -188,9 +188,9 @@ result_t insert_avl_node(avl_node_t **root, const char *word)
     return exit_code;
 }
 
-result_t make_avl_from_file(avl_node_t **root, const char *filename)
+status_t make_avl_from_file(avl_node_t **root, const char *filename)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     char buffer[MAX_STRING_LENGTH];
 
     if (!root || !filename)
@@ -204,9 +204,10 @@ result_t make_avl_from_file(avl_node_t **root, const char *filename)
         }
 
         FILE *file = NULL;
-        if (safe_open_file(filename, &file) == OK_CODE)
+        exit_code = safe_open_file(filename, &file);
+        if (exit_code == SUCCESS_CODE)
         {
-            while ((exit_code == OK_CODE) && (fscanf(file, "%s", buffer) == 1))
+            while ((exit_code == SUCCESS_CODE) && (fscanf(file, "%s", buffer) == 1))
                 exit_code = insert_avl_node(root, buffer);
             fclose(file);
         }
@@ -255,20 +256,20 @@ void print_avl_branch(avl_node_t *node, char* prefix, int is_tail, char *color)
     }
 }
 
-result_t print_avl_rec(avl_node_t *root)
+status_t print_avl_rec(avl_node_t *root)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     if (!root)
         exit_code = EMPTY_TREE_CODE;
     
-    if (exit_code == OK_CODE) 
+    if (exit_code == SUCCESS_CODE) 
         printf("* %s (%d)\n", root->word, root->count);
     
-    if (exit_code == OK_CODE && root->right)
+    if (exit_code == SUCCESS_CODE && root->right)
         print_avl_branch(root->right, "", root->left == NULL, BLUE);
 
-    if (exit_code == OK_CODE && root->left)
+    if (exit_code == SUCCESS_CODE && root->left)
         print_avl_branch(root->left, "", 1, GREEN);
 
     return exit_code;
@@ -280,9 +281,9 @@ void print_avl(avl_node_t *root)
         printf("Дерево пустое.\n");
 }
 
-result_t delete_avl_node(avl_node_t **root, const char *word, bool *to_del_found)
+status_t delete_avl_node(avl_node_t **root, const char *word, bool *to_del_found)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     avl_node_t *temp_root = NULL;
     avl_node_t *min_parent = NULL;
 
@@ -323,7 +324,7 @@ result_t delete_avl_node(avl_node_t **root, const char *word, bool *to_del_found
                 free(temp_root);
             }
         }
-        if (exit_code == OK_CODE && *root)
+        if (exit_code == SUCCESS_CODE && *root)
         {
             update_height(*root);
             exit_code = balance_node(root);
@@ -333,9 +334,9 @@ result_t delete_avl_node(avl_node_t **root, const char *word, bool *to_del_found
     return exit_code;
 }
 
-result_t find_word_in_avl(avl_node_t **root, const char *word, bool flag, int *comparisons)
+status_t find_word_in_avl(avl_node_t **root, const char *word, bool flag, int *comparisons)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     avl_node_t *target_node = NULL;
 
     if (comparisons)

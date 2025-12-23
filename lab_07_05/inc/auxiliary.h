@@ -8,8 +8,8 @@
 
 // TODO добавить doxygen
 char *str_dynamic_copy(const char *s);
-result_t safe_open_file(const char *filename, FILE **filestream);
-result_t free_words_arr(char ***words_arr, size_t arr_length);
-result_t get_words_arr_from_file(const char *filename, char ***words_arr, size_t *arr_length);
+status_t safe_open_file(const char *filename, FILE **filestream);
+status_t free_words_arr(char ***words_arr, size_t arr_length);
+status_t get_words_arr_from_file(const char *filename, char ***words_arr, size_t *arr_length);
 
 #endif

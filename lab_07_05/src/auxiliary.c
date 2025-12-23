@@ -1,9 +1,9 @@
 #include "../inc/auxiliary.h"
 
 
-result_t get_words_arr_from_file(const char *filename, char ***words_arr, size_t *arr_length)
+status_t get_words_arr_from_file(const char *filename, char ***words_arr, size_t *arr_length)
 {
-    result_t ec = OK_CODE;
+    status_t ec = SUCCESS_CODE;
     char buf[MAX_STRING_LENGTH];
     FILE *filestream = NULL;
     size_t index = 0;
@@ -11,17 +11,17 @@ result_t get_words_arr_from_file(const char *filename, char ***words_arr, size_t
     if (!filename || !words_arr || !arr_length)
         ec = INVALID_PTR_CODE;
 
-    if (ec == OK_CODE)
+    if (ec == SUCCESS_CODE)
     {
         *arr_length = 0;
         *words_arr = NULL;
         ec = safe_open_file((char *)filename, &filestream);
     }
 
-    while (ec == OK_CODE && fscanf(filestream, "%s", buf) == 1)
+    while (ec == SUCCESS_CODE && fscanf(filestream, "%s", buf) == 1)
         (*arr_length)++;
 
-    if (ec == OK_CODE)
+    if (ec == SUCCESS_CODE)
     {
         rewind(filestream);   
         *words_arr = malloc(*arr_length * sizeof(char *)); 
@@ -29,7 +29,7 @@ result_t get_words_arr_from_file(const char *filename, char ***words_arr, size_t
             ec = MEMORY_ERR_CODE;
     }
 
-    for (; ec == OK_CODE && index < *arr_length; index++)
+    for (; ec == SUCCESS_CODE && index < *arr_length; index++)
     {
         fscanf(filestream, "%s", buf);
         (*words_arr)[index] = str_dynamic_copy(buf);
@@ -52,18 +52,18 @@ result_t get_words_arr_from_file(const char *filename, char ***words_arr, size_t
     return ec;
 }
 
-result_t free_words_arr(char ***words_arr, size_t arr_length)
+status_t free_words_arr(char ***words_arr, size_t arr_length)
 {
-    result_t ec = OK_CODE;
+    status_t ec = SUCCESS_CODE;
 
     if (!words_arr || !*words_arr)
         ec = INVALID_PTR_CODE;
         
-    for (size_t i = 0; ec == OK_CODE && i < arr_length; i++)
+    for (size_t i = 0; ec == SUCCESS_CODE && i < arr_length; i++)
         if ((*words_arr)[i])
             free((*words_arr)[i]);
 
-    if (ec == OK_CODE)
+    if (ec == SUCCESS_CODE)
     {
         free(*words_arr);
         *words_arr = NULL;
@@ -73,14 +73,14 @@ result_t free_words_arr(char ***words_arr, size_t arr_length)
 }
 
 
-result_t safe_open_file(const char *filename, FILE **filestream)
+status_t safe_open_file(const char *filename, FILE **filestream)
 {
-    result_t ec = OK_CODE;
+    status_t ec = SUCCESS_CODE;
 
     if (!filename || filename[0] == '\0' || !filestream)
         ec = INVALID_PTR_CODE;
 
-    if (ec == OK_CODE)
+    if (ec == SUCCESS_CODE)
     {
         *filestream = fopen(filename, "r");
         if (*filestream == NULL)

@@ -6,9 +6,9 @@ void clear_input_buffer(void)
     while ((c = getchar()) != '\n' && c != EOF) { }
 }
 
-result_t input_menu_option(menu_option_t *current_option)
+status_t input_menu_option(menu_option_t *current_option)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     int temp;
 
     printf("Выберите пункт меню: ");
@@ -26,9 +26,9 @@ result_t input_menu_option(menu_option_t *current_option)
     return exit_code;
 }
 
-result_t input_filename(char *filename)
+status_t input_filename(char *filename)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     printf("Введите имя файла: ");
 
@@ -40,9 +40,9 @@ result_t input_filename(char *filename)
     return exit_code;
 }
 
-result_t input_integer(int *number)
+status_t input_integer(int *number)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     printf("Введите целое число: ");
 
@@ -54,30 +54,30 @@ result_t input_integer(int *number)
     return exit_code;
 }
 
-result_t input_string(char **word, char *message)
+status_t input_string(char **word, char *message)
 {
-    result_t ec = OK_CODE;
+    status_t ec = SUCCESS_CODE;
     char buffer[MAX_STRING_LENGTH];
     char extra;
 
     if (!word)
         ec = INVALID_PTR_CODE;
 
-    if (ec == OK_CODE)
+    if (ec == SUCCESS_CODE)
     {
         printf("%s",message);
         if (scanf("%s", buffer) != 1)
             ec = INPUT_ERR_CODE;
     }
 
-    if (ec == OK_CODE)
+    if (ec == SUCCESS_CODE)
     {
         *word = malloc(strlen(buffer) + 1);
         if (!(*word))
             ec = MEMORY_ERR_CODE;
     }
 
-    if (ec == OK_CODE)
+    if (ec == SUCCESS_CODE)
         strcpy(*word, buffer);
 
     // чистим буфер
@@ -86,9 +86,9 @@ result_t input_string(char **word, char *message)
     return ec;
 }
 
-result_t input_size(size_t *number)
+status_t input_size(size_t *number)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     printf("Введите размер (натуральное число): ");
 
@@ -100,15 +100,15 @@ result_t input_size(size_t *number)
     return exit_code;
 }
 
-result_t add_number_to_file(const char *filename, const int number)
+status_t add_number_to_file(const char *filename, const int number)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     FILE *file = NULL;
 
     if (!(file = fopen(filename, "a")))
         exit_code = FILE_OPEN_ERR_CODE;
 
-    if (exit_code == OK_CODE)
+    if (exit_code == SUCCESS_CODE)
         fprintf(file, " %d", number);
 
     fclose(file);
@@ -116,9 +116,9 @@ result_t add_number_to_file(const char *filename, const int number)
     return exit_code;
 }
 
-result_t get_integers_from_file(const char *filename, int **arr, size_t *arr_length)
+status_t get_integers_from_file(const char *filename, int **arr, size_t *arr_length)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     FILE *filestream = NULL;
     int x;
     size_t index = 0;
@@ -133,7 +133,7 @@ result_t get_integers_from_file(const char *filename, int **arr, size_t *arr_len
     if (!filestream)
         return FILE_OPEN_ERR_CODE;
 
-    if (exit_code != OK_CODE)
+    if (exit_code != SUCCESS_CODE)
         return exit_code;
 
     while (fscanf(filestream, "%d", &x) == 1)
@@ -141,7 +141,7 @@ result_t get_integers_from_file(const char *filename, int **arr, size_t *arr_len
 
     if (*arr_length == 0) {
         fclose(filestream);
-        return OK_CODE;
+        return SUCCESS_CODE;
     }
 
     *arr = malloc(*arr_length * sizeof(int));
@@ -166,12 +166,12 @@ result_t get_integers_from_file(const char *filename, int **arr, size_t *arr_len
         return FILE_READ_ERR_CODE;
     }
 
-    return OK_CODE;
+    return SUCCESS_CODE;
 }
 
-result_t get_words_from_file(const char *filename, char ***arr, size_t *arr_length)
+status_t get_words_from_file(const char *filename, char ***arr, size_t *arr_length)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     FILE *filestream = NULL;
     char buffer[MAX_STRING_LENGTH];
     size_t index = 0;
@@ -188,14 +188,14 @@ result_t get_words_from_file(const char *filename, char ***arr, size_t *arr_leng
             exit_code = FILE_OPEN_ERR_CODE;
     }
 
-    if (exit_code == OK_CODE)
+    if (exit_code == SUCCESS_CODE)
     {
         while (fscanf(filestream, "%s", buffer) == 1)
             (*arr_length)++;
 
         if (*arr_length == 0) {
             fclose(filestream);
-            return OK_CODE;
+            return SUCCESS_CODE;
         }
 
         *arr = malloc(*arr_length * sizeof(char *));
@@ -205,13 +205,13 @@ result_t get_words_from_file(const char *filename, char ***arr, size_t *arr_leng
         }
     }
 
-    if (exit_code == OK_CODE)
+    if (exit_code == SUCCESS_CODE)
     {
 
         rewind(filestream);
         index = 0;
 
-        while ((exit_code == OK_CODE) && index < *arr_length && fscanf(filestream, "%s", buffer) == 1) {
+        while ((exit_code == SUCCESS_CODE) && index < *arr_length && fscanf(filestream, "%s", buffer) == 1) {
             (*arr)[index] = str_dynamic_copy(buffer);  
             if (!(*arr)[index]) {
                 for (size_t i = 0; i < index; i++)
@@ -228,7 +228,7 @@ result_t get_words_from_file(const char *filename, char ***arr, size_t *arr_leng
         fclose(filestream);
     }
 
-    if (exit_code == OK_CODE)
+    if (exit_code == SUCCESS_CODE)
     {
         if (index < *arr_length) {
             for (size_t i = 0; i < index; i++)

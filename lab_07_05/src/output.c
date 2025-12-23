@@ -41,11 +41,11 @@ void print_menu(void)
     printf("%s", RESET);
 }
 
-void print_result(const result_t exit_code)
+void print_result(const status_t exit_code)
 {
     switch (exit_code)
     {
-        case OK_CODE:
+        case SUCCESS_CODE:
             printf(GREEN_BOLD "Успех!\n" RESET);
             break;
 
@@ -111,9 +111,9 @@ void print_compare_trees_table_2(double average_balanced_time_ns, double average
     printf("+======================================================================+\n");
 }
 
-result_t print_chaining_hash_table(const hst_chaining_t *table)
+status_t print_chaining_hash_table(const hst_chaining_t *table)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
     hash_node_t *current = NULL;
     bool first_in_chain = true;
 
@@ -121,7 +121,7 @@ result_t print_chaining_hash_table(const hst_chaining_t *table)
         exit_code = INVALID_PTR_CODE;
     else if (table->count == 0)
         printf("Таблица пуста!\n");  
-    else if (exit_code == OK_CODE)
+    else if (exit_code == SUCCESS_CODE)
     {
         printf("%s", BLUE);
         printf("╔═════════════════════════════════════════════════════════════╗\n");
@@ -130,7 +130,7 @@ result_t print_chaining_hash_table(const hst_chaining_t *table)
         printf("║ Размер: %6d ║ Элементов: %6d ║ Загруженность: %3.1f%%   ║\n", table->size, table->count, (double)table->count / table->size * 100);
         printf("╠════════════════╬═══════════════════╬════════════════════════╣\n");
 
-        for (int i = 0; exit_code == OK_CODE && i < table->size; i++)
+        for (int i = 0; exit_code == SUCCESS_CODE && i < table->size; i++)
         {
             if (table->table[i])
             {                
@@ -157,15 +157,15 @@ result_t print_chaining_hash_table(const hst_chaining_t *table)
     return exit_code;
 }
 
-result_t print_open_hash_table(const hst_open_t *table)
+status_t print_open_hash_table(const hst_open_t *table)
 {
-    result_t exit_code = OK_CODE;
+    status_t exit_code = SUCCESS_CODE;
 
     if (!table)
         exit_code = INVALID_PTR_CODE;
     else if (table->count == 0)
         printf("Таблица пуста!\n");
-    else if (exit_code == OK_CODE)
+    else if (exit_code == SUCCESS_CODE)
     {
         printf("%s", BLUE);
         printf("╔═════════════════════════════════════════════════════════════╗\n");
@@ -176,7 +176,7 @@ result_t print_open_hash_table(const hst_open_t *table)
                (double)table->count / table->size * 100);
         printf("╠════════════════╬═══════════════════╬════════════════════════╣\n");
 
-        for (int i = 0; exit_code == OK_CODE && i < table->size; i++)
+        for (int i = 0; exit_code == SUCCESS_CODE && i < table->size; i++)
         {
             printf("| %10d | ", i);
 
