@@ -178,67 +178,69 @@ comparison_results_t compare_structures(bst_node_t *bst_root, avl_node_t *avl_ro
 
 void print_comparison_results(comparison_results_t *results)
 {
-    printf("\n|==========================================================================|\n");
-    printf("|                     СРАВНЕНИЕ СТРУКТУР ДАННЫХ                            |\n");
-    printf("|==============================|==========|==========|==========|==========|\n");
-    printf("|           Параметр           |   BST    |   AVL    | Hash(Цеп)|Hash(Откр)|\n");
-    printf("|==============================|==========|==========|==========|==========|\n");
+    printf("%s", BLUE);
+    printf("╔══════════════════════════════════════════════════════════════════════════╗\n");
+    printf("║                     СРАВНЕНИЕ СТРУКТУР ДАННЫХ                            ║\n");
+    printf("╠══════════════════════════════╦══════════╦══════════╦══════════╦══════════╣\n");
+    printf("║           Параметр           ║   BST    ║   AVL    ║ Hash(Цеп)║Hash(Откр)║\n");
+    printf("╠══════════════════════════════╬══════════╬══════════╬══════════╬══════════╣\n");
 
-    printf("| Время поиска (nsc)           | %8.4f | %8.4f | %8.4f | %8.4f |\n", results->bst_search_time,
+    printf("║ Время поиска (nsc)           ║ %8.4f ║ %8.4f ║ %8.4f ║ %8.4f ║\n", results->bst_search_time,
            results->avl_search_time, results->hash_chaining_search_time, results->hash_open_search_time);
 
     printf("║ Ср. сравнений на поиск       ║ %8d ║ %8d ║ %8d ║ %8d ║\n", results->bst_comparisons,
            results->avl_comparisons, results->hash_chaining_comparisons, results->hash_open_comparisons);
 
-    printf("| Исп. память (байт)           | %8zu | %8zu | %8zu | %8zu |\n", results->bst_memory, results->avl_memory,
+    printf("║ Исп. память (байт)           ║ %8zu ║ %8zu ║ %8zu ║ %8zu ║\n", results->bst_memory, results->avl_memory,
            results->hash_chaining_memory, results->hash_open_memory);
 
-    printf("| Высота/Загруженность         | %8d | %8d | %7.1f%% | %7.1f%% |\n", results->bst_height,
+    printf("║ Высота/Загруженность         ║ %8d ║ %8d ║ %7.1f%% ║ %7.1f%% ║\n", results->bst_height,
            results->avl_height, results->hash_chaining_load_factor * 100, results->hash_open_load_factor * 100);
 
-    printf("|==============================|==========|==========|==========|==========|\n");
+    printf("╠══════════════════════════════╩══════════╩══════════╩══════════╩══════════╣\n");
 
-    printf("|                            ЛУЧШИЙ РЕЗУЛЬТАТ                              |\n");
+    printf("║                            ЛУЧШИЙ РЕЗУЛЬТАТ                              ║\n");
 
     if (results->bst_search_time <= results->avl_search_time &&
         results->bst_search_time <= results->hash_chaining_search_time &&
         results->bst_search_time <= results->hash_open_search_time)
     {
-        printf("| Быстрее всего: BST дерево                                                |\n");
+        printf("║ Быстрее всего: BST дерево                                                ║\n");
     }
     else if (results->avl_search_time <= results->hash_chaining_search_time &&
              results->avl_search_time <= results->hash_open_search_time)
     {
-        printf("| Быстрее всего: AVL дерево                                                |\n");
+        printf("║ Быстрее всего: AVL дерево                                                ║\n");
     }
     else if (results->hash_chaining_search_time <= results->hash_open_search_time)
     {
-        printf("| Быстрее всего: Хеш-таблица с цепочками                                   |\n");
+        printf("║ Быстрее всего: Хеш-таблица с цепочками                                   ║\n");
     }
     else
     {
-        printf("| Быстрее всего: Хеш-таблица с открытой адресацией                         |\n");
+        printf("║ Быстрее всего: Хеш-таблица с открытой адресацией                         ║\n");
     }
 
     if (results->bst_memory <= results->avl_memory && results->bst_memory <= results->hash_chaining_memory &&
         results->bst_memory <= results->hash_open_memory)
     {
-        printf("| Меньше памяти: BST дерево                                                |\n");
+        printf("║ Меньше памяти: BST дерево                                                ║\n");
     }
     else if (results->avl_memory <= results->hash_chaining_memory && results->avl_memory <= results->hash_open_memory)
     {
-        printf("| Меньше памяти: AVL дерево                                                |\n");
+        printf("║ Меньше памяти: AVL дерево                                                ║\n");
     }
     else if (results->hash_chaining_memory <= results->hash_open_memory)
     {
-        printf("| Меньше памяти: Хеш-таблица с цепочками                                   |\n");
+        printf("║ Меньше памяти: Хеш-таблица с цепочками                                   ║\n");
     }
     else
     {
-        printf("| Меньше памяти: Хеш-таблица с открытой адресацией                         |\n");
+        printf("║ Меньше памяти: Хеш-таблица с открытой адресацией                         ║\n");
     }
 
-    printf("|==========================================================================|\n");
+    printf("╚══════════════════════════════════════════════════════════════════════════╝\n");
+    printf("%s", RESET);
 }
 
 // void search_word_in_all_structures(bst_node_t *bst_root, avl_node_t *avl_root, hst_chaining_t *hash_chaining,
