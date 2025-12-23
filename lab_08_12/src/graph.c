@@ -164,7 +164,7 @@ status_t dijkstra_graph(graph_t *graph, size_t src, size_t **dist_out)
 status_t input_graph_from_file(graph_t *graph, FILE *filestream)
 {
     status_t ec = SUCCESS_CODE;
-    size_t t_distance = 0, cities_quantity = 0;
+    size_t cities_quantity = 0;
     char city1[MAX_STRING_LENGTH], city2[MAX_STRING_LENGTH];
     size_t indx1 = -1, indx2 = -1;
     size_t distance_1_to_2 = 0, distance_2_to_1 = 0;
@@ -174,9 +174,7 @@ status_t input_graph_from_file(graph_t *graph, FILE *filestream)
     if (graph->cities_names || graph->roads) free_graph(graph);
 
     rewind(filestream);
-    ec = read_size_from_file(filestream, &t_distance);
-    if (ec == SUCCESS_CODE)
-        ec = read_size_from_file(filestream, &cities_quantity);
+    ec = read_size_from_file(filestream, &cities_quantity);
 
     if (ec == SUCCESS_CODE && cities_quantity == 0)
         ec = ERR_RANGE;
