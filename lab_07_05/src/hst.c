@@ -183,6 +183,12 @@ void hash_table_delete_chaining(hst_chaining_t *ht, const char *word)
     hash_node_t *current = ht->table[index];
     hash_node_t *prev = NULL;
 
+    if (!current)
+    {
+        index = (current_hash_func == 1) ? hash_function2(word, ht->size) : hash_function1(word, ht->size);
+        current = ht->table[index];
+    }
+
     while (current)
     {
         if (!current->is_deleted && (strcmp(current->word, word) == 0))

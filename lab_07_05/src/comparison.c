@@ -10,63 +10,68 @@ long long get_time_ns()
     return (long long)ts.tv_sec * 1000000000LL + ts.tv_nsec;
 }
 
-size_t calculate_bst_memory(bst_node_t *root)
-{
-    if (root == NULL)
-        return 0;
-
-    size_t node_size = sizeof(bst_node_t);
-    return node_size + calculate_bst_memory(root->left) + calculate_bst_memory(root->right);
+size_t calculate_bst_memory(bst_node_t *root) {
+    if (!root) return 0;
+    
+    size_t total = sizeof(bst_node_t);
+    total += strlen(root->word) + 1;
+    total += calculate_bst_memory(root->left);
+    total += calculate_bst_memory(root->right);
+    
+    return total;
 }
 
-size_t calculate_avl_memory(avl_node_t *root)
-{
-    if (root == NULL)
-        return 0;
-
-    size_t node_size = sizeof(avl_node_t);
-    return node_size + calculate_avl_memory(root->left) + calculate_avl_memory(root->right);
+size_t calculate_avl_memory(avl_node_t *root) {
+    if (!root) return 0;
+    
+    size_t total = sizeof(avl_node_t);
+    total += strlen(root->word) + 1;
+    total += calculate_avl_memory(root->left);
+    total += calculate_avl_memory(root->right);
+    
+    return total;
 }
 
 size_t calculate_hash_chaining_memory(hst_chaining_t *ht)
 {
-    if (!ht)
-        return 0;
-
-    size_t memory = 0;
-
-    for (int i = 0; i < ht->size; i++)
-    {
+    if (!ht) return 0;
+    
+    size_t memory = sizeof(hst_chaining_t);         
+    memory += ht->size * sizeof(hash_node_t*);     
+    
+    for (int i = 0; i < ht->size; i++) {
         hash_node_t *current = ht->table[i];
-        while (current)
-        {
-            if (!current->is_deleted)
-            {
+        while (current) {
+            if (!current->is_deleted) {
                 memory += sizeof(hash_node_t);
+                memory += strlen(current->word) + 1;  
             }
             current = current->next;
         }
     }
-
+    
     return memory;
 }
+
 
 size_t calculate_hash_open_memory(hst_open_t *ht)
 {
-    if (!ht)
-        return 0;
-
-    size_t memory = 0;
-
-    memory += sizeof(hst_open_t);
-
-    memory += ht->size * sizeof(int); 
-    memory += ht->size * sizeof(int); 
-    memory += ht->size * sizeof(bool); 
-    memory += ht->size * sizeof(bool);
-
+    if (!ht) return 0;
+    
+    size_t memory = sizeof(hst_open_t);
+    
+    memory += ht->size * sizeof(char*);   
+    memory += ht->size * sizeof(int);     
+    memory += ht->size * sizeof(bool);    
+    memory += ht->size * sizeof(bool);   
+    
+    for (int i = 0; i < ht->size; i++)
+        if (ht->keys[i])
+            memory += strlen(ht->keys[i]) + 1;
+    
     return memory;
 }
+
 
 
 void collect_words(bst_node_t *root, char **words, int *idx)
