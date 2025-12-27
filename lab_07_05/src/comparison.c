@@ -47,7 +47,8 @@ size_t calculate_hash_chaining_memory(hst_chaining_t *ht)
     for (int i = 0; i < ht->size; i++) 
     {
         hash_node_t *current = ht->table[i];
-        while (current) {
+        while (current) 
+        {
             if (!current->is_deleted) 
             {
                 memory += sizeof(hash_node_t);
