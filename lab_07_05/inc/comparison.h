@@ -30,12 +30,8 @@ typedef struct
     double hash_open_load_factor;
 } comparison_results_t;
 
-comparison_results_t compare_structures(bst_node_t *bst_root, avl_node_t *avl_root, hst_chaining_t *hash_chaining,
-                                     hst_open_t *hash_open);
+comparison_results_t compare_structures(bst_node_t *bst_root, avl_node_t *avl_root, hst_chaining_t *hash_chaining, hst_open_t *hash_open);
 void print_comparison_results(comparison_results_t *results);
-void search_number_in_all_structures(bst_node_t *bst_root, avl_node_t *avl_root, hst_chaining_t *hash_chaining,
-                                   hst_open_t *hash_open, int number);
 void benchmark_structures(const char *filename, int hash_table_size);
-void test_different_collision_scenarios(void);
 
 #endif
