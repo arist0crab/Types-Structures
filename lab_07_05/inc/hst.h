@@ -47,8 +47,6 @@ unsigned int hash_function(const char *word, int table_size);
 void hash_table_insert_chaining(hst_chaining_t *ht, const char *word);
 hash_node_t *hash_table_search_chaining(hst_chaining_t *ht, const char *word, int *comparisons);
 void hash_table_delete_chaining(hst_chaining_t *ht, const char *word);
-void display_hash_table_chaining(hst_chaining_t *ht);
-void hash_table_statistics_chaining(hst_chaining_t *ht);
 void rehash_chaining(hst_chaining_t *ht);
 
 hst_open_t *create_hash_table_open(int size);
@@ -56,8 +54,6 @@ void free_hash_table_open(hst_open_t *ht);
 void hash_table_insert_open(hst_open_t *ht, const char *word);
 int hash_table_search_open(hst_open_t *ht, const char *word, int *comparisons);
 void hash_table_delete_open(hst_open_t *ht, const char *word);
-void display_hash_table_open(hst_open_t *ht);
-void hash_table_statistics_open(hst_open_t *ht);
 void rehash_open(hst_open_t *ht);
 
 double calculate_load_factor_chaining(hst_chaining_t *ht);
