@@ -353,12 +353,8 @@ void visualize_hash_table_chaining(hst_chaining_t *ht, const char *output_filena
                         if (!current->is_deleted)
                         {
                             fprintf(dot_file, "              <TR>\n");
-                            fprintf(dot_file, "                <TD BGCOLOR=\"%s\" ALIGN=\"CENTER\">\n",
-                                    (element_count % 2 == 0) ? "aliceblue" : "lavender");
-                            fprintf(dot_file, "                  <FONT POINT-SIZE=\"8\">%s (%d)</FONT><BR/>\n",
-                                    current->word, current->count);
-                            // FIXME: ???
-                            // fprintf(dot_file, "                  <FONT POINT-SIZE=\"7\">%zu</FONT>\n", current->tail_length);
+                            fprintf(dot_file, "                <TD BGCOLOR=\"%s\" ALIGN=\"CENTER\">\n", (element_count % 2 == 0) ? "aliceblue" : "lavender");
+                            fprintf(dot_file, "                  <FONT POINT-SIZE=\"8\">%s (%d)</FONT><BR/>\n", current->word, current->count);
                             fprintf(dot_file, "                </TD>\n");
                             fprintf(dot_file, "              </TR>\n");
                             element_count++;
